@@ -1,0 +1,216 @@
+{
+  "diagnostic_policy": "aggregate fixed-slice feedback only",
+  "labels_exposed_to_candidate": false,
+  "members": [
+    {
+      "leave_one_out_primary": 0.6047490104512825,
+      "marginal_contribution": 0.0013787381245744523,
+      "mechanism": "Validated legal ranking stack",
+      "node_id": "w001",
+      "operator_stack": [
+        "legal_rank_stack_v1"
+      ],
+      "rank_correlation_with_portfolio": 0.9488333954646948,
+      "slice_specialization": {
+        "member_advantages": [
+          {
+            "delta_primary": 0.003663163879399578,
+            "max_inclusive": 365,
+            "min_inclusive": 145,
+            "rows": 31162,
+            "slice": "train_item_popularity_quartile:q2",
+            "users": 14170
+          },
+          {
+            "delta_primary": -0.00023178954243718852,
+            "max_inclusive": 144,
+            "min_inclusive": null,
+            "rows": 31341,
+            "slice": "train_item_popularity_quartile:q1",
+            "users": 13329
+          },
+          {
+            "delta_primary": -0.0004796354896484667,
+            "max_inclusive": 35,
+            "min_inclusive": 17,
+            "rows": 24731,
+            "slice": "train_user_history_quartile:q2",
+            "users": 5563
+          }
+        ],
+        "member_disadvantages": [
+          {
+            "delta_primary": -0.036711203406393667,
+            "rows": 5170,
+            "slice": "tab=6",
+            "tab": 6,
+            "users": 2212
+          },
+          {
+            "delta_primary": -0.00677452341725393,
+            "rows": 13726,
+            "slice": "tab=0",
+            "tab": 0,
+            "users": 5579
+          },
+          {
+            "delta_primary": -0.005929808546605186,
+            "rows": 7877,
+            "slice": "tab=4",
+            "tab": 4,
+            "users": 4209
+          }
+        ]
+      },
+      "standalone_primary": 0.6049133715527031,
+      "weight": 0.4
+    },
+    {
+      "leave_one_out_primary": 0.6042290161841103,
+      "marginal_contribution": 0.0018987323917466492,
+      "mechanism": "CPU DeepFM + four engagement heads",
+      "node_id": "w002",
+      "operator_stack": [
+        "deepfm_engagement_mtl_v1"
+      ],
+      "rank_correlation_with_portfolio": 0.9652698430383465,
+      "slice_specialization": {
+        "member_advantages": [
+          {
+            "delta_primary": 0.003239660011574552,
+            "rows": 13726,
+            "slice": "tab=0",
+            "tab": 0,
+            "users": 5579
+          },
+          {
+            "delta_primary": 0.00036704383393448836,
+            "max_inclusive": null,
+            "min_inclusive": 857,
+            "rows": 31221,
+            "slice": "train_item_popularity_quartile:q4",
+            "users": 14215
+          },
+          {
+            "delta_primary": 7.808716445878439e-05,
+            "max_inclusive": 144,
+            "min_inclusive": null,
+            "rows": 31341,
+            "slice": "train_item_popularity_quartile:q1",
+            "users": 13329
+          }
+        ],
+        "member_disadvantages": [
+          {
+            "delta_primary": -0.035760181511351796,
+            "rows": 5170,
+            "slice": "tab=6",
+            "tab": 6,
+            "users": 2212
+          },
+          {
+            "delta_primary": -0.005860139823002153,
+            "rows": 3834,
+            "slice": "tab=2",
+            "tab": 2,
+            "users": 1126
+          },
+          {
+            "delta_primary": -0.002703376867769225,
+            "max_inclusive": 35,
+            "min_inclusive": 17,
+            "rows": 24731,
+            "slice": "train_user_history_quartile:q2",
+            "users": 5563
+          }
+        ]
+      },
+      "standalone_primary": 0.6047517554743435,
+      "weight": 0.4
+    },
+    {
+      "leave_one_out_primary": 0.6053678830866509,
+      "marginal_contribution": 0.0007598654892060352,
+      "mechanism": "Item/context LambdaRank",
+      "node_id": "w003",
+      "operator_stack": [
+        "item_lambdarank"
+      ],
+      "rank_correlation_with_portfolio": 0.9212491513178889,
+      "slice_specialization": {
+        "member_advantages": [
+          {
+            "delta_primary": -0.0021034284053189634,
+            "max_inclusive": 856,
+            "min_inclusive": 366,
+            "rows": 31185,
+            "slice": "train_item_popularity_quartile:q3",
+            "users": 14168
+          },
+          {
+            "delta_primary": -0.0036582053427719474,
+            "max_inclusive": 144,
+            "min_inclusive": null,
+            "rows": 31341,
+            "slice": "train_item_popularity_quartile:q1",
+            "users": 13329
+          },
+          {
+            "delta_primary": -0.0036731019882674243,
+            "max_inclusive": null,
+            "min_inclusive": 857,
+            "rows": 31221,
+            "slice": "train_item_popularity_quartile:q4",
+            "users": 14215
+          }
+        ],
+        "member_disadvantages": [
+          {
+            "delta_primary": -0.01749022029153391,
+            "rows": 13726,
+            "slice": "tab=0",
+            "tab": 0,
+            "users": 5579
+          },
+          {
+            "delta_primary": -0.009346696620826433,
+            "rows": 3834,
+            "slice": "tab=2",
+            "tab": 2,
+            "users": 1126
+          },
+          {
+            "delta_primary": -0.007196828166812441,
+            "max_inclusive": 365,
+            "min_inclusive": 145,
+            "rows": 31162,
+            "slice": "train_item_popularity_quartile:q2",
+            "users": 14170
+          }
+        ]
+      },
+      "standalone_primary": 0.6010575837714116,
+      "weight": 0.2
+    }
+  ],
+  "objective": "improve marginal portfolio primary; a candidate may succeed through standalone quality or robust complementary ordering",
+  "pairwise_diversity": [
+    {
+      "left": "w001",
+      "right": "w002",
+      "within_user_rank_correlation": 0.8928231594133691
+    },
+    {
+      "left": "w001",
+      "right": "w003",
+      "within_user_rank_correlation": 0.8224356227038319
+    },
+    {
+      "left": "w002",
+      "right": "w003",
+      "within_user_rank_correlation": 0.8327371603950816
+    }
+  ],
+  "selection_primary": 0.6061277485758569,
+  "status": "READY"
+}

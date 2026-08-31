@@ -1,0 +1,13 @@
+{
+  "action": null,
+  "gate": "static",
+  "info": {
+    "passed": [
+      "G0",
+      "G3",
+      "G2"
+    ]
+  },
+  "type": "GATE_PASS",
+  "violations": []
+}

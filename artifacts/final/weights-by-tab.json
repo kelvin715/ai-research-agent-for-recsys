@@ -1,0 +1,44 @@
+{
+  "portfolio_id": "validated_rank_router_v2",
+  "feature": "tab",
+  "test_label_free": true,
+  "fit_during_formal_run": false,
+  "verification_status": "VERIFIED",
+  "validation_primary": 0.6061277485758569,
+  "global_member_weights": {
+    "legal_rank_stack": 0.4,
+    "deepfm_engagement_mtl": 0.4,
+    "item_lambdarank": 0.2
+  },
+  "routes": {
+    "0": {
+      "legal_rank_stack": 0.1,
+      "deepfm_engagement_mtl": 0.6,
+      "item_lambdarank": 0.3
+    },
+    "1": {
+      "legal_rank_stack": 0.3,
+      "deepfm_engagement_mtl": 0.4,
+      "item_lambdarank": 0.3
+    },
+    "2": {
+      "legal_rank_stack": 0.9,
+      "deepfm_engagement_mtl": 0.0,
+      "item_lambdarank": 0.1
+    },
+    "4": {
+      "legal_rank_stack": 0.5,
+      "deepfm_engagement_mtl": 0.4,
+      "item_lambdarank": 0.1
+    },
+    "6": {
+      "legal_rank_stack": 0.0,
+      "deepfm_engagement_mtl": 0.3,
+      "item_lambdarank": 0.7
+    }
+  },
+  "minimum_validation_rows_per_route": 1000,
+  "weight_grid_step": 0.1,
+  "source": "empirical_priors/track2-solutions-valid-only-v1.json"
+}
+

@@ -1,0 +1,35 @@
+{
+  "run_id": "formal-router-gpt54-20260831-002",
+  "model": "gpt-5.4",
+  "validation": {
+    "gauc": 0.6733099778955616,
+    "ndcg_at_5": 0.5389455192561522,
+    "primary": 0.6061277485758569,
+    "run_reproduced_baseline_primary": 0.6018779688793552,
+    "delta_vs_run_reproduced_baseline": 0.004249779696501754
+  },
+  "hidden_test_one_time_post_freeze": {
+    "gauc_reported_4dp": 0.6666,
+    "ndcg_at_5_reported_4dp": 0.5317,
+    "primary_reported_4dp": 0.5991,
+    "official_baseline_primary_reported_4dp": 0.5946,
+    "delta_reported_4dp": 0.0045,
+    "used_for_selection": false
+  },
+  "resources": {
+    "logical_iterations": 4,
+    "llm_calls": 17,
+    "prompt_tokens": 101754,
+    "completion_tokens": 13891,
+    "total_tokens": 115645,
+    "wall_seconds": 1266.963,
+    "gpu_hours": 0,
+    "manual_interventions_after_start": 0
+  },
+  "submission": {
+    "path": "artifacts/final/submission.csv",
+    "rows": 170588,
+    "sha256": "eb1db430f8fdce35bcc3dd0c8eacc68565d3bc75dd667f841bc560816bc4aa50",
+    "official_format_check": "PASS"
+  }
+}

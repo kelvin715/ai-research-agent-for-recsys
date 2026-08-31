@@ -1,0 +1,68 @@
+{
+  "basis_type": "task_spec",
+  "estimated_cost_s": 60,
+  "evidence": [
+    {
+      "ref": "Trusted operator catalog applicable to this parent: legal_temporal_context, search_priority=\"first_round_exploit\"",
+      "type": "task_spec"
+    },
+    {
+      "ref": "features block calls SO.build_features(splits, train_idx, OP_CONFIG) and current OP_CONFIG has \"features\": []",
+      "type": "current_code"
+    },
+    {
+      "ref": "directional_feedback.tab includes delta_primary -0.009983512134817851 for tab 6 and positive deltas for tabs 0/2/4",
+      "type": "diagnostic"
+    }
+  ],
+  "evidence_adaptation": null,
+  "execution_mode": "operator",
+  "expected_observation": "Per-seed predictions differ from the parent, with strongest gains on context-heavy slices and positive paired portfolio contribution if temporal context repairs residual tab-specific misranking.",
+  "experiment_contract": {
+    "claim": "Trusted legal temporal context features improve the current DeepFM parent when consumed by SO.build_features and the unchanged DeepFM trainer.",
+    "expected_observable": "feature count and resulting predictions change relative to the current parent across seeds",
+    "falsification_condition": "No material prediction change or non-positive trusted paired validation effect versus the current parent/portfolio",
+    "forbidden_shortcuts": [
+      "changing only metadata or unused config keys outside the trusted operator path",
+      "using evaluation-period feedback as features",
+      "editing model/loss/train to introduce a different mechanism"
+    ],
+    "portfolio_role": "member_refinement",
+    "required_components": [
+      "features block updated through the legal_temporal_context operator",
+      "SO.build_features must append hour and strictly-earlier user-gap categorical columns",
+      "unchanged SO.train/SO.predict consume the expanded X matrices"
+    ]
+  },
+  "fallback": "If gains are negligible, move to a structurally different custom objective or an error-diverse branch rather than more scalar tuning.",
+  "hypothesis": "Adding legal temporal context fields that DeepFM can cross with user/item ids will improve within-user ranking and likely add marginal portfolio gain by correcting context-specific ordering errors without using any post-exposure inference feature.",
+  "implementation_plan": "Apply the trusted legal_temporal_context operator exactly as catalogued. This changes the features block only by configuring SO.build_features to append hour and strictly-earlier user exposure-gap buckets fit on selected train rows, leaving model/loss/train unchanged.",
+  "justification": "This is the mandated applicable first-round exploit for the baseline parent and is directly consumable by the current backend. DeepFM benefits from additional categorical context because its interaction mechanism is feature crossing; hour and prior-gap are legal pre-impression pair features that can alter ordering within a user while preserving leakage safety.",
+  "mechanism": "temporal-context categorical augmentation",
+  "mechanism_tags": [
+    "temporal",
+    "context",
+    "feature-cross",
+    "operator",
+    "fm"
+  ],
+  "observation": "The trusted operator catalog marks legal_temporal_context with search_priority=\"first_round_exploit\" and describes it as adding hour and strictly-earlier exposure-gap buckets without evaluation feedback. The current parent config has \"features\": [] so these fields are absent. The portfolio diagnostics show heterogeneous tab behavior, with fixed-slice directional feedback deltas of 0.012522871535952329 on tab 0, 0.017592661227471718 on tab 2, 0.006423778553562576 on tab 4, but -0.009983512134817851 on tab 6, suggesting context-conditioned residual error remains.",
+  "operator_id": "legal_temporal_context",
+  "parent_operator_stack": [
+    "deepfm_engagement_mtl_v1"
+  ],
+  "parent_references": [
+    "w002"
+  ],
+  "patch_scope": [
+    "features"
+  ],
+  "persona": "optimizer",
+  "primary_block": "features",
+  "research_evidence": [],
+  "research_nonuse_reason": "The operator catalog and backend contract are the most direct basis here. This is a trusted, parent-applicable exploit with explicit implementation support, so external research is unnecessary and less binding than the task-spec operator evidence.",
+  "risk": [
+    "Temporal buckets may overlap with existing latent context and add little signal",
+    "Extra categorical fields may slightly overfit or correlate too strongly with already-modeled ids"
+  ]
+}

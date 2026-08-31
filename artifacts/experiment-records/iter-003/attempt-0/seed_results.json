@@ -1,0 +1,110 @@
+[
+  {
+    "execution_mode": "parallel",
+    "gate": {
+      "action": null,
+      "gate": "G5",
+      "info": {
+        "error_class": null,
+        "n_rows": 124909
+      },
+      "type": "GATE_PASS",
+      "violations": []
+    },
+    "ok": true,
+    "pred": "runs/formal-router-gpt54-20260831-002/iter-003/attempt-0/s0/ws/pred.npy",
+    "sandbox": {
+      "cpu_s": 37.94,
+      "exit_code": 0,
+      "limits": {
+        "cpu_s": 3600,
+        "fsize_mb": 2048,
+        "mem_gb": 8,
+        "nproc": null,
+        "timeout_s": 900.0
+      },
+      "max_rss_mb": 462.1,
+      "ok": true,
+      "signal": null,
+      "stderr_path": "runs/formal-router-gpt54-20260831-002/iter-003/attempt-0/s0/logs/stderr.txt",
+      "stderr_tail": "",
+      "stdout_path": "runs/formal-router-gpt54-20260831-002/iter-003/attempt-0/s0/logs/stdout.txt",
+      "stdout_tail": "{\"training_epochs\": 3, \"checkpoint_policy\": \"fixed_train_budget\", \"operator_objective\": \"bpr_censored_watch\", \"operator_features\": [\"hour\", \"user_gap\"], \"operator_hp\": {\"aux_weight\": 0.1, \"batch\": 8192, \"epochs\": 3, \"k\": 32, \"l2\": 1e-06, \"lr\": 0.0005, \"n_neg\": 4}, \"split\": \"valid\", \"seed\": 0, \"n_rows\": 124909, \"feature_dim\": 40296, \"wall_s\": 38.0}\n",
+      "timed_out": false,
+      "wall_s": 38.1
+    },
+    "seed": 0
+  },
+  {
+    "execution_mode": "parallel",
+    "gate": {
+      "action": null,
+      "gate": "G5",
+      "info": {
+        "error_class": null,
+        "n_rows": 124909
+      },
+      "type": "GATE_PASS",
+      "violations": []
+    },
+    "ok": true,
+    "pred": "runs/formal-router-gpt54-20260831-002/iter-003/attempt-0/s1/ws/pred.npy",
+    "sandbox": {
+      "cpu_s": 37.86,
+      "exit_code": 0,
+      "limits": {
+        "cpu_s": 3600,
+        "fsize_mb": 2048,
+        "mem_gb": 8,
+        "nproc": null,
+        "timeout_s": 900.0
+      },
+      "max_rss_mb": 462.5,
+      "ok": true,
+      "signal": null,
+      "stderr_path": "runs/formal-router-gpt54-20260831-002/iter-003/attempt-0/s1/logs/stderr.txt",
+      "stderr_tail": "",
+      "stdout_path": "runs/formal-router-gpt54-20260831-002/iter-003/attempt-0/s1/logs/stdout.txt",
+      "stdout_tail": "{\"training_epochs\": 3, \"checkpoint_policy\": \"fixed_train_budget\", \"operator_objective\": \"bpr_censored_watch\", \"operator_features\": [\"hour\", \"user_gap\"], \"operator_hp\": {\"aux_weight\": 0.1, \"batch\": 8192, \"epochs\": 3, \"k\": 32, \"l2\": 1e-06, \"lr\": 0.0005, \"n_neg\": 4}, \"split\": \"valid\", \"seed\": 1, \"n_rows\": 124909, \"feature_dim\": 40296, \"wall_s\": 37.9}\n",
+      "timed_out": false,
+      "wall_s": 38.03
+    },
+    "seed": 1
+  },
+  {
+    "execution_mode": "parallel",
+    "gate": {
+      "action": null,
+      "gate": "G5",
+      "info": {
+        "error_class": null,
+        "n_rows": 124909
+      },
+      "type": "GATE_PASS",
+      "violations": []
+    },
+    "ok": true,
+    "pred": "runs/formal-router-gpt54-20260831-002/iter-003/attempt-0/s2/ws/pred.npy",
+    "sandbox": {
+      "cpu_s": 37.55,
+      "exit_code": 0,
+      "limits": {
+        "cpu_s": 3600,
+        "fsize_mb": 2048,
+        "mem_gb": 8,
+        "nproc": null,
+        "timeout_s": 900.0
+      },
+      "max_rss_mb": 462.5,
+      "ok": true,
+      "signal": null,
+      "stderr_path": "runs/formal-router-gpt54-20260831-002/iter-003/attempt-0/s2/logs/stderr.txt",
+      "stderr_tail": "",
+      "stdout_path": "runs/formal-router-gpt54-20260831-002/iter-003/attempt-0/s2/logs/stdout.txt",
+      "stdout_tail": "{\"training_epochs\": 3, \"checkpoint_policy\": \"fixed_train_budget\", \"operator_objective\": \"bpr_censored_watch\", \"operator_features\": [\"hour\", \"user_gap\"], \"operator_hp\": {\"aux_weight\": 0.1, \"batch\": 8192, \"epochs\": 3, \"k\": 32, \"l2\": 1e-06, \"lr\": 0.0005, \"n_neg\": 4}, \"split\": \"valid\", \"seed\": 2, \"n_rows\": 124909, \"feature_dim\": 40296, \"wall_s\": 37.5}\n",
+      "timed_out": false,
+      "wall_s": 37.63
+    },
+    "seed": 2
+  }
+]

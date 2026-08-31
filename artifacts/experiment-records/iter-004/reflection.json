@@ -1,0 +1,5 @@
+{
+  "analysis": "The experiment successfully changed predictions, so the mechanism was implemented and testable, but the evidence does not support a reliable gain. Standalone validation showed only a tiny mean improvement over the search parent (delta_primary 1.54e-05) with a 95% paired CI spanning zero, and paired-vs-incumbent also did not exclude zero. Portfolio impact was slightly negative (-3.37e-05) and not significant. Slice diagnostics show the tab-based residual did not consistently help the intended tabs: tab=2 improved, tab=4 worsened materially, tab=0 worsened slightly, and tab=6 showed no effect. This weakly suggests that hard-coded tab residuals derived from portfolio-relative disadvantages did not transfer cleanly into a useful standalone prediction-time correction.",
+  "next_lesson": "Do not rely on portfolio-relative tab weaknesses alone to set fixed prediction-time tab offsets; require direct standalone slice evidence before adding inference-only residual corrections.",
+  "result": "inconclusive"
+}

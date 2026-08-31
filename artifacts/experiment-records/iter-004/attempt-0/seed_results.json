@@ -1,0 +1,110 @@
+[
+  {
+    "execution_mode": "parallel",
+    "gate": {
+      "action": null,
+      "gate": "G5",
+      "info": {
+        "error_class": null,
+        "n_rows": 124909
+      },
+      "type": "GATE_PASS",
+      "violations": []
+    },
+    "ok": true,
+    "pred": "runs/formal-router-gpt54-20260831-002/iter-004/attempt-0/s0/ws/pred.npy",
+    "sandbox": {
+      "cpu_s": 31.91,
+      "exit_code": 0,
+      "limits": {
+        "cpu_s": 3600,
+        "fsize_mb": 2048,
+        "mem_gb": 8,
+        "nproc": null,
+        "timeout_s": 900.0
+      },
+      "max_rss_mb": 886.4,
+      "ok": true,
+      "signal": null,
+      "stderr_path": "runs/formal-router-gpt54-20260831-002/iter-004/attempt-0/s0/logs/stderr.txt",
+      "stderr_tail": "",
+      "stdout_path": "runs/formal-router-gpt54-20260831-002/iter-004/attempt-0/s0/logs/stdout.txt",
+      "stdout_tail": "{\"training_epochs\": 100, \"checkpoint_policy\": \"fixed_train_only_boosting_rounds\", \"model_family\": \"lightgbm_rank\", \"feature_count\": 25, \"split\": \"valid\", \"seed\": 0, \"n_rows\": 124909, \"feature_dim\": 25, \"wall_s\": 31.8}\n",
+      "timed_out": false,
+      "wall_s": 32.02
+    },
+    "seed": 0
+  },
+  {
+    "execution_mode": "parallel",
+    "gate": {
+      "action": null,
+      "gate": "G5",
+      "info": {
+        "error_class": null,
+        "n_rows": 124909
+      },
+      "type": "GATE_PASS",
+      "violations": []
+    },
+    "ok": true,
+    "pred": "runs/formal-router-gpt54-20260831-002/iter-004/attempt-0/s1/ws/pred.npy",
+    "sandbox": {
+      "cpu_s": 31.57,
+      "exit_code": 0,
+      "limits": {
+        "cpu_s": 3600,
+        "fsize_mb": 2048,
+        "mem_gb": 8,
+        "nproc": null,
+        "timeout_s": 900.0
+      },
+      "max_rss_mb": 886.6,
+      "ok": true,
+      "signal": null,
+      "stderr_path": "runs/formal-router-gpt54-20260831-002/iter-004/attempt-0/s1/logs/stderr.txt",
+      "stderr_tail": "",
+      "stdout_path": "runs/formal-router-gpt54-20260831-002/iter-004/attempt-0/s1/logs/stdout.txt",
+      "stdout_tail": "{\"training_epochs\": 100, \"checkpoint_policy\": \"fixed_train_only_boosting_rounds\", \"model_family\": \"lightgbm_rank\", \"feature_count\": 25, \"split\": \"valid\", \"seed\": 1, \"n_rows\": 124909, \"feature_dim\": 25, \"wall_s\": 31.5}\n",
+      "timed_out": false,
+      "wall_s": 31.67
+    },
+    "seed": 1
+  },
+  {
+    "execution_mode": "parallel",
+    "gate": {
+      "action": null,
+      "gate": "G5",
+      "info": {
+        "error_class": null,
+        "n_rows": 124909
+      },
+      "type": "GATE_PASS",
+      "violations": []
+    },
+    "ok": true,
+    "pred": "runs/formal-router-gpt54-20260831-002/iter-004/attempt-0/s2/ws/pred.npy",
+    "sandbox": {
+      "cpu_s": 31.93,
+      "exit_code": 0,
+      "limits": {
+        "cpu_s": 3600,
+        "fsize_mb": 2048,
+        "mem_gb": 8,
+        "nproc": null,
+        "timeout_s": 900.0
+      },
+      "max_rss_mb": 886.5,
+      "ok": true,
+      "signal": null,
+      "stderr_path": "runs/formal-router-gpt54-20260831-002/iter-004/attempt-0/s2/logs/stderr.txt",
+      "stderr_tail": "",
+      "stdout_path": "runs/formal-router-gpt54-20260831-002/iter-004/attempt-0/s2/logs/stdout.txt",
+      "stdout_tail": "{\"training_epochs\": 100, \"checkpoint_policy\": \"fixed_train_only_boosting_rounds\", \"model_family\": \"lightgbm_rank\", \"feature_count\": 25, \"split\": \"valid\", \"seed\": 2, \"n_rows\": 124909, \"feature_dim\": 25, \"wall_s\": 31.9}\n",
+      "timed_out": false,
+      "wall_s": 32.12
+    },
+    "seed": 2
+  }
+]

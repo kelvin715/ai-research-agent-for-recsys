@@ -1,0 +1,41 @@
+{
+  "coverage": [
+    {
+      "decision": "use_cache",
+      "gap": null,
+      "gap_type": "none",
+      "knowledge_ids": [
+        "K0009"
+      ],
+      "persona": "optimizer",
+      "priority": 0,
+      "query": null
+    },
+    {
+      "decision": "use_cache",
+      "gap": null,
+      "gap_type": "none",
+      "knowledge_ids": [
+        "K0007"
+      ],
+      "persona": "architecture",
+      "priority": 0,
+      "query": null
+    },
+    {
+      "decision": "use_cache",
+      "gap": null,
+      "gap_type": "none",
+      "knowledge_ids": [
+        "K0002"
+      ],
+      "persona": "reward",
+      "priority": 0,
+      "query": null
+    }
+  ],
+  "max_live_queries": 1,
+  "policy": "prior_first",
+  "selected_live_queries": [],
+  "suppressed_gap_personas": []
+}

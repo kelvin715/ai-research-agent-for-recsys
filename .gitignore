@@ -1,0 +1,29 @@
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Local environments and caches
+.orchestrator-venv/
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Generated inputs and run workspaces
+views/
+trusted_cache/
+runs/
+*.npy
+*.npz
+*.log
+
+# Editor and operating-system files
+.DS_Store
+.idea/
+.vscode/
+
+# Local coding-assistant notes, not part of the submission
+CLAUDE.md
+

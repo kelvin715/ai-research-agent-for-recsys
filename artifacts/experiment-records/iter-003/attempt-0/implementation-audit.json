@@ -1,0 +1,21 @@
+{
+  "analysis": "Faithful to the accepted predict-only contract. The only edited block is `predict`; it keeps the parent backend call, legally reads `tab` via `DV.load(split)`, and applies an explicit tab-specific affine recalibration that can change within-user ranking for affected rows. No unsupported config keys, labels, or post-exposure inference features are introduced.",
+  "changed_runtime_path": true,
+  "component_evidence": [
+    {
+      "code_evidence": "In block `predict`, first line is `pred = SO.predict(model, Xs, split)`, so prediction still flows through the trusted backend with the same `model`, `Xs`, and `split` inputs.",
+      "component": "predict block calls SO.predict(model, Xs, split)"
+    },
+    {
+      "code_evidence": "In block `predict`, `rows = DV.load(split)` followed by `tab = np.asarray(rows.tab)` concretely reads the inference-time `tab` field for the requested split.",
+      "component": "predict block loads DV.load(split).tab"
+    },
+    {
+      "code_evidence": "Block `predict` defines explicit tab-indexed coefficient maps `a_map = {1: 1.00, 2: 1.06, 4: 1.04, 6: 1.06}` and `b_map = {1: 0.00, 2: 0.01, 4: 0.005, 6: 0.01}`; then for each `t`, mask `m = (tab == t)` and update `out[m] = a * out[m] + b_map[t]`. This is a concrete affine transform of backend predictions conditioned on tab.",
+      "component": "predict block applies explicit tab-indexed affine coefficients to pred"
+    }
+  ],
+  "forbidden_shortcuts_found": [],
+  "missing_components": [],
+  "status": "PASS"
+}

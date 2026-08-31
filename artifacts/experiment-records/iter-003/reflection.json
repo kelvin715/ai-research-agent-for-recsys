@@ -1,0 +1,5 @@
+{
+  "analysis": "The experiment successfully changed predictions versus the parent, so the predict-time tab-aware affine calibration was implemented and active. However, the core hypothesis is not supported by trusted evaluation: standalone delta was only +0.000101 with a 95% paired CI spanning zero, and portfolio delta was slightly negative (-3.37e-05), also with CI spanning zero. Diagnostic slice feedback also failed to show the intended targeted improvement on weak tabs 2/4/6: tab 2 and 4 remained negative and tab 6 was neutral, while gains appeared more on other dimensions such as item-popularity slices. Thus the mechanism produced measurable ranking changes, but evidence does not establish that tab-specific posthoc calibration improved weak-tab contribution or portfolio value.",
+  "next_lesson": "Predict-time tab-only affine calibration is too crude here; prefer a stronger train-time interaction mechanism over further hand-tuned tab score shifts.",
+  "result": "inconclusive"
+}

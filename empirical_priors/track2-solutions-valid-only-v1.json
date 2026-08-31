@@ -1,0 +1,272 @@
+{
+  "schema_version": "external-research-1.1",
+  "mode": "curated",
+  "status": "complete",
+  "stage": "pre_draft",
+  "title": "Track 2 pre-run experiments: validation-only empirical prior",
+  "provenance": {
+    "source": "../track2-solutions",
+    "pre_run_curated_prior": true,
+    "counts_as_runtime_intervention": false,
+    "heldout_metrics_excluded": true,
+    "leaky_configs_excluded_from_positive_prior": true,
+    "selection_data": "official_validation_and_random_exposure_validation_only",
+    "aggregation": "mean and sample standard deviation across the named seed files",
+    "revision": 8,
+    "created_utc": "2026-08-30"
+  },
+  "operator_portfolio": {
+    "portfolio_id": "validated_rank_router_v2",
+    "evidence_id": "E012",
+    "activation": "verify_before_llm_search",
+    "operators": [
+      "legal_rank_stack_v1",
+      "deepfm_engagement_mtl_v1",
+      "item_lambdarank"
+    ],
+    "weights": [0.4, 0.4, 0.2],
+    "global_validation_selection_primary": 0.6058280796698023,
+    "validation_selection_primary": 0.6061277485758569,
+    "context_router": {
+      "feature": "tab",
+      "fallback": "global operator weights",
+      "min_rows": 1000,
+      "weight_grid_step": 0.1,
+      "inference_label_free": true,
+      "promotion_reason": "strict_all_seed_robustness",
+      "matched_seed_deltas": [
+        0.00024210719420603155,
+        0.0001501077513974547,
+        0.0002110082560214943
+      ],
+      "routes": [
+        {
+          "value": 0,
+          "rows": 13726,
+          "operator_weights": {
+            "legal_rank_stack_v1": 0.1,
+            "deepfm_engagement_mtl_v1": 0.6,
+            "item_lambdarank": 0.3
+          }
+        },
+        {
+          "value": 1,
+          "rows": 92672,
+          "operator_weights": {
+            "legal_rank_stack_v1": 0.3,
+            "deepfm_engagement_mtl_v1": 0.4,
+            "item_lambdarank": 0.3
+          }
+        },
+        {
+          "value": 2,
+          "rows": 3834,
+          "operator_weights": {
+            "legal_rank_stack_v1": 0.9,
+            "deepfm_engagement_mtl_v1": 0.0,
+            "item_lambdarank": 0.1
+          }
+        },
+        {
+          "value": 4,
+          "rows": 7877,
+          "operator_weights": {
+            "legal_rank_stack_v1": 0.5,
+            "deepfm_engagement_mtl_v1": 0.4,
+            "item_lambdarank": 0.1
+          }
+        },
+        {
+          "value": 6,
+          "rows": 5170,
+          "operator_weights": {
+            "legal_rank_stack_v1": 0.0,
+            "deepfm_engagement_mtl_v1": 0.3,
+            "item_lambdarank": 0.7
+          }
+        }
+      ]
+    },
+    "counts_as_one_logical_iteration": true,
+    "counts_as_measured_subexperiments": true
+  },
+  "sources": [
+    {
+      "source_id": "S001",
+      "kind": "local_code",
+      "citation": "../track2-solutions/solfm.py and results/{A_official,B_bpr,G_bpr_wt}*.json; fields used: config, seed, leak, primary"
+    },
+    {
+      "source_id": "S002",
+      "kind": "local_code",
+      "citation": "../track2-solutions/solfeat.py, configs.py and results/{M1_legal,M2_legal_wt,P4_M2_user}*.json; fields used: config, seed, leak, primary"
+    },
+    {
+      "source_id": "S003",
+      "kind": "local_code",
+      "citation": "../track2-solutions/results-unbiased/*.json; fields used: config, seed, valid_primary, unbiased_primary"
+    },
+    {
+      "source_id": "S004",
+      "kind": "local_code",
+      "citation": "../track2-solutions/itemcf.py and results/{N1_cf_q,N2_cf_rank,N3_M2_cf}*.json; fields used: config, seed, leak, primary"
+    },
+    {
+      "source_id": "S005",
+      "kind": "local_code",
+      "citation": "../track2-solutions/results/M2_legal_wt__k32_lr0.0005_aw0.2_n4_l1e-06__s*.json; fields used: config, seed, leak, primary"
+    },
+    {
+      "source_id": "S006",
+      "kind": "local_code",
+      "citation": "task_spec/stable_ops.py, orchestrator/operators.py, tests/evaluate_lightgbm_primitive.py, and the pinned guided-empirical baseline predictions; fields used: model configuration, three-seed valid metrics, equal-rank-blend paired bootstrap"
+    },
+    {
+      "source_id": "S007",
+      "kind": "local_code",
+      "citation": "orchestrator/operators.py, orchestrator/ensemble.py, tests/evaluate_legal_rank_stack_primitive.py, and tests/evaluate_operator_ensemble.py; fields used: locked fixed schedules, three-seed official-validation metrics, bounded exhaustive subset and weight diagnostics"
+    },
+    {
+      "source_id": "S008",
+      "kind": "local_code",
+      "citation": "runs/formal-portfolio-gpt54-20260830-001/iter-004/{proposal.json,attempt-0/pipeline.diff,reflection.json}; fields used: train-only patch, three-seed prediction identity, no-op diagnosis"
+    },
+    {
+      "source_id": "S009",
+      "kind": "local_code",
+      "citation": "runs/formal-atomic-warmstart-gpt54-20260830-002/iter-{002,003}/{proposal.json,metrics.json,reflection.json}; fields used: exact operator/config, three-seed official-validation deltas and paired intervals"
+    },
+    {
+      "source_id": "S010",
+      "kind": "local_code",
+      "citation": "runs/portfolio-router-pilot-gpt56sol-20260830-008/summary.json and orchestrator/ensemble.py; fields used: frozen tab routes, global/routed official-validation primary, matched-seed deltas, promotion gate, and label-free inference contract"
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "E001",
+      "kind": "curated_research",
+      "record_type": "mechanism",
+      "persona": "optimizer",
+      "query": "Which ranking objective and sampling implementation reliably improves the official FM?",
+      "reason": "Cold-start runs repeatedly proposed BPR but implementation quality varied sharply.",
+      "summary": "Use vectorized same-user BPR, not all-batch quadratic pairing. Build per-user positive blocks and negative pools only for users with both classes; use one sampled same-user negative per positive per epoch; align positive and negative arrays by user block; return safely when no eligible pairs; the FM global bias cancels. The exact loss is L=mean(softplus(-(z_pos-z_neg))). With diff=z_pos-z_neg, use g_pos=(sigmoid(diff)-1)/pair_count and g_neg=-g_pos. At diff=0, g_pos must equal -0.5/pair_count, never +0.5/pair_count; a one-step sanity check must increase z_pos-z_neg. At k=16, lr=0.001, one negative, the five-seed official-validation primary changed from 0.601500738 ± 0.000481897 for pointwise FM to 0.603517127 ± 0.000631158 for BPR. Treat the mechanism and implementation invariants as the prior; rerun it inside the Agent harness rather than assuming the measured delta transfers exactly.",
+      "source_ids": ["S001"]
+    },
+    {
+      "evidence_id": "E002",
+      "kind": "curated_research",
+      "record_type": "mechanism",
+      "persona": "reward",
+      "query": "How should watch time complement native long_view without changing evaluation labels?",
+      "reason": "The native binary label discards engagement magnitude and completed plays are right-censored by duration.",
+      "summary": "Keep native long_view as the ranking objective and add a small censored watch-time regression head sharing FM embeddings. Transform play time and duration with log1p/12. For incomplete plays use exact regression residual; for completed plays use a one-sided lower-bound hinge that stops penalizing predictions above log-duration. Never use evaluation-period feedback as an input feature. BPR plus this auxiliary target at weight 0.2 reached five-seed official-validation primary 0.604023290 ± 0.000282947 versus 0.603517127 ± 0.000631158 for BPR alone; on three random-exposure seeds, unbiased primary was 0.376328528 ± 0.003245064 versus 0.373291085 ± 0.002151737. This is an implementation prior, not permission to replace the fixed relevance label.",
+      "source_ids": ["S001", "S003"]
+    },
+    {
+      "evidence_id": "E003",
+      "kind": "curated_research",
+      "record_type": "mechanism",
+      "persona": "architecture",
+      "query": "Which legal context and side-information fields complement the FM?",
+      "reason": "Broad side-feature additions can add noise; legal temporal context needs an explicit availability rule.",
+      "summary": "Prioritize low-cardinality hour and train-derived user exposure-gap buckets before broad profile expansion. Compute all quantile edges from train only. The hour+user_gap BPR configuration reached five-seed official-validation primary 0.604430330 ± 0.000459158; adding the censored watch-time auxiliary target reached 0.604607224 ± 0.000168363. Adding selected user profile domains on top reached 0.604821956 ± 0.000355822, a smaller incremental effect. The legal hour+gap+aux configuration also led the inspected random-exposure set at unbiased primary 0.378085981 ± 0.003012055. Any history feature must use train feedback or exposure-only information available at prediction time; evaluation-period long_view/play-time feedback is forbidden.",
+      "source_ids": ["S002", "S003"]
+    },
+    {
+      "evidence_id": "E004",
+      "kind": "curated_research",
+      "record_type": "negative_result",
+      "persona": "architecture",
+      "query": "Which apparently plausible local mechanism should be deprioritized?",
+      "reason": "Negative empirical knowledge prevents repeating expensive but harmful branches.",
+      "summary": "Deprioritize the current train-only ItemCF score as an FM categorical feature unless a materially different formulation is proposed. Official-validation primary was 0.595545073 ± 0.000252105 for quantile-bucket ItemCF, 0.589108209 ± 0.000535982 for within-user ItemCF-rank buckets, and 0.589134475 ± 0.000359362 when stacked onto the legal multitask configuration. Record this as a mechanism-specific negative result, not a permanent ban on every collaborative-filtering architecture.",
+      "source_ids": ["S004"]
+    },
+    {
+      "evidence_id": "E005",
+      "kind": "curated_research",
+      "record_type": "tuning",
+      "requires_success_mechanisms": [
+        "same-user sampled BPR",
+        "censored watch-time",
+        "hour and user exposure-gap"
+      ],
+      "persona": "optimizer",
+      "query": "Which bounded hyperparameter region is worth testing after the mechanism works?",
+      "reason": "Generic tuning need not trigger WebSearch, but a validated local region can reduce wasted iterations.",
+      "summary": "After BPR, legal hour/user_gap features, and the censored auxiliary target are implemented correctly, a bounded capacity/sampling refinement is k=32, lr=0.0005, four same-user negatives, auxiliary weight 0.2. It reached three-seed official-validation primary 0.605174243 ± 0.000257887. This is a second-stage tuning prior: do not jump to it before reproducing the mechanism ladder, and do not treat a sub-0.002 tuning effect as evidence that the core mechanism failed.",
+      "source_ids": ["S005"]
+    },
+    {
+      "evidence_id": "E006",
+      "kind": "curated_research",
+      "record_type": "guardrail",
+      "persona": "reward",
+      "query": "How can random-exposure validation expose offline leakage or selection bias?",
+      "reason": "A high biased-log validation score can reward evaluation-period feedback leakage.",
+      "summary": "Use random-exposure validation as a post-hoc robustness signal, never as extra training data. A deliberately leaky prior-long_view feature scored official validation 0.606701016 but random-exposure primary only 0.367647936, while the legal hour+gap+censored-target configuration scored official validation 0.604987204 and random-exposure primary 0.378085981 on the same three-seed audit. Therefore reject any candidate feature that consumes evaluation-period feedback, and view disagreement between official and random-exposure rankings as a bias warning rather than optimizing both sets adaptively every round.",
+      "source_ids": ["S003"]
+    },
+    {
+      "evidence_id": "E007",
+      "kind": "curated_research",
+      "record_type": "mechanism",
+      "persona": "architecture",
+      "query": "Can a leakage-safe tree ranker add complementary signal to the three-seed FM?",
+      "reason": "The reference solution's gain came from heterogeneous scorers, but its item-rate tree needed adaptation to the stricter candidate-label boundary.",
+      "summary": "Use the standalone item_lambdarank operator as an ensemble leaf, not as an FM-stack mutation. Its 25 features combine legal context with strictly-prior-date train aggregates for long_view, click, like, follow, hate, play ratio, and completion over item/author/tag/music/video-type/upload-type keys. Group LambdaRank by (user,date), use a fixed 100-round train-only checkpoint, and never early-stop on candidate-visible validation labels. Do not use row-wise leave-one-out target encoding: removing the current positive lowers its rate while removing a current negative raises it, creating a mechanical anti-label signal. In a three-seed pre-run check, the tree seed ensemble scored official-validation primary 0.601057584 versus 0.601877969 for the pinned FM seed ensemble; their equal-weight within-user rank blend scored 0.603346495, delta +0.001468526 with paired CI95 [+0.000340311,+0.002804302]. The tree is valuable for error diversity, not standalone dominance, and the normal positive-paired-CI ensemble gate must still rerun and approve it in each Agent run.",
+      "source_ids": ["S006"]
+    },
+    {
+      "evidence_id": "E008",
+      "kind": "curated_research",
+      "record_type": "mechanism",
+      "persona": "architecture",
+      "query": "Which locked operators form the strongest validation-only heterogeneous subset without greedy path dependence?",
+      "reason": "A pairwise greedy promotion gate can reject an uncertain intermediate pair even when a three-way combination is robustly stronger.",
+      "summary": "In the locked candidate environment, the fixed legal stack (k=32, lr=0.0005, four negatives, three epochs, auxiliary weight 0.1) reached three-seed primary mean 0.604437172 and seed-ensemble primary 0.604913372. DeepFM engagement MTL reached seed-ensemble 0.604751755 and item LambdaRank 0.601057584. Legal+DeepFM alone reached 0.605110911 but had one matched-seed delta -0.000085343 versus Legal. The equal-weight Legal+DeepFM+LambdaRank subset reached 0.605673866, production delta +0.000760495 versus Legal, with all matched-seed deltas positive [+0.001237330,+0.000622945,+0.000404091]. A bounded 0.1-step weight refinement selected 0.4/0.4/0.2 and reached 0.605828080; versus equal weights its matched-seed deltas were [-0.000035825,+0.000188479,+0.000294849]. Therefore enumerate bounded subsets before applying promotion evidence, then allow weight refinement only under the bounded matched-seed robustness rule. These are official-validation-only selection results; no hidden-test labels were loaded.",
+      "source_ids": ["S007"]
+    },
+    {
+      "evidence_id": "E009",
+      "kind": "curated_research",
+      "record_type": "negative_result",
+      "persona": "optimizer",
+      "query": "Which optimizer-side proposal failed because its configuration was not connected to the training backend?",
+      "reason": "Prevent a later Agent iteration from repeating an executable-looking but semantically inert config-only patch.",
+      "summary": "Deprioritize the exact tab inverse-frequency BPR proposal that only adds hp['pair_group_weight']='tab_invfreq' and hp['pair_group_weight_values'] before calling SO.train. In the locked formal run, all three seed predictions were byte-identical to the Legal parent because stable_ops did not consume either key. Before proposing any config-only optimizer change, trace the key to a concrete sampler, loss, or gradient consumer in current code; if no consumer exists within the allowed patch scope, reject the proposal rather than relying on static/smoke success. This is an implementation-specific no-op, not evidence that correctly wired group weighting can never work.",
+      "source_ids": ["S008"]
+    },
+    {
+      "evidence_id": "E010",
+      "kind": "curated_research",
+      "record_type": "negative_result",
+      "persona": "architecture",
+      "query": "Should selected_user_profile be added on top of legal_rank_stack_v1?",
+      "reason": "The profile operator had older positive evidence on weaker stacks but was directly negative on the locked Legal parent.",
+      "summary": "Do not repeat selected_user_profile on parent stack ['legal_rank_stack_v1']. The exact trusted operator added seven low-cardinality static profile fields and reached selection_primary 0.604175571 versus parent 0.604913372, delta -0.000737800 with paired CI95 [-0.001416160,-0.000037160]. The loss was reliable on this stronger parent even though a few narrow slices improved. Treat this as an exact parent/operator negative result, not a ban on every targeted user-item interaction architecture.",
+      "source_ids": ["S009"]
+    },
+    {
+      "evidence_id": "E011",
+      "kind": "curated_research",
+      "record_type": "negative_result",
+      "persona": "reward",
+      "query": "Should bpr_censored_watch aux_weight increase from 0.1 to 0.2 on legal_rank_stack_v1?",
+      "reason": "The exact connected scalar retune was measured after atomic warm-start and trended negative.",
+      "summary": "Do not repeat the exact aux_weight transition 0.1 to 0.2 for bpr_censored_watch on parent stack ['legal_rank_stack_v1']. It reached mean primary 0.604399212 and was -0.000493931 in selection_primary versus the parent, with paired CI95 [-0.000983860,+0.000042216]. This rejects only the measured weight transition under current stable_ops loss scaling; materially different reward formulations remain eligible.",
+      "source_ids": ["S009"]
+    },
+    {
+      "evidence_id": "E012",
+      "kind": "curated_research",
+      "record_type": "mechanism",
+      "persona": "architecture",
+      "query": "Can the validated heterogeneous portfolio use a fixed label-free context router without weakening the test firewall?",
+      "reason": "The global 0.4/0.4/0.2 mixture leaves stable tab-specific member specialization unused, while fitting a flexible gate would add excessive validation degrees of freedom.",
+      "summary": "Pre-register the five coarse tab routes over the locked Legal, DeepFM engagement MTL, and item LambdaRank members. Keep 0.4/0.4/0.2 as fallback and route only tabs with at least 1,000 official-validation rows on a 0.1 weight grid. The global portfolio scored 0.605828080 and the fixed router scored 0.606127749. All matched seeds improved by [+0.000242107,+0.000150108,+0.000211008], mean +0.000201074, clearing the predeclared all-seed mean >=0.00015 gate although the paired-user CI crossed zero. The formal run must translate stable operator IDs to fresh node IDs, reproduce the exact score and seed deltas before LLM search, never refit routes during warm-start, and use only inference-time tab on test.",
+      "source_ids": ["S007", "S010"]
+    }
+  ]
+}

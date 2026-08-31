@@ -1,0 +1,16 @@
+{
+  "execution_mode": "empirical_prior_portfolio",
+  "hypothesis": "Reproduce the locked validation-only portfolio before LLM search.",
+  "llm_generated": false,
+  "operators": [
+    "legal_rank_stack_v1",
+    "deepfm_engagement_mtl_v1",
+    "item_lambdarank"
+  ],
+  "portfolio_id": "validated_rank_router_v2",
+  "weights": [
+    0.4,
+    0.4,
+    0.2
+  ]
+}

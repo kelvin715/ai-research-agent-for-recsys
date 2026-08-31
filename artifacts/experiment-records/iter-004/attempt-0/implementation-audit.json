@@ -1,0 +1,21 @@
+{
+  "analysis": "PASS. The candidate edits only the predict block, preserves the delegated parent training/runtime path, computes base predictions via SO.predict, legally reads inference-time tab through DV.load(split), and applies explicit nonzero residuals only for selected tabs. No labels or post-exposure inference features are used, no global constant is added to all rows, and predictions will differ from parent only on affected tab rows.",
+  "changed_runtime_path": true,
+  "component_evidence": [
+    {
+      "code_evidence": "In predict block: `base = SO.predict(model, Xs, split)`. This directly calls the trusted backend prediction API with the provided model, feature matrix dict, and requested split, then uses that result as the starting score array.",
+      "component": "predict block computes base = SO.predict(model, Xs, split)"
+    },
+    {
+      "code_evidence": "In predict block: `rowset = DV.load(split)` followed by `tabs = np.asarray(rowset.tab)`. This is a concrete inference-time dataflow from the legal dataview API to the tab array used for residual selection.",
+      "component": "predict block loads DV.load(split).tab"
+    },
+    {
+      "code_evidence": "In predict block: `tab_residual = {0: 0.010, 2: 0.006, 4: 0.004, 6: 0.018}` and loop `for tab_value, delta in tab_residual.items(): mask = (tabs == tab_value); ... pred[mask] += delta`. This applies nonzero tab-specific adjustments only to rows whose inference-time tab matches selected values; other tabs remain at the base score because `pred` is initialized from `base` and never changed elsewhere.",
+      "component": "predict block applies nonzero tab-specific residuals for selected tabs only"
+    }
+  ],
+  "forbidden_shortcuts_found": [],
+  "missing_components": [],
+  "status": "PASS"
+}

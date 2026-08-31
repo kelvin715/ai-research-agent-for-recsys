@@ -1,0 +1,519 @@
+{
+  "adaptive_search_policy": [
+    "portfolio_residual_exploit",
+    "portfolio_branch_broaden",
+    "stagnation_escape"
+  ],
+  "baseline_pipeline_sha256": "41f6fb3e5cdbdea6ba76a2b8925f2e1b29d3bcd1b88de29fa326f65f3b6efe2a",
+  "baseline_primary_mean": 0.6010445576222115,
+  "baseline_selection_primary": 0.6018779688793552,
+  "baseline_source": "candidate/pipeline.py",
+  "baseline_status": "reproduced_in_run",
+  "borrowed_agent_mechanisms": {
+    "AIDE": "persistent execution frontier, independent root drafts, and parent re-selection across ACCEPT/UNCERTAIN nodes",
+    "MLE-STAR": "specialized leakage/data-usage gates plus a separate heterogeneous bounded exhaustive ensemble phase over retained nodes",
+    "MLE-bench": "isolated execution, immutable evaluator, and reproducibility accounting",
+    "RD-Agent": "observation/justification hypothesis records and typed memory",
+    "RecSys-Factory": "typed failure-to-recovery guidance for timeout/OOM/NaN/format",
+    "Self-Evolving-RecSys": "optimizer/architecture/reward personas, shared journal, and planner/WebSearchTool/reviewer research loop"
+  },
+  "candidate_environment": {
+    "import_roots": [
+      "PIL",
+      "_distutils_hack",
+      "_plotly_utils",
+      "_yaml",
+      "absl",
+      "aiosignal",
+      "attr",
+      "attrs",
+      "certifi",
+      "charset_normalizer",
+      "click",
+      "cloudpickle",
+      "colorama",
+      "colorlog",
+      "dateutil",
+      "fbgemm_gpu",
+      "filelock",
+      "frozenlist",
+      "fsspec",
+      "functorch",
+      "grpc",
+      "idna",
+      "importlib_metadata",
+      "isympy",
+      "jinja2",
+      "joblib",
+      "jsonschema",
+      "jsonschema_specifications",
+      "lightgbm",
+      "lightning_utilities",
+      "list_versions",
+      "markdown",
+      "markupsafe",
+      "mpmath",
+      "msgpack",
+      "mypy_extensions",
+      "narwhals",
+      "networkx",
+      "numpy",
+      "orjson",
+      "packaging",
+      "pandas",
+      "pip",
+      "plotly",
+      "psutil",
+      "pyre_extensions",
+      "pytz",
+      "pyvers",
+      "ray",
+      "recbole",
+      "referencing",
+      "requests",
+      "rpds",
+      "scipy",
+      "scripts",
+      "setuptools",
+      "six",
+      "sklearn",
+      "sympy",
+      "tabulate",
+      "tensorboard",
+      "tensorboard_data_server",
+      "tensordict",
+      "texttable",
+      "thop",
+      "threadpoolctl",
+      "torch",
+      "torchgen",
+      "torchmetrics",
+      "torchrec",
+      "tqdm",
+      "typing_extensions",
+      "typing_inspect",
+      "tzdata",
+      "urllib3",
+      "werkzeug",
+      "yaml",
+      "zipp"
+    ],
+    "lock_sha256": "e511064195b052d14ea8d026b2a422e08df44ce77f19daa670d58f2864df9190",
+    "network": false,
+    "packages": {
+      "Jinja2": "3.1.6",
+      "Markdown": "3.10.3",
+      "MarkupSafe": "3.0.3",
+      "PyYAML": "6.0.3",
+      "Werkzeug": "3.1.8",
+      "absl-py": "2.5.0",
+      "aiosignal": "1.4.0",
+      "attrs": "26.1.0",
+      "certifi": "2026.7.22",
+      "charset-normalizer": "3.5.1",
+      "click": "8.5.0",
+      "cloudpickle": "3.1.2",
+      "colorama": "0.4.4",
+      "colorlog": "4.7.2",
+      "fbgemm_gpu-cpu": "1.8.0",
+      "filelock": "3.32.4",
+      "frozenlist": "1.8.0",
+      "fsspec": "2026.7.0",
+      "grpcio": "1.83.1",
+      "idna": "3.19",
+      "importlib_metadata": "9.0.1",
+      "joblib": "1.5.3",
+      "jsonschema": "4.26.0",
+      "jsonschema-specifications": "2025.9.1",
+      "lightgbm": "4.7.0",
+      "lightning-utilities": "0.15.3",
+      "mpmath": "1.3.0",
+      "msgpack": "1.2.2",
+      "mypy_extensions": "1.1.0",
+      "narwhals": "2.25.0",
+      "networkx": "3.4.2",
+      "numpy": "2.2.6",
+      "orjson": "3.12.0",
+      "packaging": "26.3",
+      "pandas": "2.3.3",
+      "pillow": "12.3.0",
+      "pip": "22.0.2",
+      "plotly": "7.0.0",
+      "protobuf": "7.36.0",
+      "psutil": "7.2.2",
+      "pyre-extensions": "0.0.32",
+      "python-dateutil": "2.9.0.post0",
+      "pytz": "2026.3.post1",
+      "pyvers": "0.2.3",
+      "ray": "2.6.3",
+      "recbole": "1.2.1",
+      "referencing": "0.37.0",
+      "requests": "2.34.2",
+      "rpds-py": "0.30.0",
+      "scikit-learn": "1.7.2",
+      "scipy": "1.15.3",
+      "setuptools": "84.0.0",
+      "six": "1.17.0",
+      "sympy": "1.14.0",
+      "tabulate": "0.10.0",
+      "tensorboard": "2.21.0",
+      "tensorboard-data-server": "0.7.2",
+      "tensordict": "0.14.0",
+      "texttable": "1.7.0",
+      "thop": "0.1.1-2209072238",
+      "threadpoolctl": "3.6.0",
+      "torch": "2.13.0+cpu",
+      "torchmetrics": "1.0.3",
+      "torchrec": "1.8.0",
+      "tqdm": "4.70.0",
+      "typing-inspect": "0.9.0",
+      "typing_extensions": "4.16.0",
+      "tzdata": "2026.3",
+      "urllib3": "2.7.0",
+      "zipp": "4.1.0"
+    },
+    "python": "3.10.12",
+    "requirements_sha256": "133b78dd73428b8deb44b6c99e0297dcdfd883baa53a4b7f18158d6cec347f52",
+    "runtime_installation": false
+  },
+  "checkpoint_policy": {
+    "frontier_parent": "rotate through deployed portfolio members, including standalone rollback specialists, then use UCB over ACCEPT/UNCERTAIN nodes",
+    "stable_checkpoint": "positive paired CI95 lower bound required",
+    "uncertain": "archive, allow validation-best update, and retain as an exploratory frontier parent without calling it a stable promotion",
+    "validation_best": "highest legal official-validation selection score"
+  },
+  "controller_snapshot": {
+    "files": [
+      "orchestrator/__init__.py",
+      "orchestrator/ablation.py",
+      "orchestrator/agent.py",
+      "orchestrator/core.py",
+      "orchestrator/diagnostics.py",
+      "orchestrator/ensemble.py",
+      "orchestrator/external_research.py",
+      "orchestrator/frontier.py",
+      "orchestrator/journal.py",
+      "orchestrator/llm.py",
+      "orchestrator/memory.py",
+      "orchestrator/operators.py",
+      "orchestrator/patching.py",
+      "orchestrator/prior_store.py",
+      "orchestrator/research.py",
+      "orchestrator/schemas.py",
+      "README.md",
+      "requirements-orchestrator.txt",
+      "requirements-candidate.txt",
+      "env.lock.json",
+      "task_spec/dataview.py",
+      "task_spec/stable_ops.py"
+    ],
+    "path": "controller-snapshot"
+  },
+  "convergence": {
+    "consecutive_iterations": 3,
+    "epsilon": 0.002,
+    "pilot_override": false,
+    "stopping_enabled": true
+  },
+  "empirical_portfolio_warmstart": {
+    "activation": "verify_before_llm_search",
+    "context_router": {
+      "fallback": "global operator weights",
+      "feature": "tab",
+      "inference_label_free": true,
+      "matched_seed_deltas": [
+        0.00024210719420603155,
+        0.0001501077513974547,
+        0.0002110082560214943
+      ],
+      "min_rows": 1000,
+      "promotion_reason": "strict_all_seed_robustness",
+      "routes": [
+        {
+          "operator_weights": {
+            "deepfm_engagement_mtl_v1": 0.6,
+            "item_lambdarank": 0.3,
+            "legal_rank_stack_v1": 0.1
+          },
+          "rows": 13726,
+          "value": 0
+        },
+        {
+          "operator_weights": {
+            "deepfm_engagement_mtl_v1": 0.4,
+            "item_lambdarank": 0.3,
+            "legal_rank_stack_v1": 0.3
+          },
+          "rows": 92672,
+          "value": 1
+        },
+        {
+          "operator_weights": {
+            "deepfm_engagement_mtl_v1": 0.0,
+            "item_lambdarank": 0.1,
+            "legal_rank_stack_v1": 0.9
+          },
+          "rows": 3834,
+          "value": 2
+        },
+        {
+          "operator_weights": {
+            "deepfm_engagement_mtl_v1": 0.4,
+            "item_lambdarank": 0.1,
+            "legal_rank_stack_v1": 0.5
+          },
+          "rows": 7877,
+          "value": 4
+        },
+        {
+          "operator_weights": {
+            "deepfm_engagement_mtl_v1": 0.3,
+            "item_lambdarank": 0.7,
+            "legal_rank_stack_v1": 0.0
+          },
+          "rows": 5170,
+          "value": 6
+        }
+      ],
+      "weight_grid_step": 0.1
+    },
+    "counts_as_measured_subexperiments": true,
+    "counts_as_one_logical_iteration": true,
+    "evidence_id": "E012",
+    "global_validation_selection_primary": 0.6058280796698023,
+    "llm_calls": 0,
+    "logical_iteration_count": 1,
+    "measured_subexperiment_count": 3,
+    "member_subexperiments_excluded_from_convergence": true,
+    "observed_selection_primary": 0.6061277485758569,
+    "operators": [
+      "legal_rank_stack_v1",
+      "deepfm_engagement_mtl_v1",
+      "item_lambdarank"
+    ],
+    "portfolio_id": "validated_rank_router_v2",
+    "selection_path": "warmstart/selection.json",
+    "status": "verified",
+    "validation_selection_primary": 0.6061277485758569,
+    "verification_path": "warmstart/verification.json",
+    "weights": [
+      0.4,
+      0.4,
+      0.2
+    ]
+  },
+  "frontier": {
+    "draft_count": 2,
+    "exploration": 0.00025,
+    "portfolio_parent_rotation": "least-expanded then weight and standalone opportunity",
+    "selected_portfolio_members_expandable": true,
+    "uncertain_nodes_expandable": true
+  },
+  "heterogeneous_ensemble": {
+    "candidate_reward_channels": [
+      "standalone",
+      "portfolio_marginal"
+    ],
+    "enabled": true,
+    "final_context_router": {
+      "enabled": true,
+      "feature": "tab",
+      "fit_phase": "final designation only",
+      "min_rows_per_route": 1000,
+      "promotion_gate": "positive paired CI95 OR all matched seeds positive with mean gain >= 0.00015",
+      "test_inference_uses_labels": false,
+      "weight_grid_step": 0.1
+    },
+    "incumbent_preservation": "a new portfolio must robustly improve the deployed portfolio; point-estimate regressions never replace it",
+    "max_members": 3,
+    "max_pool": 8,
+    "promotion_gate": "positive paired CI95 lower bound OR bounded matched-seed robustness (>=2/3 positive, mean >=1e-4, worst >=-5e-5)",
+    "protected_pool_members": true
+  },
+  "in_run_block_ablation": false,
+  "in_run_block_ablation_note": "reserved for separately accounted post-hoc ablation",
+  "iteration_boundary": "proposal-only memory screening is logged as planning; the official iteration begins at PATCH for an eligible proposal",
+  "iterations_cap": 50,
+  "manual_interventions": 0,
+  "manual_interventions_definition": "human guide/stir after the Agent run starts; pre-run priors and registered operators are fixed Agent configuration and do not increment this count",
+  "max_planning_redrafts": 2,
+  "mixed_operator_mode": {
+    "counts_as_runtime_intervention": false,
+    "custom_patch_fallback": true,
+    "enabled": true,
+    "operators": [
+      {
+        "compound_components": [
+          "same_user_bpr",
+          "censored_watch_time",
+          "legal_temporal_context",
+          "tuned_k32"
+        ],
+        "description": "Compound first-round recipe: same-user BPR, a train-only censored watch-time auxiliary task, legal hour/user-gap context, and the robust k=32 schedule. Its components were separately ablated before registration; use it to test their cumulative effect within the short convergence window.",
+        "implementation": "trusted_registry_no_llm_patch",
+        "operator_id": "legal_rank_stack_v1",
+        "patch_scope": [
+          "features",
+          "target",
+          "model",
+          "loss",
+          "train"
+        ],
+        "primary_block": "train",
+        "required_libraries": [],
+        "search_priority": "first_round_exploit",
+        "title": "Validated legal ranking stack"
+      },
+      {
+        "compound_components": [],
+        "description": "Vectorized full-train user pools, one sampled same-user negative per positive, correct normalized pairwise gradient.",
+        "implementation": "trusted_registry_no_llm_patch",
+        "operator_id": "same_user_bpr",
+        "patch_scope": [
+          "loss",
+          "train"
+        ],
+        "primary_block": "train",
+        "required_libraries": [],
+        "search_priority": "standard",
+        "title": "Same-user BPR"
+      },
+      {
+        "compound_components": [],
+        "description": "Adds hour and strictly-earlier exposure-gap buckets without evaluation feedback.",
+        "implementation": "trusted_registry_no_llm_patch",
+        "operator_id": "legal_temporal_context",
+        "patch_scope": [
+          "features"
+        ],
+        "primary_block": "features",
+        "required_libraries": [],
+        "search_priority": "standard",
+        "title": "Legal temporal context"
+      },
+      {
+        "compound_components": [],
+        "description": "Adds seven low-cardinality pre-impression user profile fields; FM crosses them with candidate item and context fields.",
+        "implementation": "trusted_registry_no_llm_patch",
+        "operator_id": "selected_user_profile",
+        "patch_scope": [
+          "features"
+        ],
+        "primary_block": "features",
+        "required_libraries": [],
+        "search_priority": "standard",
+        "title": "Selected static user profile"
+      },
+      {
+        "compound_components": [],
+        "description": "Standalone LightGBM LambdaRank scorer using context plus strictly-prior-date train-only item, author, tag, music, and auxiliary-action rates. It is intended as an error-diverse ensemble member, not as an FM stack mutation.",
+        "implementation": "trusted_registry_no_llm_patch",
+        "operator_id": "item_lambdarank",
+        "patch_scope": [
+          "features",
+          "target",
+          "model",
+          "train"
+        ],
+        "primary_block": "model",
+        "required_libraries": [
+          "lightgbm"
+        ],
+        "search_priority": "standard",
+        "title": "Item/context LambdaRank"
+      },
+      {
+        "compound_components": [
+          "deepfm_cpu",
+          "engagement_aux_heads_4"
+        ],
+        "description": "Standalone compound primitive: a DeepFM main scorer plus train-only is_like/is_follow/is_comment/is_forward auxiliary heads sharing its deep trunk. Only the long_view main logit is emitted. Uses the validated fixed 12-epoch CPU schedule because candidate processes cannot inspect validation labels for checkpointing.",
+        "implementation": "trusted_registry_no_llm_patch",
+        "operator_id": "deepfm_engagement_mtl_v1",
+        "patch_scope": [
+          "target",
+          "model",
+          "loss",
+          "train"
+        ],
+        "primary_block": "model",
+        "required_libraries": [
+          "torch"
+        ],
+        "search_priority": "first_round_exploit",
+        "title": "CPU DeepFM + four engagement heads"
+      }
+    ],
+    "registry_sha256": "9f0722b8d36e0f27b8dfb91bb41c990a890d773d94817154eee9058509596531",
+    "stable_ops_sha256": "5796c247f4f3683a67f8a3dfac5f63d340b5254e75c0c8902cbd0a3327d6ba78"
+  },
+  "model": "gpt-5.4",
+  "n_boot": 1000,
+  "n_candidates_per_iteration": 3,
+  "nonstandard_pilot_controls": [],
+  "official_iteration_cap": 50,
+  "official_validation_used": true,
+  "orchestrator_sha256": "ee38dfb8e67a23522e360d2d3bfcb375c8344b273da6131b93cc51be2be7201b",
+  "personas": [
+    "optimizer",
+    "architecture",
+    "reward"
+  ],
+  "prompt_version": "full-5.1-portfolio-aware-fidelity-router",
+  "proposal_code_fidelity_audit": {
+    "enabled": true,
+    "operator_mode": "trusted registry provenance",
+    "policy": "each required contract component needs visible executable dataflow; unknown config delegation fails closed before seed execution"
+  },
+  "research": {
+    "curated_cards": [],
+    "empirical_prior_snapshot": "empirical_priors/track2-solutions-valid-only-v1.json",
+    "first_iteration_policy": "prior_gap_gate",
+    "max_followups": 0,
+    "max_live_queries_per_iteration": 1,
+    "mode": "live",
+    "per_search_timeout_s": 90,
+    "policy": "prior-first",
+    "prior_first_followups": 0,
+    "prior_per_persona": 1,
+    "prior_seed_snapshot": null,
+    "prior_sources": [
+      "pre_run_curated_validation_prior"
+    ],
+    "prior_store": "prior-store/store.json",
+    "provider": "OpenAI Agents SDK WebSearchTool",
+    "raw_responses_and_sources_persisted": true,
+    "search_context_size": "low",
+    "snapshot": null,
+    "stage": "pre-draft",
+    "timeout_policy": "per_search_and_run_deadline",
+    "web_search_max_tokens": 12000,
+    "web_search_tool_choice": "auto"
+  },
+  "research_module_sha256": {
+    "curated_offline": "24221013d5aeec604f13093f2738be261f6bfa20c51c06c7e22dd03416aabac3",
+    "external": "0eebbb2d91419d05fca3a10931868553a81adb9460ff22ca641f6c5345d8a01c"
+  },
+  "role": "formal",
+  "run_id": "formal-router-gpt54-20260831-002",
+  "schema_version": "full-5.1-portfolio-aware-fidelity-router",
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "selection_metric": "within-user normalized-rank average over fixed seeds",
+  "smoke_test_rows": 20000,
+  "smoke_timeout_s": 60,
+  "structured_memory_retrieval": true,
+  "submission_reserve_s": 2760,
+  "temperature": null,
+  "temperature_note": "provider default",
+  "test_labels_exposed_to_candidate": false,
+  "test_labels_used_for_selection": false,
+  "token_budget": null,
+  "token_budget_note": "tokens are measured and reported, not used as a stopping rule",
+  "validation_labels_exposed_to_candidate": false,
+  "variant": "Full",
+  "wall_budget_s": 21600
+}

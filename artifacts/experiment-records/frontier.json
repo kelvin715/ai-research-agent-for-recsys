@@ -1,0 +1,287 @@
+{
+  "nodes": [
+    {
+      "children": [
+        "w001",
+        "w002",
+        "w003"
+      ],
+      "decision": "BASELINE",
+      "execution_mode": "baseline",
+      "mechanism": "official FM baseline",
+      "metrics_path": "baseline/metrics.json",
+      "node_id": "n000",
+      "operator_stack": [],
+      "parent_node_id": null,
+      "pipeline_path": "incumbents/iter-000.py",
+      "pipeline_sha256": "41f6fb3e5cdbdea6ba76a2b8925f2e1b29d3bcd1b88de29fa326f65f3b6efe2a",
+      "prediction_paths": [
+        "baseline/s0/ws/pred.npy",
+        "baseline/s1/ws/pred.npy",
+        "baseline/s2/ws/pred.npy"
+      ],
+      "selection_primary": 0.6018779688793552,
+      "status": "COMPLETE",
+      "times_selected_as_parent": 0
+    },
+    {
+      "acceptance_channel": "standalone",
+      "children": [],
+      "decision": "UNCERTAIN",
+      "execution_mode": "operator",
+      "logical_patch_scope": [
+        "features"
+      ],
+      "materialized_patch_scope": [
+        "data_view"
+      ],
+      "mechanism": "temporal-context categorical augmentation",
+      "metrics_path": "iter-002/metrics.json",
+      "node_id": "n002",
+      "operator_id": "legal_temporal_context",
+      "operator_stack": [
+        "deepfm_engagement_mtl_v1",
+        "legal_temporal_context"
+      ],
+      "parent_node_id": "w002",
+      "pipeline_path": "iter-002/attempt-0/pipeline.py",
+      "pipeline_sha256": "79abf9cca5e5397b1c6654f826bc2accf69710e1a74728f6f21314b7cbabbb5c",
+      "portfolio_delta_primary": -0.0002527445864699551,
+      "prediction_paths": [
+        "iter-002/attempt-0/s0/ws/pred.npy",
+        "iter-002/attempt-0/s1/ws/pred.npy",
+        "iter-002/attempt-0/s2/ws/pred.npy"
+      ],
+      "selection_primary": 0.6052800193085559,
+      "standalone_decision": "UNCERTAIN",
+      "status": "COMPLETE",
+      "times_selected_as_parent": 0
+    },
+    {
+      "acceptance_channel": "standalone",
+      "children": [],
+      "decision": "UNCERTAIN",
+      "execution_mode": "custom_patch",
+      "logical_patch_scope": [
+        "predict"
+      ],
+      "materialized_patch_scope": null,
+      "mechanism": "tab-aware score calibration at prediction",
+      "metrics_path": "iter-003/metrics.json",
+      "node_id": "n003",
+      "operator_id": null,
+      "operator_stack": null,
+      "parent_node_id": "w001",
+      "pipeline_path": "iter-003/attempt-0/pipeline.py",
+      "pipeline_sha256": "413239a68afb72b74cf59eecb54b6110ee739609e5b036a2f3fb3c544b8e4eb5",
+      "portfolio_delta_primary": -3.368225314370754e-05,
+      "prediction_paths": [
+        "iter-003/attempt-0/s0/ws/pred.npy",
+        "iter-003/attempt-0/s1/ws/pred.npy",
+        "iter-003/attempt-0/s2/ws/pred.npy"
+      ],
+      "selection_primary": 0.6050145220543199,
+      "standalone_decision": "UNCERTAIN",
+      "status": "COMPLETE",
+      "times_selected_as_parent": 0
+    },
+    {
+      "acceptance_channel": "standalone",
+      "children": [],
+      "decision": "UNCERTAIN",
+      "execution_mode": "custom_patch",
+      "logical_patch_scope": [
+        "predict"
+      ],
+      "materialized_patch_scope": null,
+      "mechanism": "tab-aware prediction residual blend",
+      "metrics_path": "iter-004/metrics.json",
+      "node_id": "n004",
+      "operator_id": null,
+      "operator_stack": null,
+      "parent_node_id": "w003",
+      "pipeline_path": "iter-004/attempt-0/pipeline.py",
+      "pipeline_sha256": "3413f58b5ef1fbbcb6aa3f2b618217d78b4c19ab47a2f431312bcdf8a800106d",
+      "portfolio_delta_primary": -3.368225314370754e-05,
+      "prediction_paths": [
+        "iter-004/attempt-0/s0/ws/pred.npy",
+        "iter-004/attempt-0/s1/ws/pred.npy",
+        "iter-004/attempt-0/s2/ws/pred.npy"
+      ],
+      "selection_primary": 0.6010729591013781,
+      "standalone_decision": "UNCERTAIN",
+      "status": "COMPLETE",
+      "times_selected_as_parent": 0
+    },
+    {
+      "children": [
+        "n003"
+      ],
+      "decision": "ACCEPT",
+      "execution_mode": "empirical_prior_portfolio",
+      "logical_iteration": 1,
+      "logical_patch_scope": [
+        "features",
+        "target",
+        "model",
+        "loss",
+        "train"
+      ],
+      "materialized_patch_scope": [
+        "data_view",
+        "features",
+        "target",
+        "model",
+        "loss",
+        "train",
+        "predict"
+      ],
+      "mechanism": "Validated legal ranking stack",
+      "metrics_path": "warmstart/members/member-001/metrics.json",
+      "node_id": "w001",
+      "operator_id": "legal_rank_stack_v1",
+      "operator_stack": [
+        "legal_rank_stack_v1"
+      ],
+      "parent_node_id": "n000",
+      "pipeline_path": "warmstart/members/member-001/attempt-0/pipeline.py",
+      "pipeline_sha256": "960c2c3af18107d8def79c6e969d2be9870d70f29465e1ed68f033f23aad4f8d",
+      "prediction_paths": [
+        "warmstart/members/member-001/attempt-0/s0/ws/pred.npy",
+        "warmstart/members/member-001/attempt-0/s1/ws/pred.npy",
+        "warmstart/members/member-001/attempt-0/s2/ws/pred.npy"
+      ],
+      "selection_primary": 0.6049133715527031,
+      "status": "COMPLETE",
+      "times_selected_as_parent": 1,
+      "warmstart_subexperiment": 1
+    },
+    {
+      "children": [
+        "n002"
+      ],
+      "decision": "ACCEPT",
+      "execution_mode": "empirical_prior_portfolio",
+      "logical_iteration": 1,
+      "logical_patch_scope": [
+        "target",
+        "model",
+        "loss",
+        "train"
+      ],
+      "materialized_patch_scope": [
+        "data_view",
+        "features",
+        "target",
+        "model",
+        "loss",
+        "train",
+        "predict"
+      ],
+      "mechanism": "CPU DeepFM + four engagement heads",
+      "metrics_path": "warmstart/members/member-002/metrics.json",
+      "node_id": "w002",
+      "operator_id": "deepfm_engagement_mtl_v1",
+      "operator_stack": [
+        "deepfm_engagement_mtl_v1"
+      ],
+      "parent_node_id": "n000",
+      "pipeline_path": "warmstart/members/member-002/attempt-0/pipeline.py",
+      "pipeline_sha256": "2b3ae1494c2fe98e6dc6de77f09d3488d094f2f40c27837031b5a7e5ecedc447",
+      "prediction_paths": [
+        "warmstart/members/member-002/attempt-0/s0/ws/pred.npy",
+        "warmstart/members/member-002/attempt-0/s1/ws/pred.npy",
+        "warmstart/members/member-002/attempt-0/s2/ws/pred.npy"
+      ],
+      "selection_primary": 0.6047517554743435,
+      "status": "COMPLETE",
+      "times_selected_as_parent": 1,
+      "warmstart_subexperiment": 2
+    },
+    {
+      "children": [
+        "n004"
+      ],
+      "decision": "ROLLBACK",
+      "execution_mode": "empirical_prior_portfolio",
+      "logical_iteration": 1,
+      "logical_patch_scope": [
+        "features",
+        "target",
+        "model",
+        "train"
+      ],
+      "materialized_patch_scope": [
+        "data_view",
+        "features",
+        "target",
+        "model",
+        "loss",
+        "train",
+        "predict"
+      ],
+      "mechanism": "Item/context LambdaRank",
+      "metrics_path": "warmstart/members/member-003/metrics.json",
+      "node_id": "w003",
+      "operator_id": "item_lambdarank",
+      "operator_stack": [
+        "item_lambdarank"
+      ],
+      "parent_node_id": "n000",
+      "pipeline_path": "warmstart/members/member-003/attempt-0/pipeline.py",
+      "pipeline_sha256": "5a61d820798d697c7c097c674315d9ac31aeb101a97c152ec46cfa9ff58e54c0",
+      "prediction_paths": [
+        "warmstart/members/member-003/attempt-0/s0/ws/pred.npy",
+        "warmstart/members/member-003/attempt-0/s1/ws/pred.npy",
+        "warmstart/members/member-003/attempt-0/s2/ws/pred.npy"
+      ],
+      "selection_primary": 0.6010575837714116,
+      "status": "COMPLETE",
+      "times_selected_as_parent": 1,
+      "warmstart_subexperiment": 3
+    }
+  ],
+  "parent_selections": [
+    {
+      "decision": "ACCEPT",
+      "iteration": 2,
+      "node_id": "w002",
+      "portfolio_weight": 0.4,
+      "reason": "portfolio_member_rotation",
+      "selection_primary": 0.6047517554743435,
+      "times_selected_as_parent": 1
+    },
+    {
+      "decision": "ACCEPT",
+      "iteration": 3,
+      "node_id": "w001",
+      "portfolio_weight": 0.4,
+      "reason": "portfolio_member_rotation",
+      "selection_primary": 0.6049133715527031,
+      "times_selected_as_parent": 1
+    },
+    {
+      "decision": "ROLLBACK",
+      "iteration": 4,
+      "node_id": "w003",
+      "portfolio_weight": 0.2,
+      "reason": "portfolio_member_rotation",
+      "selection_primary": 0.6010575837714116,
+      "times_selected_as_parent": 1
+    }
+  ],
+  "policy": {
+    "draft_count": 2,
+    "eligible_decisions": [
+      "ACCEPT",
+      "BASELINE",
+      "UNCERTAIN"
+    ],
+    "exploration": 0.00025,
+    "portfolio_parent_policy": "least-expanded member, then weight and opportunity",
+    "rollback_nodes_preserved_but_not_expandable": true,
+    "selected_portfolio_members_expandable": true,
+    "uncertain_nodes_expandable": true
+  },
+  "schema_version": "frontier-1.0"
+}

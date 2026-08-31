@@ -1,0 +1,68 @@
+{
+  "basis_type": "diagnostic",
+  "estimated_cost_s": 10,
+  "evidence": [
+    {
+      "ref": "portfolio_diagnostics.members[2].slice_specialization.member_disadvantages: tab=0 -0.01749022029153391, tab=2 -0.009346696620826433, tab=6 -0.036711203406393667",
+      "type": "diagnostic"
+    },
+    {
+      "ref": "predict block currently returns SO.predict(model, Xs, split)",
+      "type": "current_code"
+    },
+    {
+      "ref": "predict block may call DV.load(split) to read inference-time arrays such as tab; per-user constants cannot change either metric",
+      "type": "task_spec"
+    }
+  ],
+  "evidence_adaptation": null,
+  "execution_mode": "custom_patch",
+  "expected_observation": "If the hypothesis is right, official validation primary should rise modestly through better contribution on tabs 0/2/6, with prediction hashes changing for affected rows only.",
+  "experiment_contract": {
+    "claim": "Test whether a tab-aware residual applied only at prediction time improves this tree member's within-user ordering contribution.",
+    "expected_observable": "Predictions differ from parent on rows in selected tabs and remain identical on other tabs.",
+    "falsification_condition": "No measurable gain in official validation primary or byte-identical predictions relative to parent.",
+    "forbidden_shortcuts": [
+      "adding a global constant to all rows",
+      "using any label or post-exposure feature at inference",
+      "editing train/model/features so the effect is no longer attributable to predict-time tab residuals"
+    ],
+    "portfolio_role": "error_diversifier",
+    "required_components": [
+      "predict block computes base = SO.predict(model, Xs, split)",
+      "predict block loads DV.load(split).tab",
+      "predict block applies nonzero tab-specific residuals for selected tabs only"
+    ]
+  },
+  "fallback": "If this is neutral or negative, revert and prefer a train-side structural change rather than further scalar residual tuning.",
+  "hypothesis": "A small tab-conditional residual on top of the LambdaRank score will improve marginal portfolio value by nudging the tree member toward slices where current portfolio feedback shows systematic underperformance by tab.",
+  "implementation_plan": "Edit only the predict block. Keep SO.predict(model, Xs, split) as the base score, then load the same split via DV.load(split), identify rows with tab in {0,2,4,6}, and apply fixed tab-specific affine residuals to the base score using train-derived constants hard-coded in code from diagnostics, with zero adjustment for other tabs. Use only inference-time tab and base prediction; do not touch training or features.",
+  "justification": "Because ranking is within-user, a global shift is inert, but a tab-varying residual changes ordering when a user has candidates from multiple tabs. The large tab-specific disadvantages suggest this member's errors are structured by tab rather than random. A prediction-side residual is directly executable, cheap, and targets error diversity without changing the delegated training backend.",
+  "mechanism": "tab-aware prediction residual blend",
+  "mechanism_tags": [
+    "prediction_blend",
+    "group_specialization",
+    "error_diversity",
+    "residual_targeting"
+  ],
+  "observation": "The portfolio diagnostics show the selected parent w003 has strong tab weaknesses: in \"portfolio_diagnostics.members[2].slice_specialization.member_disadvantages\" the deltas are -0.01749022029153391 for \"tab=0\", -0.009346696620826433 for \"tab=2\", and -0.036711203406393667 for \"tab=6\"; the current pipeline predict path is exactly `return SO.predict(model, Xs, split)`.",
+  "operator_id": null,
+  "parent_operator_stack": [
+    "item_lambdarank"
+  ],
+  "parent_references": [
+    "w003"
+  ],
+  "patch_scope": [
+    "predict"
+  ],
+  "persona": "optimizer",
+  "primary_block": "predict",
+  "research_evidence": [],
+  "research_nonuse_reason": "The direct basis is slice diagnostics plus the explicit predict-time legal-context allowance. No supplied research record describes this tab-residual mechanism more directly than the current portfolio evidence.",
+  "risk": [
+    "Residual magnitudes may be miscalibrated and hurt standalone ranking",
+    "Many users may see only one tab so effect could be limited",
+    "Diagnostic disadvantages are portfolio-relative and may not transfer cleanly to standalone prediction edits"
+  ]
+}

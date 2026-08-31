@@ -1,0 +1,5 @@
+{
+  "analysis": "The experiment successfully changed predictions, so the legal_temporal_context operator was active and consumed by the unchanged DeepFM pipeline. On standalone validation it produced only a very small mean gain over the search parent/incumbent (delta_primary about +0.00053), but the paired 95% CI crossed zero, so the improvement is not statistically reliable. Slice diagnostics show mixed effects rather than the expected broad context repair: gains appeared for some tabs and user-history/popularity segments, but several context-heavy slices regressed, including tabs 2, 4, and 6 and higher-popularity item quartiles. Portfolio impact was slightly negative versus the incumbent ensemble and also not significant, so the hypothesis that these temporal-context categorical features would likely add useful portfolio gain is not established by this run.",
+  "next_lesson": "Legal temporal context can alter rankings but, here, its signal was too weak and inconsistent to justify keeping it as a standalone refinement.",
+  "result": "inconclusive"
+}

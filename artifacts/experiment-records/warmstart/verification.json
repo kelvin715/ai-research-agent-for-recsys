@@ -1,0 +1,85 @@
+{
+  "context_router": {
+    "expected_selection_primary": 0.6061277485758569,
+    "fit_during_run": false,
+    "global_selection_primary": 0.6058280796698023,
+    "matched_seed_deltas": [
+      0.00024210719420603155,
+      0.0001501077513974547,
+      0.0002110082560214943
+    ],
+    "observed_selection_primary": 0.6061277485758569,
+    "router": {
+      "fallback": "global member weights",
+      "feature": "tab",
+      "min_rows": 1000,
+      "routes": [
+        {
+          "member_weights": {
+            "w001": 0.1,
+            "w002": 0.6,
+            "w003": 0.3
+          },
+          "rows": 13726,
+          "value": 0
+        },
+        {
+          "member_weights": {
+            "w001": 0.3,
+            "w002": 0.4,
+            "w003": 0.3
+          },
+          "rows": 92672,
+          "value": 1
+        },
+        {
+          "member_weights": {
+            "w001": 0.9,
+            "w002": 0.0,
+            "w003": 0.1
+          },
+          "rows": 3834,
+          "value": 2
+        },
+        {
+          "member_weights": {
+            "w001": 0.5,
+            "w002": 0.4,
+            "w003": 0.1
+          },
+          "rows": 7877,
+          "value": 4
+        },
+        {
+          "member_weights": {
+            "w001": 0.0,
+            "w002": 0.3,
+            "w003": 0.7
+          },
+          "rows": 5170,
+          "value": 6
+        }
+      ],
+      "source": "pre_registered_empirical_prior",
+      "test_label_free": true,
+      "weight_grid_step": 0.1
+    },
+    "status": "VERIFIED",
+    "test_labels_used": false
+  },
+  "expected_selection_primary": 0.6058280796698023,
+  "observed_selection_primary": 0.6058280796698023,
+  "operators": [
+    "legal_rank_stack_v1",
+    "deepfm_engagement_mtl_v1",
+    "item_lambdarank"
+  ],
+  "portfolio_id": "validated_rank_router_v2",
+  "status": "VERIFIED",
+  "test_labels_used": false,
+  "weights": [
+    0.4,
+    0.4,
+    0.2
+  ]
+}

@@ -1,0 +1,26 @@
+# Candidate-side model libraries.  This file is intentionally separate from
+# requirements-orchestrator.txt: everything installed here is mounted read-only
+# inside the offline candidate sandbox and recorded exactly in env.lock.json.
+#
+# Add any model library needed by a pre-run primitive or by the
+# candidate search space, then rebuild with `bash trusted/make_venv.sh` before
+# freezing manifest.json. Runtime installation and network access remain blocked.
+# PyTorch is pinned to its official CPU wheel channel; TorchRec is paired with
+# the maintainers' CPU-specific FBGEMM distribution below.  This keeps the formal
+# environment usable on CPU-only workers and prevents a silent CUDA resolution.
+--extra-index-url https://download.pytorch.org/whl/cpu
+numpy==2.2.6
+scipy>=1.10,<2
+scikit-learn>=1.3,<2
+lightgbm>=4,<5
+torch==2.13.0+cpu
+recbole==1.2.1
+fbgemm-gpu-cpu==1.8.0
+tensordict>=0.10,<1
+torchmetrics==1.0.3
+tqdm>=4.48,<5
+pyre-extensions>=0.0.29,<1
+# no-deps: torchrec==1.8.0
+# TorchRec upstream declares the CUDA-oriented distribution name `fbgemm-gpu`.
+# trusted/make_venv.sh installs this recorded spec with --no-deps after the
+# synchronized `fbgemm-gpu-cpu` package and all remaining dependencies above.

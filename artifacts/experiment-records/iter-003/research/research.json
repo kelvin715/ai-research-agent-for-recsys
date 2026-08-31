@@ -1,0 +1,140 @@
+{
+  "cache_policy": "prior_first_cache_hit_no_web_search",
+  "cached_knowledge_ids": [
+    "K0009",
+    "K0003",
+    "K0002"
+  ],
+  "empirical_snapshots": [
+    {
+      "original_mode": "curated",
+      "path": "empirical/bf8d6c5da9e2cc2e09d0d33db4b5017bc024e042a2a500c7336d6d6e1fd40aaa.json",
+      "sha256": "bf8d6c5da9e2cc2e09d0d33db4b5017bc024e042a2a500c7336d6d6e1fd40aaa",
+      "source_path": "empirical_priors/track2-solutions-valid-only-v1.json"
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "E001",
+      "kind": "curated_research",
+      "knowledge_id": "K0009",
+      "knowledge_origin": "cached",
+      "persona": "optimizer",
+      "query": "Which optimizer-side proposal failed because its configuration was not connected to the training backend?",
+      "reason": "Prevent a later Agent iteration from repeating an executable-looking but semantically inert config-only patch.",
+      "record_type": "negative_result",
+      "requires_success_mechanisms": [],
+      "source_ids": [
+        "S001"
+      ],
+      "summary": "Deprioritize the exact tab inverse-frequency BPR proposal that only adds hp['pair_group_weight']='tab_invfreq' and hp['pair_group_weight_values'] before calling SO.train. In the locked formal run, all three seed predictions were byte-identical to the Legal parent because stable_ops did not consume either key. Before proposing any config-only optimizer change, trace the key to a concrete sampler, loss, or gradient consumer in current code; if no consumer exists within the allowed patch scope, reject the proposal rather than relying on static/smoke success. This is an implementation-specific no-op, not evidence that correctly wired group weighting can never work."
+    },
+    {
+      "evidence_id": "E002",
+      "kind": "curated_research",
+      "knowledge_id": "K0003",
+      "knowledge_origin": "cached",
+      "persona": "architecture",
+      "query": "Which legal context and side-information fields complement the FM?",
+      "reason": "Broad side-feature additions can add noise; legal temporal context needs an explicit availability rule.",
+      "record_type": "mechanism",
+      "requires_success_mechanisms": [],
+      "source_ids": [
+        "S002",
+        "S003"
+      ],
+      "summary": "Prioritize low-cardinality hour and train-derived user exposure-gap buckets before broad profile expansion. Compute all quantile edges from train only. The hour+user_gap BPR configuration reached five-seed official-validation primary 0.604430330 ± 0.000459158; adding the censored watch-time auxiliary target reached 0.604607224 ± 0.000168363. Adding selected user profile domains on top reached 0.604821956 ± 0.000355822, a smaller incremental effect. The legal hour+gap+aux configuration also led the inspected random-exposure set at unbiased primary 0.378085981 ± 0.003012055. Any history feature must use train feedback or exposure-only information available at prediction time; evaluation-period long_view/play-time feedback is forbidden."
+    },
+    {
+      "evidence_id": "E003",
+      "kind": "curated_research",
+      "knowledge_id": "K0002",
+      "knowledge_origin": "cached",
+      "persona": "reward",
+      "query": "How should watch time complement native long_view without changing evaluation labels?",
+      "reason": "The native binary label discards engagement magnitude and completed plays are right-censored by duration.",
+      "record_type": "mechanism",
+      "requires_success_mechanisms": [],
+      "source_ids": [
+        "S003",
+        "S004"
+      ],
+      "summary": "Keep native long_view as the ranking objective and add a small censored watch-time regression head sharing FM embeddings. Transform play time and duration with log1p/12. For incomplete plays use exact regression residual; for completed plays use a one-sided lower-bound hinge that stops penalizing predictions above log-duration. Never use evaluation-period feedback as an input feature. BPR plus this auxiliary target at weight 0.2 reached five-seed official-validation primary 0.604023290 ± 0.000282947 versus 0.603517127 ± 0.000631158 for BPR alone; on three random-exposure seeds, unbiased primary was 0.376328528 ± 0.003245064 versus 0.373291085 ± 0.002151737. This is an implementation prior, not permission to replace the fixed relevance label."
+    }
+  ],
+  "executed_live_query_count": 0,
+  "gap_decision": {
+    "coverage": [
+      {
+        "decision": "use_cache",
+        "gap": null,
+        "gap_type": "none",
+        "knowledge_ids": [
+          "K0009"
+        ],
+        "persona": "optimizer",
+        "priority": 0,
+        "query": null
+      },
+      {
+        "decision": "use_cache",
+        "gap": null,
+        "gap_type": "none",
+        "knowledge_ids": [
+          "K0003"
+        ],
+        "persona": "architecture",
+        "priority": 0,
+        "query": null
+      },
+      {
+        "decision": "use_cache",
+        "gap": null,
+        "gap_type": "none",
+        "knowledge_ids": [
+          "K0002"
+        ],
+        "persona": "reward",
+        "priority": 0,
+        "query": null
+      }
+    ],
+    "max_live_queries": 1,
+    "policy": "prior_first",
+    "selected_live_queries": [],
+    "suppressed_gap_personas": []
+  },
+  "live_search_performed": false,
+  "mode": "warm_start",
+  "new_knowledge_ids": [],
+  "planned_live_query_count": 0,
+  "query_plan": null,
+  "review": null,
+  "schema_version": "external-research-1.1",
+  "searches": [],
+  "seed_snapshots": [],
+  "sources": [
+    {
+      "citation": "runs/formal-portfolio-gpt54-20260830-001/iter-004/{proposal.json,attempt-0/pipeline.diff,reflection.json}; fields used: train-only patch, three-seed prediction identity, no-op diagnosis",
+      "kind": "local_code",
+      "source_id": "S001"
+    },
+    {
+      "citation": "../track2-solutions/solfeat.py, configs.py and results/{M1_legal,M2_legal_wt,P4_M2_user}*.json; fields used: config, seed, leak, primary",
+      "kind": "local_code",
+      "source_id": "S002"
+    },
+    {
+      "citation": "../track2-solutions/results-unbiased/*.json; fields used: config, seed, valid_primary, unbiased_primary",
+      "kind": "local_code",
+      "source_id": "S003"
+    },
+    {
+      "citation": "../track2-solutions/solfm.py and results/{A_official,B_bpr,G_bpr_wt}*.json; fields used: config, seed, leak, primary",
+      "kind": "local_code",
+      "source_id": "S004"
+    }
+  ],
+  "stage": "pre_draft",
+  "status": "complete"
+}

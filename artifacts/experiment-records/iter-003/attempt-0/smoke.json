@@ -1,0 +1,5 @@
+{
+  "infrastructure_retries": 0,
+  "kind": "smoke",
+  "wall_s": 1.15
+}
