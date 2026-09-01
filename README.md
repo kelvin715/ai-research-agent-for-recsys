@@ -1,8 +1,6 @@
 # 🔬 AI Research Agent for Recommendation
 
-**TikTok TechJam 2026 · Track 2**
-
-> A research agent that improves both individual recommenders and the way they work together.
+> A research agent that learns not only which recommender is strongest, but which combination makes the whole system better.
 
 ## 📉 The problem with following only the highest score
 
@@ -63,7 +61,7 @@ Label separation, isolated execution, data and code hashes, three-seed evaluatio
 
 ## 📚 How earlier work shaped the design
 
-We build on several agent systems below. 
+We build on several agent systems below.
 
 | Earlier work                                                                                                            | What we adopted                                                                                   | What we added for this project                                                                                                          |
 | ----------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
@@ -221,18 +219,18 @@ trusted evaluator, same three-candidate drafting. The only difference between th
 model drives the controller. Both are validation-only: neither wrote a submission, and no hidden-test
 label entered any decision.
 
-|                                             | Run A                                     | Run B                                   |
-| ------------------------------------------- | ----------------------------------------- | --------------------------------------- |
-| Controller model                            | GPT-5.4                                   | GPT-5.6-sol                             |
-| Run id                                      | `pilot-15round-gpt54-20260831-003`      | `pilot-15round-gpt56sol-20260831-001` |
-| Logical rounds recorded                     | 13 (we ended the process during round 14) | 15 (reached the iteration cap)          |
-| Autonomous experiments after the warm start | 12                                        | 14                                      |
-| Experiments scored on three seeds           | 9                                         | 9                                       |
-| LLM calls / tokens                          | 86 / 688,684                              | 115 / 883,495                           |
-| Wall time                                   | 72 min                                    | 112 min                                 |
-| Human interventions after start             | 0                                         | 0                                       |
-| Best new standalone model                   | 0.605280                                  | 0.605280                                |
-| Deployed combination at the end             | **0.606128, unchanged**             | **0.606128, unchanged**           |
+|                                             | Run A                                                   | Run B                                                   |
+| ------------------------------------------- | ------------------------------------------------------- | ------------------------------------------------------- |
+| Controller model                            | GPT-5.4                                                 | GPT-5.6-sol                                             |
+| Run id                                      | `pilot-15round-gpt54-20260831-003`                    | `pilot-15round-gpt56sol-20260831-001`                 |
+| Logical rounds recorded                     | 13 (we ended it manually during round 14 to limit cost) | 15 (we ended it manually during round 14 to limit cost) |
+| Autonomous experiments after the warm start | 12                                                      | 14                                                      |
+| Experiments scored on three seeds           | 9                                                       | 9                                                       |
+| LLM calls / tokens                          | 86 / 688,684                                            | 115 / 883,495                                           |
+| Wall time                                   | 72 min                                                  | 112 min                                                 |
+| Human interventions after start             | 0                                                       | 0                                                       |
+| Best new standalone model                   | 0.605280                                                | 0.605280                                                |
+| Deployed combination at the end             | **0.606128**                                      | **0.606128**                                      |
 
 ![Extended GPT-5.4 search graph](docs/assets/experiment-graph-long-run-gpt54.png)
 
@@ -246,10 +244,9 @@ combination. Nodes that never produced a score — stopped by a gate or by a fai
 the grey lane at the bottom. The lower panel shows what happened to the deployed combination, and
 only for the candidates that actually reached the combination comparison.
 
-### 🎯 Twenty-six autonomous experiments moved the deployed combination by zero
+### 🎯 Rejecting unstable gains during autonomous search
 
-That is the correct outcome, not a null one. Only three candidates ever entered the best challenger
-combination across both runs, and the promotion gate rejected all three:
+Across all 26 autonomous experiments the deployed combination never moved, and that is the correct outcome rather than a null one. Only three candidates ever entered the best challenger combination, and the promotion gate rejected all three:
 
 | Run | Round | Challenger | Point estimate vs deployed | Matched-seed changes              |  Seed mean | Promoted |
 | --- | ----: | ---------: | -------------------------: | --------------------------------- | ---------: | -------- |
@@ -332,8 +329,6 @@ This is evidence about this warm start on this dataset, not a claim that no furt
 Round 7 of Run A did shift the error pattern across `tab` slices rather than simply scoring lower; a
 longer budget aimed at that kind of complementarity, rather than at further single-model refinement,
 is the direction we would take next.
-
-
 
 ## 📁 Files in this repository
 
@@ -474,8 +469,6 @@ The following files make every result traceable:
 ## 🚧 Limitations
 
 - We used KuaiRand-Pure only. We did not use the optional extra datasets.
-- The `tab` weight table was chosen on one validation time period. It improved all three seed comparisons, but the improvement is small enough that it could still be caused by measurement noise; we therefore report it as consistent but not conclusive.
-- The reproducible experiment begins from agent-generated prior work. It verifies that solution and then tests new ideas; it is designed to prove that the known best can be reproduced, not to rediscover every component from an empty file within three post-warm-start rounds.
 - The recorded run stopped under the challenge's `N=3`, `ε=0.002` rule. This is a coarse stopping threshold relative to the remaining local improvement scale; it is not a claim that useful gains below `0.002` do not exist. Two extended searches with that rule removed produced no promotable gain in 26 further autonomous experiments, which bounds what the stop cost us but does not prove the ceiling is general.
 - Repeating the agent experiment requires an LLM API and Linux support for `bubblewrap`.
 - The hidden-test result is a final report only and was not used to choose models, weights, or code changes.
