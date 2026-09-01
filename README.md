@@ -2,6 +2,15 @@
 
 > A research agent that learns not only which recommender is strongest, but which combination makes the whole system better.
 
+[![Open the live experiment graph](https://img.shields.io/badge/%E2%96%B6%20Open%20the%20live%20experiment%20graph-6688d9?style=for-the-badge)](https://kelvin715.github.io/ai-research-agent-for-recsys/)
+
+**Click any node** to read the agent's hypothesis, its three-seed scores, the paired confidence
+interval, and the exact reason the change was kept or rejected. Nothing to install. Three real runs
+are replayed from frozen snapshots:
+[submitted run](https://kelvin715.github.io/ai-research-agent-for-recsys/demo/submitted-run/) ·
+[extended GPT-5.4](https://kelvin715.github.io/ai-research-agent-for-recsys/demo/long-run-gpt54/) ·
+[extended GPT-5.6-sol](https://kelvin715.github.io/ai-research-agent-for-recsys/demo/long-run-gpt56sol/)
+
 ## 📉 The problem with following only the highest score
 
 Many machine-learning agents follow one path: modify the current highest-scoring model, keep the change if that model improves, and repeat. That works when the goal is one model. It can fail when the final prediction combines several models.
@@ -195,6 +204,8 @@ flowchart LR
     L --> R
 ```
 
+▶ **[Open this run in the live dashboard](https://kelvin715.github.io/ai-research-agent-for-recsys/demo/submitted-run/)** — click a node for its hypothesis, seed scores, and decision.
+
 This graph captures three different outcomes that a scalar leaderboard would collapse together:
 
 - `w001` and `w002` were clear standalone successes and became complementary portfolio members.
@@ -234,7 +245,11 @@ label entered any decision.
 
 ![Extended GPT-5.4 search graph](docs/assets/experiment-graph-long-run-gpt54.png)
 
+▶ **[Explore this graph interactively](https://kelvin715.github.io/ai-research-agent-for-recsys/demo/long-run-gpt54/)** — every node opens its proposal, code change, and evidence.
+
 ![Extended GPT-5.6-sol search graph](docs/assets/experiment-graph-long-run-gpt56sol.png)
+
+▶ **[Explore this graph interactively](https://kelvin715.github.io/ai-research-agent-for-recsys/demo/long-run-gpt56sol/)** — same dashboard, the GPT-5.6-sol run.
 
 Both figures are drawn directly from the saved decision records with
 `python3 scripts/long_run_graphs.py render`, and use the dashboard's colours. The upper panel is the
