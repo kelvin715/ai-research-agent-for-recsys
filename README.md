@@ -1,10 +1,10 @@
-# AI Research Agent for Recommendation
+# 🔬 AI Research Agent for Recommendation
 
 **TikTok TechJam 2026 · Track 2**
 
 > A research agent that improves both individual recommenders and the way they work together.
 
-## The problem with following only the highest score
+## 📉 The problem with following only the highest score
 
 Many machine-learning agents follow one path: modify the current highest-scoring model, keep the change if that model improves, and repeat. That works when the goal is one model. It can fail when the final prediction combines several models.
 
@@ -18,7 +18,7 @@ We observed exactly this failure mode. LambdaRank was the weakest of our three m
 
 An agent that always expands the best individual model would spend the least attention on LambdaRank, even though LambdaRank contributes the most different information.
 
-## Our answer
+## 💡 Our answer
 
 Our agent keeps a graph of measured experiments instead of one chain of successive models. It can return to an earlier branch, deliberately revisit every model in the current combination, or join ideas from different branches. Every candidate is judged in two ways:
 
@@ -31,7 +31,7 @@ The agent also turns published methods and earlier experiments into specific, te
 
 Our final solution combines three different models. It changes their weights according to the input field `tab`, using a small fixed table. The solution scored **0.6061277486** on validation and **0.5991** on the hidden test.
 
-## Results
+## 📊 Results
 
 The official primary score is the average of GAUC and nDCG@5:
 
@@ -50,7 +50,7 @@ GAUC measures whether each user receives a good ordering overall. nDCG@5 focuses
 
 The hidden test was scored once, after all model choices and weights had been fixed. Hidden-test labels were never given to the agent or the training code. Exact values and the evaluation rules are in [docs/RESULTS.md](docs/RESULTS.md).
 
-## Core contributions
+## ⭐ Core contributions
 
 1. **Search a graph, not one model chain.** The agent preserves successful, uncertain, and failed branches. It can revisit a model that is weak on its own when that model contributes different errors to the final combination.
 2. **Optimize the final result during research.** Individual score and improvement to the current combination are two separate measurements. A candidate can be retained for either reason, with the reason recorded explicitly.
@@ -61,7 +61,7 @@ The hidden test was scored once, after all model choices and weights had been fi
 
 Label separation, isolated execution, data and code hashes, three-seed evaluation, and complete logs are the engineering foundation that makes these contributions measurable. They are important safeguards, but they are not presented as the main research novelty.
 
-## How earlier work shaped the design
+## 📚 How earlier work shaped the design
 
 We build on several agent systems below. 
 
@@ -76,7 +76,7 @@ We build on several agent systems below.
 
 The detailed design lineage, including what is borrowed and what is specific to our system, is in [docs/METHOD_LINEAGE.md](docs/METHOD_LINEAGE.md).
 
-## From open discovery to a reproducible demonstration
+## 🧭 From open discovery to a reproducible demonstration
 
 The solution was developed in two stages.
 
@@ -88,7 +88,7 @@ The challenge run has a maximum of 50 iterations and stops when the best result 
 
 The recorded run reproduced the warm start and then stopped after three new experiments that did not change the best deployed combination. That is compliance with the required stopping rule, not a three-iteration limit in the agent design.
 
-## Overall flow
+## 🗺️ Overall flow
 
 ```mermaid
 flowchart LR
@@ -113,9 +113,9 @@ flowchart LR
 
 The loop on the left shows research over several branches. The path on the right shows model selection and final prediction. The important connection is the feedback from the current combination back into the next branch choice.
 
-## Final recommendation method
+## 🧩 Final recommendation method
 
-### Three models that learn different patterns
+### 🧠 Three models that learn different patterns
 
 | Model                        | What it does                                                                                                                                                                             | Why it is included                                                                                     |
 | ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
@@ -125,7 +125,7 @@ The loop on the left shows research over several branches. The path on the right
 
 Each model is trained three times with random seeds `0`, `1`, and `2`. For every user, each model's scores are first converted to ranks between 0 and 1. The ranks are then averaged. This prevents a model with numerically larger scores from dominating the result.
 
-### Fixed weights selected by `tab`
+### ⚖️ Fixed weights selected by `tab`
 
 The default weights are `0.4 / 0.4 / 0.2` for the pairwise model, DeepFM, and LambdaRank. For common `tab` values, the following fixed weights are used:
 
@@ -140,7 +140,7 @@ The default weights are `0.4 / 0.4 / 0.2` for the pairwise model, DeepFM, and La
 
 These values came from the agent-driven discovery stage. Together, the three models and their weights form the **warm start**: a previously tested solution used as the starting point for the reproducible GPT-5.4 experiment. The final run does not trust the saved score blindly. It retrains all three members with seeds `0`, `1`, and `2`, checks their code and prediction hashes, reconstructs the fixed combination, verifies the expected validation score, and confirms that no test label was used. If any check fails, the experiment stops. The exact table is stored in [artifacts/final/weights-by-tab.json](artifacts/final/weights-by-tab.json).
 
-## How the agent tests a change
+## 🧪 How the agent tests a change
 
 Each round is straightforward:
 
@@ -158,7 +158,7 @@ review past results → choose one idea → change the code → check safety
 - Small or unclear changes remain recorded but are not described as proven improvements.
 - The experiment stops after three rounds without a large enough gain.
 
-## Recorded experiment
+## 📒 Recorded experiment
 
 | Item                      | Value                                                                 |
 | ------------------------- | --------------------------------------------------------------------- |
@@ -205,11 +205,11 @@ This graph captures three different outcomes that a scalar leaderboard would col
 
 The convergence history was `0.601878 → 0.606128 → 0.606128 → 0.606128 → 0.606128`: the warm start produced the large gain, then three post-warm-start rounds produced zero deployed gain and triggered `N=3`. The final challenger combination scored `0.6060940663`, only `0.0000336823` below the incumbent, and was correctly rejected. [docs/RUN_LOGS.md](docs/RUN_LOGS.md) contains the complete success, failure, and evidence-gate analysis.
 
-### One decision that shows why the checks matter
+### 🔍 One decision that shows why the checks matter
 
 An experimental `tab` router for the challenger reached a higher raw point estimate of `0.606411`, but its matched-seed changes were `+0.000072`, `+0.000068`, and `−0.000017`; the confidence interval crossed zero. The router therefore failed its predeclared promotion gate. Without that unverified router, the challenger scored `0.606094`, below the `0.606128` incumbent. The agent retained both results as evidence without turning either one into an unsupported improvement claim.
 
-## Extended searches with the stopping rule removed
+## 🔭 Extended searches with the stopping rule removed
 
 The submitted run stops after three post-warm-start rounds because the challenge requires it. That
 invites a fair objection: three experiments are a small basis for judging whether the agent can
@@ -246,7 +246,7 @@ combination. Nodes that never produced a score — stopped by a gate or by a fai
 the grey lane at the bottom. The lower panel shows what happened to the deployed combination, and
 only for the candidates that actually reached the combination comparison.
 
-### Twenty-six autonomous experiments moved the deployed combination by zero
+### 🎯 Twenty-six autonomous experiments moved the deployed combination by zero
 
 That is the correct outcome, not a null one. Only three candidates ever entered the best challenger
 combination across both runs, and the promotion gate rejected all three:
@@ -267,7 +267,7 @@ worst seed was `−0.000353`. An agent that ranks by a single validation number 
 discards the second. This one recorded both as evidence and promoted neither — over 26 unsupervised
 rounds, no candidate was ever waved through on a point estimate alone.
 
-### The two controller models searched the same way
+### 🔄 The two controller models searched the same way
 
 Follow the arrows in either upper panel: every new experiment hangs off `w001`, `w002`, or `w003`, in
 a strict `w002 → w001 → w003` cycle. Run B completed that rotation cleanly across all fourteen of its
@@ -282,7 +282,7 @@ Changing the controller model changed which mechanisms were invented later; it d
 branch rotation, the evidence requirements, or the verdicts. The discipline is in the controller, not
 in the language model.
 
-### The ideas were varied; the ceiling held anyway
+### 🧱 The ideas were varied; the ceiling held anyway
 
 The 26 proposals edited four of the seven editable blocks — `features`, `target`, `train`, and
 `predict` — across per-tab calibration and score mixtures, tab-6 mixture-of-experts and importance
@@ -299,7 +299,7 @@ correlated label is not a usable substitute target, and the deployed combination
 design that edits one current-best model in place, that round is an expensive recovery. Here it is
 one rolled-back branch.
 
-### The failure rate of long-horizon autonomy, reported rather than hidden
+### ❌ The failure rate of long-horizon autonomy, reported rather than hidden
 
 Eight of the 26 experiments produced no score at all, and reaching 18 scored nodes took 45 patch
 attempts. Where those attempts stopped:
@@ -321,7 +321,7 @@ are cheap and the seeds are not, and all three label-boundary violations were ca
 analysis before any code ran. But the cost is real, and a long autonomous run spends a substantial
 share of its budget on repair rather than on science.
 
-### What this means for the submitted run
+### ✅ What this means for the submitted run
 
 The recorded submission run stopped after three post-warm-start rounds under `N=3`, `ε=0.002`.
 Twenty-six further autonomous experiments, driven by two different controller models with that rule
@@ -335,7 +335,7 @@ is the direction we would take next.
 
 
 
-## Files in this repository
+## 📁 Files in this repository
 
 ```text
 .
@@ -358,9 +358,9 @@ is the direction we would take next.
 
 The submission does not include datasets, generated data copies, validation-label caches, virtual environments, temporary prediction arrays, earlier trial folders, or API keys. Those files are either public inputs or can be rebuilt.
 
-## Setup
+## ⚙️ Setup
 
-### Requirements
+### 📋 Requirements
 
 - Linux and Python 3.10 or newer
 - `bubblewrap` (`bwrap`), which starts the isolated process used for model training
@@ -401,9 +401,9 @@ python3 trusted/manifest.py --verify
 
 Copy `.env.example` to `.env` and fill in `OPENAI_API_KEY`. Never commit `.env`.
 
-## Check and reproduce
+## 🔁 Check and reproduce
 
-### Quick upload check
+### ⚡ Quick upload check
 
 These commands need no dataset or API key. One test that inspects generated data is skipped until setup creates `views/agent`; it runs normally after setup.
 
@@ -412,7 +412,7 @@ python3 scripts/preflight.py
 python3 -m unittest discover -s tests -v
 ```
 
-### Repeat the complete GPT-5.4 experiment
+### ▶️ Repeat the complete GPT-5.4 experiment
 
 After setup, run:
 
@@ -422,7 +422,7 @@ bash scripts/run_experiment.sh
 
 The script uses GPT-5.4 and the saved warm-start settings. It creates a new experiment ID. The agent's new proposals may vary, but the program must first reproduce `0.6061277485758569` from the warm start or it stops.
 
-### Watch the experiment graph while the agent works
+### 👀 Watch the experiment graph while the agent works
 
 After the run directory appears, start the read-only viewer in another terminal:
 
@@ -459,7 +459,7 @@ The submitted file is already included at [artifacts/final/submission.csv](artif
 - SHA-256: `eb1db430f8fdce35bcc3dd0c8eacc68565d3bc75dd667f841bc560816bc4aa50`
 - official format check: passed
 
-## Experiment records
+## 🗂️ Experiment records
 
 The following files make every result traceable:
 
@@ -471,7 +471,7 @@ The following files make every result traceable:
 - each round's idea, code change, three training results, scores, error comparison, and final decision under `artifacts/experiment-records/iter-*`
 - [decision records of the two extended searches](artifacts/long-run-records/), which back every number in the section above and regenerate both figures with `python3 scripts/long_run_graphs.py render`
 
-## Limitations
+## 🚧 Limitations
 
 - We used KuaiRand-Pure only. We did not use the optional extra datasets.
 - The `tab` weight table was chosen on one validation time period. It improved all three seed comparisons, but the improvement is small enough that it could still be caused by measurement noise; we therefore report it as consistent but not conclusive.
@@ -480,7 +480,7 @@ The following files make every result traceable:
 - Repeating the agent experiment requires an LLM API and Linux support for `bubblewrap`.
 - The hidden-test result is a final report only and was not used to choose models, weights, or code changes.
 
-## Tools and data
+## 🛠️ Tools and data
 
 - Data: official KuaiRand-Pure files only; no external training data
 - Agent model: GPT-5.4; the extended searches also ran the same controller on GPT-5.6-sol
@@ -488,7 +488,7 @@ The following files make every result traceable:
 - Model libraries: NumPy, SciPy, scikit-learn, LightGBM, PyTorch CPU, RecBole, and TorchRec
 - Exact library versions: `env.lock.json`
 
-## Team and contributions
+## 👥 Team and contributions
 
 | Member                 | Contact               | Contribution                                                                                                                                                                                                                                                                                 |
 | ---------------------- | --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
