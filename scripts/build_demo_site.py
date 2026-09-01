@@ -210,6 +210,9 @@ def main(argv: list[str]) -> int:
     for name in ("styles.css", "app.js"):
         shutil.copy2(STATIC_SOURCE / "assets" / name, shared / name)
 
+    # Tell GitHub Pages to serve the tree verbatim instead of running Jekyll over it.
+    (SITE / ".nojekyll").touch()
+
     frozen = [summary for run in RUNS if (summary := freeze_run(run))]
     if not frozen:
         print("no runs frozen", file=sys.stderr)
