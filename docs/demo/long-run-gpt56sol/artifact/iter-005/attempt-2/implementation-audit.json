@@ -1,0 +1,33 @@
+{
+  "analysis": "The declared target, model, and train blocks visibly implement the censored watch-time auxiliary while preserving the parent pointwise main and four-head engagement objectives and listed hyperparameters. Completed plays are censored rather than treated as exact targets, invalid and zero-duration observations cannot enter the auxiliary loss, watch feedback is absent from inference features, and the weighted watch gradient reaches the shared ranking representation. Fixed-final-epoch checkpointing and required audit metadata are present.",
+  "changed_runtime_path": true,
+  "component_evidence": [
+    {
+      "code_evidence": "build_target calls `ratio, ratio_valid = DV.watch_ratio()`; no prediction or feature-building path calls it, and the resulting arrays are placed only in the training target dictionary.",
+      "component": "Call DV.watch_ratio() only while building training targets."
+    },
+    {
+      "code_evidence": "`watch_mask` requires `ratio_valid`, finite ratio/played time/duration, `duration_ms > 0.0`, and nonnegative played time. Training applies the watch residuals only under `mask_b`; `invalid_included = watch_mask & (~ratio_valid | zero_duration)` is asserted empty and reported in metadata.",
+      "component": "Mask invalid ratios and all zero-duration rows from the watch loss."
+    },
+    {
+      "code_evidence": "`played_ms = ratio * duration_ms`; incomplete rows receive `np.log1p(played_ms[watch_incomplete]) / 12.0`, and training minimizes the squared exact residual `watch_prediction[incomplete_b] - watch_yb[incomplete_b]`.",
+      "component": "Use log1p(played_ms)/12 for incomplete exact regression."
+    },
+    {
+      "code_evidence": "Completed rows receive `watch_bound = np.log1p(duration_ms) / 12.0`; training uses the one-sided squared hinge `F.relu(bound_yb[completed_b] - watch_prediction[completed_b]).square()`, which is zero whenever prediction reaches or exceeds the duration bound.",
+      "component": "Use a one-sided lower-bound hinge at log1p(duration_ms)/12 for completed plays."
+    },
+    {
+      "code_evidence": "`FM.forward_all` constructs `shared` from the common categorical embeddings and deep network, then feeds that same tensor to `main_head`, `engagement_head`, and scalar `watch_head`. The watch loss backpropagates through this shared representation and therefore can alter ranking predictions.",
+      "component": "Share the ranking representation with a scalar watch head."
+    },
+    {
+      "code_evidence": "The target retains `SO.build_target(...)[\"main\"]`; training uses it in `binary_cross_entropy_with_logits(main_logit, main_yb)`, includes that main loss in `total_loss`, and prediction emits `sigmoid(main_logit)` rather than the watch output.",
+      "component": "Keep native long_view as the main evaluation-aligned objective."
+    }
+  ],
+  "forbidden_shortcuts_found": [],
+  "missing_components": [],
+  "status": "PASS"
+}

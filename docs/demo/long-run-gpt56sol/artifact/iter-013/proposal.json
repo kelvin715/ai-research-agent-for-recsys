@@ -1,0 +1,73 @@
+{
+  "basis_type": "diagnostic",
+  "estimated_cost_s": 210,
+  "evidence": [
+    {
+      "ref": "directional_feedback.train_user_history_quartile.slices[min_inclusive=65].delta_primary=0.0010795645277275057",
+      "type": "diagnostic"
+    },
+    {
+      "ref": "Personalization must depend on a (user, candidate-item) pair, and inference-time user_id, video_id, and author_id are available through DV.load.",
+      "type": "task_spec"
+    },
+    {
+      "ref": "SO.build_features currently returns a fixed 25-column item/context representation consumed directly by SO.train.",
+      "type": "current_code"
+    }
+  ],
+  "evidence_adaptation": null,
+  "execution_mode": "custom_patch",
+  "expected_observation": "If the hypothesis is true, trusted primary and the long-history slice will improve, and LightGBM feature usage will show at least one split on a newly appended affinity column.",
+  "experiment_contract": {
+    "claim": "The experiment tests whether two strictly train-derived, label-free repeat-exposure pair counts improve the existing item/context LambdaRank representation.",
+    "expected_observable": "feature_dim must increase from 25 to 27, the new columns must have nonzero variance, and at least some rows for the same user must have different affinity values.",
+    "falsification_condition": "Reject the hypothesis if trusted primary does not improve or if gains are offset by a clear degradation in marginal portfolio primary; invalidate the experiment if either feature contains feedback-derived information or non-train evaluation history.",
+    "forbidden_shortcuts": [
+      "Using long_view, click, watch ratio, or any other feedback to form the features",
+      "Counting validation exposures when predicting validation or test",
+      "Including same-date exposures in a training row's prior count",
+      "Adding only a per-user history count that is constant across that user's candidates",
+      "Changing LambdaRank hyperparameters or targets in the same experiment"
+    ],
+    "portfolio_role": "member_refinement",
+    "required_components": [
+      "Prior-date (user_id, video_id) exposure count for training rows",
+      "Prior-date (user_id, author_id) exposure count for training rows",
+      "Train-total pair counts for validation and test rows",
+      "Zero values for unseen pairs",
+      "Both columns appended as float32 inputs to the unchanged LambdaRank consumer"
+    ]
+  },
+  "fallback": "Rollback to the fixed 25-column feature builder if the new columns are nearly constant, violate chronology checks, exceed memory limits, or fail trusted portfolio acceptance.",
+  "hypothesis": "Explicit label-free user-video and user-author repeat-exposure affinities will improve the current LambdaRank leaf because they add candidate-dependent personalization absent from item-only popularity and context aggregates.",
+  "implementation_plan": "Extend the 25 stable item/context features with two label-free pair features: log1p of prior exposure count for (user_id, video_id) and for (user_id, author_id). Build all maps only from train_idx. For training rows, calculate counts using strictly earlier dates, excluding every exposure from the current date to prevent within-date future leakage. For validation and test, use totals accumulated over train_idx only; unseen pairs receive zero. Append the two float32 columns to every Xs matrix and increase feature_count by two. Leave the existing LambdaRank training parameters, (user,date) grouping, target, and prediction path unchanged.",
+  "justification": "A repeat-exposure count is a direct user-candidate interaction, not a per-user constant. It uses only exposure identities available before inference and can let the tree distinguish familiar videos or authors from otherwise similar candidates. The positive diagnostic in the longest-history slice suggests that richer history-dependent ordering is plausible, while this implementation avoids all feedback-derived inference columns.",
+  "mechanism": "label-free repeat-exposure affinity features",
+  "mechanism_tags": [
+    "user_item_interaction",
+    "exposure_history",
+    "author_affinity",
+    "video_affinity",
+    "tree_features"
+  ],
+  "observation": "The fixed directional feedback reports train_user_history_quartile.slices for histories of at least 65 with delta_primary=0.0010795645277275057, while the task specification states that personalization must depend on a user and candidate-item pair.",
+  "operator_id": null,
+  "parent_operator_stack": [
+    "item_lambdarank"
+  ],
+  "parent_references": [
+    "w003"
+  ],
+  "patch_scope": [
+    "features"
+  ],
+  "persona": "architecture",
+  "primary_block": "features",
+  "research_evidence": [],
+  "research_nonuse_reason": "The supplied research records concern BPR optimization and the already-deployed LambdaRank leaf, but neither evaluates label-free repeat-exposure pair features. The task constraint and the exact long-history slice diagnostic are the more direct basis.",
+  "risk": [
+    "Exact repeated video pairs may be sparse on future dates.",
+    "Exposure frequency can represent prior dislike or fatigue as well as affinity.",
+    "Constructing causal pair counts over 1.14 million rows may add memory and preprocessing cost."
+  ]
+}

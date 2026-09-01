@@ -1,0 +1,34 @@
+--- incumbent/pipeline.py
++++ candidate/pipeline.py
+@@ -38,7 +38,30 @@
+ 
+ # <<<BLOCK:target>>>
+ def build_target(splits, train_idx):
+-    return SO.build_target(splits, train_idx, OP_CONFIG)
++    target = SO.build_target(splits, train_idx, OP_CONFIG)
++    ratio, valid = DV.watch_ratio()
++
++    ratio = np.asarray(ratio)
++    valid_raw = np.asarray(valid)
++    original_main = np.asarray(target['main'])
++
++    DV.assert_trainable(ratio, 'build_target.watch_ratio')
++    DV.assert_trainable(valid_raw, 'build_target.watch_ratio_valid')
++
++    if ratio.shape != original_main.shape or valid_raw.shape != original_main.shape:
++        raise ValueError('watch-ratio arrays must match the main target shape')
++
++    valid = valid_raw.astype(bool, copy=False)
++    safe_ratio = np.zeros(ratio.shape, dtype=np.float32)
++    safe_ratio[valid] = np.clip(ratio[valid], 0.0, 1.0).astype(np.float32, copy=False)
++
++    shaped_main = original_main.astype(np.float32, copy=True)
++    shaped_main[valid] = (0.85 * shaped_main[valid] +
++                          0.15 * safe_ratio[valid])
++
++    result = dict(target)
++    result['main'] = shaped_main
++    return result
+ # <<<END:target>>>
+ 
+ 

@@ -1,0 +1,24 @@
+{
+  "analysis": "The candidate does implement the claimed watch-target construction, custom model head, and mixed censored watch loss with real gradient consumers, and it does not use watch-time as an inference feature. However, fail-closed applies because predictions are still produced by opaque delegated SO.predict on a custom model class outside the trusted backend contract, so executable prediction change is not evidenced. Additionally, the custom replacement introduces its own best-train-loss checkpoint rule without contract support, creating an undeclared runtime behavior change.",
+  "changed_runtime_path": true,
+  "component_evidence": [
+    {
+      "code_evidence": "In build_target(), base = SO.build_target(...); then ratio, valid = DV.watch_ratio(), duration_ms = np.asarray(train.duration_ms,...), watch_ms = safe_ratio * safe_duration, watch_t = log1p(watch_ms)/12, dur_t = log1p(safe_duration)/12, and outputs include watch_time_target/watch_time_valid/watch_time_complete/watch_time_incomplete/watch_time_duration_target.",
+      "component": "target construction from DV.watch_ratio() and duration_ms in target block"
+    },
+    {
+      "code_evidence": "In model block, class DeepFMMTLWatch(nn.Module) defines self.watch_head = nn.Linear(in_dim, 1) and forward() returns {'main': main, 'aux': aux, 'watch': watch}.",
+      "component": "model extension with one scalar watch-time head in model block"
+    },
+    {
+      "code_evidence": "In train(), main_loss = BCEWithLogits(out['main'], y_main), aux_loss = BCEWithLogits(out['aux'], y_aux); watch loss uses smooth_l1 on incomplete rows and squared hinge relu(dur_b - watch_pred)^2 on complete rows, then loss = main_loss + aux_weight * aux_loss + watch_weight * watch_loss.",
+      "component": "train loss combining main long_view objective with censored watch-time loss in train block"
+    }
+  ],
+  "forbidden_shortcuts_found": [
+    "changed code cannot alter predictions at inference because predict() still delegates to SO.predict(model, Xs, split), while the trusted backend contract only guarantees SO.predict for models returned by SO.train on the delegated torch_deepfm_mtl path; no visible delegated code shows it can consume the custom DeepFMMTLWatch model, so prediction dataflow from the added head/custom trainer to output is unproven",
+    "custom training path replaces delegated backend but does not preserve the contract's fixed train-only checkpoint policy evidence. The accepted contract requires a fixed train-only checkpoint policy inside candidate code; candidate uses best total training loss over epochs, but this grouping/checkpoint rule is a new undeclared replacement of the parent training behavior rather than a contract-backed visible equivalent"
+  ],
+  "missing_components": [],
+  "status": "REVISE"
+}

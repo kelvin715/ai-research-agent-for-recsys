@@ -1,0 +1,29 @@
+{
+  "analysis": "The candidate changes only the declared target block and concretely rebuilds the four-head auxiliary matrix from train-only targets. The unchanged trainer consumes that matrix with the fixed `aux_weight` of 0.2, so the modification can affect learned parameters and predictions. Features and prediction remain unchanged, no auxiliary value enters inference, and there is no validation/test-label access or candidate-side checkpoint selection.",
+  "changed_runtime_path": true,
+  "component_evidence": [
+    {
+      "code_evidence": "`parent_target = SO.build_target(splits, train_idx, OP_CONFIG)` followed by `main = np.asarray(parent_target['main'])` preserves the parent's main target; it is returned unchanged under the `main` key and passed through `y` to `SO.train`.",
+      "component": "Unchanged binary long_view main target"
+    },
+    {
+      "code_evidence": "`DV.train_targets([name])` explicitly loads `is_click`, `is_like`, and `is_profile_enter`; `DV.watch_ratio()` supplies watch ratio, and `soft_completion[watch_valid] = np.clip(watch_ratio[watch_valid], 0.0, 1.0)` constructs the clipped fourth column. `np.column_stack((click, like, profile, soft_completion))` creates the four-column matrix.",
+      "component": "Explicit auxiliary columns for is_click, is_like, is_profile_enter, and clipped watch_ratio"
+    },
+    {
+      "code_evidence": "`watch_valid_full` is obtained from `DV.watch_ratio()`, aligned using `watch_valid_full[train_idx]`, and `soft_completion` is initialized entirely to `0.5`; only valid positions are overwritten. `assert np.all(soft_completion[~watch_valid] == 0.5)` verifies neutralization.",
+      "component": "Use of the watch_ratio valid mask with neutral 0.5 values on invalid rows"
+    },
+    {
+      "code_evidence": "The code checks full target sizes against `splits['train'].n`, validates `train_idx` bounds, indexes every auxiliary array with the same `train_idx`, asserts each selected vector has shape `(n_fit,)`, and applies `DV.assert_trainable` to source/selected targets, `main`, `soft_completion`, and the final `engagement_aux` matrix.",
+      "component": "DV.assert_trainable checks and exact row alignment with the training RowSet"
+    },
+    {
+      "code_evidence": "`build_target` returns exactly `{'main': main, 'engagement_aux': engagement_aux}`. `main` passes this result as `y` into the unchanged `train`, which directly calls the contract-supported `SO.train(..., y, ...)`; the backend contract states this trainer consumes both keys.",
+      "component": "Preservation of target keys main and engagement_aux consumed by SO.train"
+    }
+  ],
+  "forbidden_shortcuts_found": [],
+  "missing_components": [],
+  "status": "PASS"
+}

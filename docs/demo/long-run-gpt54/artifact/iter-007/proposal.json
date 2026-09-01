@@ -1,0 +1,75 @@
+{
+  "basis_type": "diagnostic",
+  "estimated_cost_s": 160,
+  "evidence": [
+    {
+      "ref": "portfolio_diagnostics member disadvantages for w003 on tab slices, especially tab=0 and tab=2",
+      "type": "diagnostic"
+    },
+    {
+      "ref": "fixed aggregate directional feedback from the last measured candidate: negative deltas on tab 0/1/2/4/6",
+      "type": "diagnostic"
+    },
+    {
+      "ref": "metrics rank within user; personalization must depend on a (user, candidate-item) pair; tab and duration_ms are legal inference-time arrays",
+      "type": "task_spec"
+    },
+    {
+      "ref": "features and predict blocks can alter Xs and final score composition while keeping SO.train base branch",
+      "type": "current_code"
+    }
+  ],
+  "evidence_adaptation": null,
+  "execution_mode": "custom_patch",
+  "expected_observation": "Standalone primary may move modestly, but within-user rank correlation with the parent should drop on tab-sensitive slices and portfolio marginal contribution should improve if the residual branch corrects those slices.",
+  "experiment_contract": {
+    "claim": "Test whether a tab-specialized residual scorer fused with the base LambdaRank score improves tab-slice ordering and portfolio complementarity.",
+    "expected_observable": "Prediction hashes differ from the parent, and tab-conditioned score distributions show non-constant adjustments varying by both tab and item context.",
+    "falsification_condition": "Trusted validation shows no gain in primary or no evidence of complementary contribution; or implementation degenerates to a per-user/per-tab constant shift only.",
+    "forbidden_shortcuts": [
+      "using any post-exposure feedback as inference features",
+      "changing only a scalar post-hoc tab bias per row without training the residual head",
+      "claiming fusion while reusing only one parent mechanism"
+    ],
+    "portfolio_role": "mechanism_fusion",
+    "required_components": [
+      "features block appends explicit tab/duration interaction columns",
+      "train block fits both base SO.train model and a separate residual head on the new columns",
+      "predict block combines the two branch outputs with a fixed predeclared weight"
+    ]
+  },
+  "fallback": "If harmful, keep the tab-interaction features idea but drop the extra branch and test them as pure tree inputs in a later isolated architecture experiment.",
+  "hypothesis": "A small tab/context residual branch will correct systematic ordering errors where the current tree leaf is weak, especially on tabs 0/2/4/6, producing complementary within-user reordering and better marginal portfolio contribution.",
+  "implementation_plan": "Edit features, train, and predict. In features, append a small set of legal interaction columns that expose tab-specific behavior without labels: one-hot flags for major tabs seen in diagnostics (0,1,2,4,6), duration_ms transforms such as log1p(duration_ms), and tab×log_duration interactions, while retaining all base SO.build_features columns. In train, fit the base SO.train LambdaRank model as-is on the augmented matrix, then also fit a lightweight sklearn logistic regression residual head on train rows using only the new interaction columns to predict long_view; standardize only inside train if needed. In predict, output base rank score plus a small fixed-weight residual adjustment from the residual head. This is a bounded two-branch fusion inside one candidate.",
+  "justification": "Because portfolio search is active and convergence is high, a structural error-diversifying branch targeted at a diagnosed weakness is preferable to scalar retuning. Using only inference-time tab and duration interactions respects leakage rules and creates a candidate whose errors need not be highly correlated with the current tree leaf.",
+  "mechanism": "tab-specialized residual blend over base lambdarank",
+  "mechanism_tags": [
+    "error_diversifier",
+    "tab_specialization",
+    "residual_model",
+    "mechanism_fusion"
+  ],
+  "observation": "Portfolio diagnostics show strong tab specialization mismatch: w003 has member disadvantages on tab=0 (-0.01749022029153391) and tab=2 (-0.009346696620826433), while w001 and w002 are stronger on some tab slices; the last measured candidate also regressed on every reported tab slice, including tab 2 (-0.004738620736890686), tab 4 (-0.005241128435804598), and tab 6 (-0.004047385767926126).",
+  "operator_id": null,
+  "parent_operator_stack": [
+    "item_lambdarank"
+  ],
+  "parent_references": [
+    "w001",
+    "w003"
+  ],
+  "patch_scope": [
+    "features",
+    "train",
+    "predict"
+  ],
+  "persona": "architecture",
+  "primary_block": "train",
+  "research_evidence": [],
+  "research_nonuse_reason": "No supplied research record directly describes this tab-residual fusion for the current parent. The strongest basis is the trusted tab-slice diagnostics plus the active portfolio directive requiring an error-diverse or structural idea.",
+  "risk": [
+    "Residual logistic branch may optimize pointwise probability rather than ranking and could hurt base ordering",
+    "Added interactions may be redundant with tree splits and provide little diversity",
+    "Score-scale mismatch could overpower the base model if blend weight is too large"
+  ]
+}

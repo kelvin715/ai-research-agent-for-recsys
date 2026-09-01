@@ -1,0 +1,237 @@
+<!doctype html>
+<html data-static-base="." lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Experiment Graph</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+  <div class="ambient ambient-one" aria-hidden="true"></div>
+  <div class="ambient ambient-two" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <div class="brand-block">
+      <div class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 36 36" role="img">
+          <circle cx="9" cy="18" r="4"></circle>
+          <circle cx="25" cy="9" r="4"></circle>
+          <circle cx="27" cy="27" r="4"></circle>
+          <path d="M12.5 16 21.5 11M12.5 20 23 25"></path>
+        </svg>
+      </div>
+      <div>
+        <div class="eyebrow">LIVE RESEARCH WORKSPACE</div>
+        <h1>Experiment Graph</h1>
+      </div>
+    </div>
+
+    <div class="run-meta">
+      <div class="run-copy">
+        <strong id="run-name">Loading experiment…</strong>
+        <span id="run-subtitle">Reading the latest graph state</span>
+      </div>
+      <div class="live-pill waiting" id="live-pill">
+        <span class="live-dot"></span>
+        <span id="live-label">Connecting</span>
+      </div>
+      <button class="soft-button" id="refresh-button" type="button" title="Refresh now">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5M6.1 9A7 7 0 0 1 18.4 6.5L20 9M4 15l1.6 2.5A7 7 0 0 0 17.9 15"></path></svg>
+        Refresh
+      </button>
+    </div>
+  </header>
+
+  <main class="page-shell">
+    <section class="stat-grid" aria-label="Experiment summary">
+      <article class="stat-card tint-blue">
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="12" r="2.5"></circle><circle cx="18" cy="6" r="2.5"></circle><circle cx="18" cy="18" r="2.5"></circle><path d="m8.2 10.8 7.4-3.7M8.2 13.2l7.4 3.7"></path></svg>
+        </div>
+        <div><span class="stat-label">Recorded nodes</span><strong id="stat-nodes">—</strong></div>
+      </article>
+      <article class="stat-card tint-mint">
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 13 4 4L19 7"></path></svg>
+        </div>
+        <div><span class="stat-label">Measured models</span><strong id="stat-measured">—</strong></div>
+      </article>
+      <article class="stat-card tint-lilac">
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19V9M12 19V5M19 19v-7"></path></svg>
+        </div>
+        <div><span class="stat-label">Best standalone</span><strong id="stat-standalone">—</strong></div>
+      </article>
+      <article class="stat-card tint-peach">
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 15 5-5 4 4 7-8M16 6h4v4"></path></svg>
+        </div>
+        <div><span class="stat-label">Best combination</span><strong id="stat-combination">—</strong></div>
+      </article>
+    </section>
+
+    <section class="workspace">
+      <article class="graph-card panel">
+        <div class="panel-header graph-header">
+          <div>
+            <div class="section-kicker">SEARCH MAP</div>
+            <h2>How each measured idea evolved</h2>
+          </div>
+          <div class="graph-actions">
+            <div class="segmented" id="edge-filter" aria-label="Graph edge filters">
+              <button class="segment active" data-edge="execution" type="button">Built from</button>
+              <button class="segment active" data-edge="reference" type="button">Idea links</button>
+              <button class="segment active" data-edge="portfolio" type="button">Combination</button>
+            </div>
+            <button class="icon-button" id="zoom-out" type="button" title="Zoom out">−</button>
+            <button class="icon-button" id="zoom-in" type="button" title="Zoom in">+</button>
+            <button class="icon-button fit-button" id="fit-graph" type="button" title="Fit graph">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5"></path></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="legend" aria-label="Graph legend">
+          <span><i class="legend-dot accepted"></i>Kept</span>
+          <span><i class="legend-dot uncertain"></i>Promising</span>
+          <span><i class="legend-dot rollback"></i>Rolled back</span>
+          <span><i class="legend-dot failed"></i>Failed</span>
+          <span><i class="legend-dot running"></i>In progress</span>
+          <span><i class="legend-line reference"></i>Idea used</span>
+        </div>
+
+        <div class="graph-viewport" id="graph-viewport">
+          <svg id="graph-svg" role="img" aria-label="Interactive experiment graph">
+            <defs>
+              <filter id="node-shadow" x="-20%" y="-30%" width="140%" height="170%">
+                <feDropShadow dx="0" dy="8" stdDeviation="9" flood-color="#5771a4" flood-opacity="0.12"></feDropShadow>
+              </filter>
+              <marker id="arrow-execution" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="strokeWidth">
+                <path d="M0,0 L8,4 L0,8 z" fill="#aab8cf"></path>
+              </marker>
+              <marker id="arrow-reference" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="strokeWidth">
+                <path d="M0,0 L8,4 L0,8 z" fill="#b7a6df"></path>
+              </marker>
+              <marker id="arrow-portfolio" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="strokeWidth">
+                <path d="M0,0 L8,4 L0,8 z" fill="#72b99e"></path>
+              </marker>
+              <pattern id="soft-grid" width="28" height="28" patternUnits="userSpaceOnUse">
+                <circle cx="1" cy="1" r="1" fill="#dfe7f4"></circle>
+              </pattern>
+            </defs>
+            <rect class="graph-grid" x="-4000" y="-4000" width="8000" height="8000" fill="url(#soft-grid)"></rect>
+            <g id="graph-scene">
+              <g id="edge-layer"></g>
+              <g id="node-layer"></g>
+            </g>
+          </svg>
+          <div class="graph-loading" id="graph-loading">
+            <div class="loader-orbit"><span></span><span></span><span></span></div>
+            <p>Building the experiment map…</p>
+          </div>
+          <div class="graph-hint">Drag to move · Scroll to zoom · Select a node for evidence</div>
+        </div>
+      </article>
+
+      <aside class="detail-card panel" id="detail-card">
+        <div class="empty-detail" id="empty-detail">
+          <div class="empty-illustration">
+            <svg viewBox="0 0 96 96" aria-hidden="true">
+              <path d="M21 52c0-17 12-31 28-31 15 0 27 11 28 26 9 2 15 9 15 18 0 10-8 18-18 18H25C13 83 4 74 4 63c0-10 7-19 17-21"></path>
+              <circle cx="36" cy="52" r="6"></circle><circle cx="61" cy="41" r="6"></circle><circle cx="67" cy="65" r="6"></circle>
+              <path d="m41 49 14-6M41 55l20 8"></path>
+            </svg>
+          </div>
+          <h3>Select an experiment</h3>
+          <p>Click any node to see its hypothesis, measured result, confidence interval, code change, and final decision.</p>
+        </div>
+
+        <div class="detail-content hidden" id="detail-content">
+          <div class="detail-topline">
+            <span class="node-id" id="detail-node-id"></span>
+            <span class="status-chip" id="detail-status"></span>
+          </div>
+          <h2 id="detail-title"></h2>
+          <p class="detail-stage hidden" id="detail-stage"></p>
+
+          <div class="metric-pair">
+            <div>
+              <span id="detail-score-label">Standalone score</span>
+              <strong id="detail-score">—</strong>
+              <small id="detail-score-delta">No comparison</small>
+            </div>
+            <div>
+              <span>Combination change</span>
+              <strong id="detail-combination-delta">—</strong>
+              <small id="detail-combination-note">Not selected</small>
+            </div>
+          </div>
+
+          <div class="confidence-box hidden" id="confidence-box">
+            <div class="confidence-copy">
+              <span>95% paired interval</span>
+              <strong id="confidence-label"></strong>
+            </div>
+            <div class="confidence-track"><span id="confidence-range"></span><i id="confidence-zero"></i></div>
+          </div>
+
+          <div class="detail-section hidden" id="hypothesis-section">
+            <div class="detail-label"><span>01</span> Hypothesis</div>
+            <p id="detail-hypothesis"></p>
+          </div>
+          <div class="detail-section hidden" id="why-section">
+            <div class="detail-label"><span>02</span> Why this branch</div>
+            <p id="detail-why"></p>
+          </div>
+          <div class="detail-section hidden" id="result-section">
+            <div class="detail-label"><span>03</span> What happened</div>
+            <p id="detail-result"></p>
+          </div>
+          <div class="detail-section hidden" id="lesson-section">
+            <div class="detail-label"><span>04</span> Lesson saved</div>
+            <p id="detail-lesson"></p>
+          </div>
+
+          <div class="tag-row" id="detail-tags"></div>
+          <div class="artifact-section hidden" id="artifact-section">
+            <div class="detail-label">Evidence files</div>
+            <div class="artifact-links" id="artifact-links"></div>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="lower-grid">
+      <article class="timeline-card panel">
+        <div class="panel-header">
+          <div>
+            <div class="section-kicker">RUN TIMELINE</div>
+            <h2>Round-by-round progress</h2>
+          </div>
+          <span class="refresh-note">Updates every 2 seconds</span>
+        </div>
+        <div class="timeline-list" id="timeline-list"></div>
+      </article>
+
+      <article class="combination-card panel">
+        <div class="panel-header">
+          <div>
+            <div class="section-kicker">CURRENT RESULT</div>
+            <h2>Best verified combination</h2>
+          </div>
+        </div>
+        <div id="combination-content" class="combination-content">
+          <div class="mini-empty">No model combination has been selected yet.</div>
+        </div>
+      </article>
+    </section>
+
+    <div class="warning-banner hidden" id="warning-banner"></div>
+  </main>
+
+  <div class="toast hidden" id="toast" role="status"></div>
+  <script src="../assets/app.js"></script>
+<div style="position:fixed;left:0;right:0;bottom:0;z-index:99;padding:7px 14px;font:600 11px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#70809a;background:rgba(255,255,255,.93);border-top:1px solid #e4eaf3;text-align:center">Frozen snapshot of <code>long-run-gpt54</code> — read-only replay. <a href="../../" style="color:#6688d9">All runs</a> · <a href="https://github.com/kelvin715/ai-research-agent-for-recsys" style="color:#6688d9">Repository</a></div>
+</body>
+</html>

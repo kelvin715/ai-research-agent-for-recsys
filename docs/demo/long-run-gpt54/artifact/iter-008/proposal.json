@@ -1,0 +1,96 @@
+{
+  "basis_type": "curated_research",
+  "estimated_cost_s": 240,
+  "evidence": [
+    {
+      "ref": "E003",
+      "type": "curated_research"
+    },
+    {
+      "ref": "DV.watch_ratio() -> (ratio, valid), train only; post-exposure feedback may be a training/auxiliary target, never an inference feature",
+      "type": "task_spec"
+    },
+    {
+      "ref": "Parent operator stack is deepfm_engagement_mtl_v1 with existing auxiliary engagement heads and objective pointwise_engagement_mtl",
+      "type": "current_code"
+    },
+    {
+      "ref": "Deterministic train-only diagnostics: key 'train_target_phi_with_long_view' shows weak-to-moderate non-long_view auxiliaries, e.g. is_like 0.09916137501207341 and is_profile_enter 0.14612987498722513, leaving room for additional richer auxiliary signal",
+      "type": "diagnostic"
+    }
+  ],
+  "evidence_adaptation": {
+    "evidence_id": "E003",
+    "implementation_mapping": "Primary block train: add a custom multitask training loop with one extra watch-time head and mixed loss; target block constructs train-only transformed watch targets from DV.watch_ratio() and duration_ms; model block extends the shared representation with one scalar regression output.",
+    "protocol_caveat": "E003 was reported for a different implementation context and should only transfer the auxiliary-loss pattern, not its reported score; evaluation remains the fixed long_view ranking metric on the official split.",
+    "source_mechanism": "Keep native long_view as the ranking objective and add a small censored watch-time regression head sharing FM embeddings; use exact regression residual for incomplete plays and a one-sided lower-bound hinge for completed plays."
+  },
+  "execution_mode": "custom_patch",
+  "expected_observation": "If true, validation primary should rise modestly and predictions should become less correlated with the current parent than a pure feature tweak, improving portfolio marginality.",
+  "experiment_contract": {
+    "claim": "Adding a train-only censored watch-time auxiliary head, while keeping long_view as the main objective, improves ranking quality and/or portfolio diversity.",
+    "expected_observable": "Predictions differ materially from the parent across seeds and training info should report the added watch-time loss path being active.",
+    "falsification_condition": "Added head produces no prediction change, or paired validation delta is non-positive despite the connected auxiliary path.",
+    "forbidden_shortcuts": [
+      "using watch_ratio or any feedback-derived column as an inference feature",
+      "relabeling the main target away from long_view",
+      "claiming the mechanism while only changing a scalar hp key with no consumer"
+    ],
+    "portfolio_role": "error_diversifier",
+    "required_components": [
+      "target construction from DV.watch_ratio() and duration_ms in target block",
+      "model extension with one scalar watch-time head in model block",
+      "train loss combining main long_view objective with censored watch-time loss in train block"
+    ]
+  },
+  "fallback": "If the full censored formulation is unstable, simplify to incomplete-row smooth L1 only while keeping the same train-only target path in a later isolated follow-up.",
+  "hypothesis": "A censored watch-time auxiliary objective will shape embeddings toward fine-grained dwell preference complementary to binary long_view, yielding better within-user ordering and potentially more error diversity relative to the current portfolio.",
+  "implementation_plan": "Edit target, model, and train blocks. Keep long_view as the main objective. In target, derive a train-only watch-time target from DV.watch_ratio() and RowSet.duration_ms: compute valid rows from the returned mask, transform observed play ratio and duration with a bounded log-scale target such as log1p(ratio * duration_ms)/12 and log1p(duration_ms)/12. In model/train, add one scalar auxiliary regression head sharing the existing representation with the main multitask tower. For rows flagged complete by watch_ratio validity and ratio near/full completion, use a one-sided lower-bound hinge against log-duration; for incomplete valid rows use squared error or smooth L1 to the transformed watch-time target. Combine this with the existing long_view plus engagement auxiliary objective using a small fixed weight (for example retain aux_weight 0.2 for existing heads and add a separate small watch loss weight implemented visibly in train). No watch-time values may be used as inference features.",
+  "justification": "This proposal reuses a directly applicable multitask mechanism from supplied research while respecting task constraints: watch-time is train-only auxiliary signal, not an inference feature, and long_view remains the evaluated target. Because the active portfolio already contains a tree and two FM-like members, a dwell-sensitive auxiliary may add complementary ordering even if standalone gains are modest.",
+  "mechanism": "censored watch-time auxiliary head for long_view",
+  "mechanism_tags": [
+    "auxiliary_task",
+    "watch_time",
+    "censored_regression",
+    "multitask",
+    "error_diversifier"
+  ],
+  "observation": "Research evidence E003 reports a positive mechanism prior: keeping long_view as the ranking objective while adding a small censored watch-time regression head improved official-validation primary over BPR alone. The task also exposes train-only DV.watch_ratio(), and the parent is already a multitask DeepFM with auxiliary engagement heads, making an extra head structurally compatible through custom code. Train target correlations show auxiliary targets can be useful, but many are weak; watch-time is not currently used by the parent.",
+  "operator_id": null,
+  "parent_operator_stack": [
+    "deepfm_engagement_mtl_v1"
+  ],
+  "parent_references": [
+    "w002"
+  ],
+  "patch_scope": [
+    "target",
+    "model",
+    "train"
+  ],
+  "persona": "reward",
+  "primary_block": "train",
+  "research_evidence": [
+    {
+      "evidence_id": "E003",
+      "kind": "curated_research",
+      "knowledge_id": "K0002",
+      "knowledge_origin": "cached",
+      "persona": "reward",
+      "query": "How should watch time complement native long_view without changing evaluation labels?",
+      "reason": "The native binary label discards engagement magnitude and completed plays are right-censored by duration.",
+      "record_type": "mechanism",
+      "requires_success_mechanisms": [],
+      "source_ids": [
+        "S003",
+        "S004"
+      ],
+      "summary": "Keep native long_view as the ranking objective and add a small censored watch-time regression head sharing FM embeddings. Transform play time and duration with log1p/12. For incomplete plays use exact regression residual; for completed plays use a one-sided lower-bound hinge that stops penalizing predictions above log-duration. Never use evaluation-period feedback as an input feature. BPR plus this auxiliary target at weight 0.2 reached five-seed official-validation primary 0.604023290 ± 0.000282947 versus 0.603517127 ± 0.000631158 for BPR alone; on three random-exposure seeds, unbiased primary was 0.376328528 ± 0.003245064 versus 0.373291085 ± 0.002151737. This is an implementation prior, not permission to replace the fixed relevance label."
+    }
+  ],
+  "research_nonuse_reason": null,
+  "risk": [
+    "Custom multitask implementation may be brittle on CPU and miss the parent's optimized training behavior",
+    "Watch-ratio validity/censoring assumptions may be misaligned with long_view and add noise"
+  ]
+}

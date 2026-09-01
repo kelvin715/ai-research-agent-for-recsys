@@ -1,0 +1,21 @@
+{
+  "analysis": "Fidelity is adequate: only the predict block changed, base predictions still come from SO.predict, and the patch adds a concrete tab-conditioned monotone postscore transform using legal inference-time tab access. No train-time features/labels were altered, no validation-fitted calibration is visible, and no exposure-after-feedback inference signal is used.",
+  "changed_runtime_path": true,
+  "component_evidence": [
+    {
+      "code_evidence": "In predict(model, Xs, split): `rows = DV.load(split)` then `tabs = np.asarray(rows.tab)`. This is direct inference-time access to the legal tab field and is used to branch score transforms.",
+      "component": "predict block must read DV.load(split).tab"
+    },
+    {
+      "code_evidence": "`params = {0: (0.96, 1.05, 1.12, 0.055), 1: (0.98, 1.02, 1.06, 0.020), 2: (0.95, 1.06, 1.14, 0.070), 4: (1.00, 0.99, 0.97, -0.015), 6: (0.97, 1.03, 1.08, 0.035)}` defines distinct transforms for multiple tab groups, and `pred[m] = apply_pwl(raw[m], *p)` applies them by tab mask. `apply_pwl` is piecewise linear with all positive slopes in each region, so it is monotone within each tab group.",
+      "component": "predict block must apply different monotone transforms for at least two tab groups"
+    },
+    {
+      "code_evidence": "`raw = np.asarray(SO.predict(model, Xs, split), dtype=np.float32)` obtains base scores directly from unmodified delegated prediction, and all later operations are post-score transforms of `raw` only.",
+      "component": "base scores must originate from unmodified SO.predict"
+    }
+  ],
+  "forbidden_shortcuts_found": [],
+  "missing_components": [],
+  "status": "PASS"
+}

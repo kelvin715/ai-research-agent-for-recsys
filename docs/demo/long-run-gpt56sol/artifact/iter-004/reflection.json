@@ -1,0 +1,5 @@
+{
+  "analysis": "The click-tiebroken ordinal LambdaRank target did not improve performance. Standalone primary declined by 0.0015719 versus the incumbent, with a paired 95% CI of [-0.0028354, -0.0001966] excluding zero; the per-seed comparison was likewise significantly negative. Portfolio primary also decreased by 0.0002527, although its paired CI crossed zero, so there is no evidence of marginal portfolio benefit and the candidate was not promoted. Diagnostic slices show losses across most user-history and item-popularity groups, especially tabs 0 and 6, while gains for the least-popular item quartile and tab 4 are exploratory and insufficient to offset the aggregate decline. This refutes the tested formulation—grade=2*long_view+is_click under unchanged LambdaRank settings—not the broader possibility that click could help through a differently controlled training-only auxiliary objective.",
+  "next_lesson": "Do not use raw click as a four-grade LambdaRank tie-breaker; its exposure bias and default graded gains can distort the official long_view ordering objective.",
+  "result": "not_supported"
+}

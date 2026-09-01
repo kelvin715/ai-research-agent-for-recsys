@@ -1,0 +1,89 @@
+{
+  "basis_type": "curated_research",
+  "estimated_cost_s": 60,
+  "evidence": [
+    {
+      "ref": "E002",
+      "type": "curated_research"
+    },
+    {
+      "ref": "Trusted operator catalog applicable to this parent lists selected_user_profile",
+      "type": "task_spec"
+    },
+    {
+      "ref": "Trusted runtime-backend contract feature_api supports user_core and parent features are only hour,user_gap",
+      "type": "task_spec"
+    }
+  ],
+  "evidence_adaptation": {
+    "evidence_id": "E002",
+    "implementation_mapping": "primary block features; trusted operator appends seven static pre-impression user profile categorical fields to the feature matrix so FM can cross them with item/context categorical ids",
+    "protocol_caveat": "E002 used related legal configurations and official validation, but score transfer is not assumed; only the feature-augmentation mechanism is borrowed.",
+    "source_mechanism": "adding selected static user profile domains on top of the legal hour+user_gap FM configuration"
+  },
+  "execution_mode": "operator",
+  "expected_observation": "Validation primary increases modestly, with strongest gains likely in slices needing more personalization than hour+gap alone.",
+  "experiment_contract": {
+    "claim": "Test the trusted selected_user_profile feature refinement on the current legal FM parent.",
+    "expected_observable": "Feature dimension increases and predictions differ from the parent due to added user-profile/item-context interactions.",
+    "falsification_condition": "Trusted validation shows no paired improvement or deterioration despite the feature-matrix change.",
+    "forbidden_shortcuts": [
+      "manual custom rewrite of the catalogued operator",
+      "adding post-exposure features",
+      "combining with unrelated train/loss changes"
+    ],
+    "portfolio_role": "member_refinement",
+    "required_components": [
+      "features block expanded by operator",
+      "training and prediction both consume the enlarged feature matrix"
+    ]
+  },
+  "fallback": "If the incremental gain is absent, keep the legal minimal stack and seek more diverse mechanisms rather than further profile expansion.",
+  "hypothesis": "Adding selected static user profile fields will improve personalization of item/context interactions and lift within-user ranking beyond the hour+user_gap feature set.",
+  "implementation_plan": "Use the trusted operator selected_user_profile exactly, which appends the seven low-cardinality static pre-impression user profile fields through the features block on top of the current legal stack. No other blocks change.",
+  "justification": "The task metric is within-user ranking, so per-user constants alone do not help, but FM crosses between user profile fields and candidate item/context fields can change item ordering within each user. This is a direct, applicable extension already supported by the trusted feature API as 'user_core', making it lower risk than bespoke feature engineering.",
+  "mechanism": "add selected static user profile fields to FM crosses",
+  "mechanism_tags": [
+    "user-features",
+    "fm-crosses",
+    "representation",
+    "official-operator",
+    "member-refinement"
+  ],
+  "observation": "The current parent exact_parent_config features are only ['hour','user_gap']; the operator catalog exposes an applicable trusted refinement 'selected_user_profile'; and E002 reports that adding selected user profile domains on top of hour+gap+aux produced an incremental gain over the legal configuration family.",
+  "operator_id": "selected_user_profile",
+  "parent_operator_stack": [
+    "legal_rank_stack_v1"
+  ],
+  "parent_references": [
+    "w001"
+  ],
+  "patch_scope": [
+    "features"
+  ],
+  "persona": "architecture",
+  "primary_block": "features",
+  "research_evidence": [
+    {
+      "evidence_id": "E002",
+      "kind": "curated_research",
+      "knowledge_id": "K0003",
+      "knowledge_origin": "cached",
+      "persona": "architecture",
+      "query": "Which legal context and side-information fields complement the FM?",
+      "reason": "Broad side-feature additions can add noise; legal temporal context needs an explicit availability rule.",
+      "record_type": "mechanism",
+      "requires_success_mechanisms": [],
+      "source_ids": [
+        "S002",
+        "S003"
+      ],
+      "summary": "Prioritize low-cardinality hour and train-derived user exposure-gap buckets before broad profile expansion. Compute all quantile edges from train only. The hour+user_gap BPR configuration reached five-seed official-validation primary 0.604430330 ± 0.000459158; adding the censored watch-time auxiliary target reached 0.604607224 ± 0.000168363. Adding selected user profile domains on top reached 0.604821956 ± 0.000355822, a smaller incremental effect. The legal hour+gap+aux configuration also led the inspected random-exposure set at unbiased primary 0.378085981 ± 0.003012055. Any history feature must use train feedback or exposure-only information available at prediction time; evaluation-period long_view/play-time feedback is forbidden."
+    }
+  ],
+  "research_nonuse_reason": null,
+  "risk": [
+    "Extra profile fields may add noise or overfit",
+    "Profile effects may be redundant with existing user_gap signal"
+  ]
+}

@@ -1,0 +1,830 @@
+[
+  {
+    "candidates": [
+      {
+        "blocker": null,
+        "candidate_index": 0,
+        "eligible": true,
+        "hypothesis": "A small within-mechanism ensemble of the current LambdaRank model will reduce variance and produce rank orders complementary to the active portfolio, improving marginal portfolio primary even if standalone gain is small.",
+        "persona": "optimizer",
+        "proposal": {
+          "basis_type": "curated_research",
+          "estimated_cost_s": 180,
+          "evidence": [
+            {
+              "ref": "E002",
+              "type": "curated_research"
+            },
+            {
+              "ref": "portfolio_diagnostics.pairwise_diversity: w001-w003=0.8224356227038319, w002-w003=0.8327371603950816",
+              "type": "diagnostic"
+            },
+            {
+              "ref": "train block calls SO.train once; predict block calls SO.predict once",
+              "type": "current_code"
+            }
+          ],
+          "evidence_adaptation": {
+            "evidence_id": "E002",
+            "implementation_mapping": "primary block train: instantiate and store multiple SO.train models with different deterministic seeds; predict: average SO.predict outputs and add deterministic user-item hash tie-break jitter using DV.load(split) arrays",
+            "protocol_caveat": "E002 studies cross-member routing, not intra-member bagging; here only the label-free combination pattern is borrowed, not its reported route weights or expected gain.",
+            "source_mechanism": "fixed label-free routing/combination over heterogeneous validated rankers can improve official validation without violating inference constraints"
+          },
+          "execution_mode": "custom_patch",
+          "expected_observation": "If true, per-seed predictions become less noisy and ensemble leave-one-out marginal contribution should improve slightly, with standalone primary flat to mildly positive.",
+          "experiment_contract": {
+            "claim": "Test whether averaging multiple deterministic replicas of the exact current LambdaRank trainer improves portfolio contribution versus a single replica.",
+            "expected_observable": "meta/training artifact reflects multiple fitted models and prediction differs from single-model parent on the same split/seed",
+            "falsification_condition": "No positive paired delta versus parent or evidence that averaged predictions collapse to the single-model ordering.",
+            "forbidden_shortcuts": [
+              "changing LightGBM fixed parameters",
+              "adding unsupported hp keys without a consumer",
+              "using a per-user constant adjustment",
+              "using validation labels or post-exposure targets at inference"
+            ],
+            "portfolio_role": "member_refinement",
+            "required_components": [
+              "train block must call SO.train at least 3 times with distinct deterministic seeds",
+              "predict block must average all stored model predictions",
+              "predict block jitter must depend on both user_id and video_id and remain tiny"
+            ]
+          },
+          "fallback": "Remove jitter first and keep pure averaging if audit/runtime is tight; if cost is prohibitive, reduce to 2 replicas.",
+          "hypothesis": "A small within-mechanism ensemble of the current LambdaRank model will reduce variance and produce rank orders complementary to the active portfolio, improving marginal portfolio primary even if standalone gain is small.",
+          "implementation_plan": "Patch train and predict. In train, keep SO.train exact config/grouping but train 3 LightGBM rankers per seed using deterministic sub-seeds {seed, seed+101, seed+202} and the same Xs/y, storing the list in one model object. In predict, average member predictions and add a tiny deterministic inference-time tab-conditioned score jitter based on hashed (user_id, video_id) scaled to ~1e-6 only to break ties differently across users/items without changing coarse score structure. No feature or target changes.",
+          "justification": "For a diverse but weaker branch, averaging nearby stochastic rankers often preserves mechanism identity while smoothing idiosyncratic errors. Because portfolio search reward is marginal contribution, a modestly smoother but still distinct LambdaRank member is a plausible refinement. The tiny deterministic jitter only resolves ties at the user-item level, which can matter for nDCG@5 and cannot be achieved by a per-user constant.",
+          "mechanism": "same-user LambdaRank score jitter bagging",
+          "mechanism_tags": [
+            "lambdarank",
+            "prediction_diversity",
+            "seed_bagging",
+            "error_diversifier"
+          ],
+          "observation": "The selected parent is \"item_lambdarank\" with standalone_primary 0.6010575837714116, while portfolio diagnostics show lower within-user rank correlation versus the other members (0.8224356227038319 and 0.8327371603950816), indicating this branch already contributes diversity; current code trains exactly one SO.train model per seed.",
+          "operator_id": null,
+          "parent_operator_stack": [
+            "item_lambdarank"
+          ],
+          "parent_references": [
+            "w003"
+          ],
+          "patch_scope": [
+            "train",
+            "predict"
+          ],
+          "persona": "optimizer",
+          "primary_block": "train",
+          "research_evidence": [
+            {
+              "evidence_id": "E002",
+              "kind": "curated_research",
+              "knowledge_id": "K0012",
+              "knowledge_origin": "cached",
+              "persona": "architecture",
+              "query": "Can the validated heterogeneous portfolio use a fixed label-free context router without weakening the test firewall?",
+              "reason": "The global 0.4/0.4/0.2 mixture leaves stable tab-specific member specialization unused, while fitting a flexible gate would add excessive validation degrees of freedom.",
+              "record_type": "mechanism",
+              "requires_success_mechanisms": [],
+              "source_ids": [
+                "S002",
+                "S003"
+              ],
+              "summary": "Pre-register the five coarse tab routes over the locked Legal, DeepFM engagement MTL, and item LambdaRank members. Keep 0.4/0.4/0.2 as fallback and route only tabs with at least 1,000 official-validation rows on a 0.1 weight grid. The global portfolio scored 0.605828080 and the fixed router scored 0.606127749. All matched seeds improved by [+0.000242107,+0.000150108,+0.000211008], mean +0.000201074, clearing the predeclared all-seed mean >=0.00015 gate although the paired-user CI crossed zero. The formal run must translate stable operator IDs to fresh node IDs, reproduce the exact score and seed deltas before LLM search, never refit routes during warm-start, and use only inference-time tab on test."
+            }
+          ],
+          "research_nonuse_reason": null,
+          "risk": [
+            "3x training cost may be too slow",
+            "bagging may mostly increase correlation with existing portfolio instead of diversity",
+            "tiny jitter may be ineffective if there are few ties"
+          ]
+        },
+        "traces": [
+          {
+            "action": "proceed",
+            "matches": [
+              {
+                "conclusion": "uncertain: delta=+0.000134145; paired_ci95=[-0.0007888344716550366, 0.0011032652758651532]; lesson=Tab-specialized residual fusion can create genuine diversification, but the next test should isolate and constrain the harmful tab segments instead of using one global residual blend.",
+                "context_similarity": 0.187246,
+                "delta_primary": 0.00013414459046257043,
+                "delta_primary_mean": 0.00013414459046257043,
+                "exact_hypothesis": false,
+                "execution_mode": "custom_patch",
+                "failure_class": "statistical_inconclusive",
+                "hypothesis": "A small tab/context residual branch will correct systematic ordering errors where the current tree leaf is weak, especially on tabs 0/2/4/6, producing complementary within-user reordering and better marginal portfolio contribution.",
+                "hypothesis_similarity": 0.224751,
+                "implementation_plan": "Edit features, train, and predict. In features, append a small set of legal interaction columns that expose tab-specific behavior without labels: one-hot flags for major tabs seen in diagnostics (0,1,2,4,6), duration_ms transforms such as log1p(duration_ms), and tab×log_duration interactions, while retaining all base SO.build_features columns. In train, fit the base SO.train LambdaRank model as-is on the augmented matrix, then also fit a lightweight sklearn logistic regression residual head on train rows using only the new interaction columns to predict long_view; standardize only inside train if needed. In predict, output base rank score plus a small fixed-weight residual adjustment from the residual head. This is a bounded two-branch fusion inside one candidate.",
+                "implementation_signature": "168aba4a7ce14cd9",
+                "kind": "inconclusive",
+                "lexical_similarity": 0.224751,
+                "mechanism": "tab-specialized residual blend over base lambdarank",
+                "mechanism_similarity": 0.141667,
+                "memory_id": "m008",
+                "memory_parameter_signature": {
+                  "parameters": [],
+                  "transition": null
+                },
+                "operator_id": null,
+                "parameter_signature": {
+                  "parameters": [],
+                  "transition": null
+                },
+                "parameter_signature_match": false,
+                "parent_operator_stack": [
+                  "item_lambdarank"
+                ],
+                "patch_scope": [
+                  "features",
+                  "train",
+                  "predict"
+                ],
+                "primary_block": "train",
+                "research_knowledge_ids": [],
+                "same_block": true,
+                "same_implementation": false,
+                "same_operator": false,
+                "same_patch_scope": false
+              },
+              {
+                "conclusion": "reject: {\"kind\": \"experiment_contract\", \"audit\": {\"status\": \"REVISE\", \"component_evidence\": [{\"component\": \"target construction from DV.watch_ratio() and duration_ms in target block\", \"code_evidence\": \"In build_target(), base = SO.build_target(...); then ratio, valid = DV.watch_ratio(), duration_ms = np.asarray(train.duration_ms,...), watch_ms = safe_ratio * safe_duration, watch_t = log1p(watch_ms)/12, dur_t = log1p(safe_duration)/12, and outputs include watch_time_target/watch_time_valid/watch_time_complete/watch_time_incomplete/watch_time_duration_target.\"}, {\"component\": \"model extension with one scalar watch-time head in model block\", \"code_evidence\": \"In model block, class DeepFMMTLWatch(nn.Module) defines self.watch_head = nn.Linear(in_dim, 1) and forward() returns {'main': main, 'aux': aux, 'watch': watch}.\"}, {\"component\": \"train loss combining main long_view objective with censored watch-time loss in train block\", \"code_evidence\": \"In train(), main_loss = BCEWithLogits(out['main'], y_main), aux_loss = BCEWithLogits(out['aux'], y_aux); watch loss uses smooth_l1 on incomplete rows and squared hinge relu(dur_b - watch_pred)^2 on complete rows, then loss = main_loss + aux_weight * aux_loss + watch_weight * watch_loss.\"}], \"missing_components\": [], \"forbidden_shortcuts_found\": [\"changed code cannot alter predictions at inference because predict() still delegates to SO.predict(model, Xs, split), while the trusted backend contract only guarantees SO.predict for models returned by SO.train on the delegated torch_deepfm_mtl path; no visible delegated code shows it can consume the custom DeepFMMTLWatch model, so prediction dataflow from the added head/custom trainer to output is unproven\", \"custom training path replaces delegated backend but does not preserve the contract's fixed train-only checkpoint policy evidence. The accepted contract requires a fixed train-only checkpoint policy inside candidate code; candidate uses best total training loss over epochs, but this grouping/checkpoint rule is a new undeclared replacement of the parent training behavior rather than a contract-backed visible equivalent\"], \"changed_runtime_path\": true, \"analysis\": \"The candidate does implement the claimed watch-target construction, custom model head, and mixed censored watch loss with real gradient consumers, and it does not use watch-time as an inference feature. However, fail-closed applies because predictions are still produced by opaque delegated SO.predict on a custom model class outside the trusted backend contract, so executable prediction change is not evidenced. Additionally, the custom replacement introduces its own best-train-loss checkpoint rule without contract support, creating an undeclared runtime behavior change.\"}}; lesson=When replacing a parent training stack, make prediction and checkpoint behavior explicitly contract-safe in-code before interpreting any validation gain.",
+                "context_similarity": 0.157053,
+                "delta_primary": null,
+                "delta_primary_mean": null,
+                "exact_hypothesis": false,
+                "execution_mode": "custom_patch",
+                "failure_class": "implementation_or_runtime",
+                "hypothesis": "A censored watch-time auxiliary objective will shape embeddings toward fine-grained dwell preference complementary to binary long_view, yielding better within-user ordering and potentially more error diversity relative to the current portfolio.",
+                "hypothesis_similarity": 0.133603,
+                "implementation_plan": "Edit target, model, and train blocks. Keep long_view as the main objective. In target, derive a train-only watch-time target from DV.watch_ratio() and RowSet.duration_ms: compute valid rows from the returned mask, transform observed play ratio and duration with a bounded log-scale target such as log1p(ratio * duration_ms)/12 and log1p(duration_ms)/12. In model/train, add one scalar auxiliary regression head sharing the existing representation with the main multitask tower. For rows flagged complete by watch_ratio validity and ratio near/full completion, use a one-sided lower-bound hinge against log-duration; for incomplete valid rows use squared error or smooth L1 to the transformed watch-time target. Combine this with the existing long_view plus engagement auxiliary objective using a small fixed weight (for example retain aux_weight 0.2 for existing heads and add a separate small watch loss weight implemented visibly in train). No watch-time values may be used as inference features.",
+                "implementation_signature": "3a87ed66d9e6d2c1",
+                "kind": "failure",
+                "lexical_similarity": 0.133603,
+                "mechanism": "censored watch-time auxiliary head for long_view",
+                "mechanism_similarity": 0.0,
+                "memory_id": "m009",
+                "memory_parameter_signature": {
+                  "parameters": [],
+                  "transition": null
+                },
+                "operator_id": null,
+                "parameter_signature": {
+                  "parameters": [],
+                  "transition": null
+                },
+                "parameter_signature_match": false,
+                "parent_operator_stack": [
+                  "deepfm_engagement_mtl_v1"
+                ],
+                "patch_scope": [
+                  "target",
+                  "model",
+                  "train"
+                ],
+                "primary_block": "train",
+                "research_knowledge_ids": [
+                  "K0002"
+                ],
+                "same_block": true,
+                "same_implementation": false,
+                "same_operator": false,
+                "same_patch_scope": false
+              },
+              {
+                "conclusion": "rolled back: delta=-0.000246674; paired_ci95=[-0.0004971115428910489, 3.2847883175468575e-05]; lesson=A tab-specific correction must change within-user ordering on the weak slice more effectively than a coarse item-popularity prior; otherwise it adds little or no useful diversity.",
+                "context_similarity": 0.242768,
+                "delta_primary": -0.0002466744088756023,
+                "delta_primary_mean": -0.0002466744088756023,
+                "exact_hypothesis": false,
+                "execution_mode": "custom_patch",
+                "failure_class": "statistical_negative",
+                "hypothesis": "Because both current portfolio leaders are strongly disadvantaged on tab=6, injecting a conservative train-only item prior only on tab=6 will create useful error diversity and improve marginal portfolio contribution even if standalone gain is small.",
+                "hypothesis_similarity": 0.316228,
+                "implementation_plan": "Edit only the predict block. Keep the trained parent model score from SO.predict(model, Xs, split), then load DV.load('train') and DV.load(split) inside predict to compute a train-only item long_view rate prior per video_id and a global fallback for unseen items. Construct a deterministic tab-gated convex mixture only for inference: for rows with tab==6, use alpha*model_score + (1-alpha)*item_prior with fixed alpha around 0.6; for all other tabs, return the original model score unchanged. No labels from valid/test are read, and the prior is constant across users only through the candidate item, so it can change within-user rankings across items.",
+                "implementation_signature": "92ebc3a3e1e1d1eb",
+                "kind": "failure",
+                "lexical_similarity": 0.316228,
+                "mechanism": "tab-specific prediction mixture between parent model and item-popularity prior",
+                "mechanism_similarity": 0.0,
+                "memory_id": "m006",
+                "memory_parameter_signature": {
+                  "parameters": [],
+                  "transition": null
+                },
+                "operator_id": null,
+                "parameter_signature": {
+                  "parameters": [],
+                  "transition": null
+                },
+                "parameter_signature_match": false,
+                "parent_operator_stack": [
+                  "deepfm_engagement_mtl_v1"
+                ],
+                "patch_scope": [
+                  "predict"
+                ],
+                "primary_block": "predict",
+                "research_knowledge_ids": [],
+                "same_block": false,
+                "same_implementation": false,
+                "same_operator": false,
+                "same_patch_scope": false
+              },
+              {
+                "conclusion": "rolled back: delta=-0.005117702; paired_ci95=[-0.006985271057388248, -0.0033271836431576583]; lesson=Keep the official long_view target if needed, but preserve the pairwise censored-watch objective; objective-family switching alone was a net negative here.",
+                "context_similarity": 0.107733,
+                "delta_primary": -0.005117702403826252,
+                "delta_primary_mean": -0.005117702403826252,
+                "exact_hypothesis": false,
+                "execution_mode": "custom_patch",
+                "failure_class": "statistical_negative",
+                "hypothesis": "A pointwise objective on the official binary target will underperform or match standalone BPR but may add portfolio value by producing less correlated within-user orderings than the current pairwise censored-watch stack.",
+                "hypothesis_similarity": 0.132478,
+                "implementation_plan": "Edit target and train blocks only. In target, return the plain binary long_view label from train rows and DV.assert_trainable(y, 'target'). In train, override config['objective']='pointwise' while keeping the same connected stable_ops train path and existing supported hp keys. Do not alter features or predict. This tests a loss-family change from pairwise censored-watch BPR to pointwise long_view optimization using the same FM architecture.",
+                "implementation_signature": "629658f50fe1de11",
+                "kind": "failure",
+                "lexical_similarity": 0.132478,
+                "mechanism": "pointwise long_view target for probability-style error diversification",
+                "mechanism_similarity": 0.0,
+                "memory_id": "m012",
+                "memory_parameter_signature": {
+                  "parameters": [],
+                  "transition": null
+                },
+                "operator_id": null,
+                "parameter_signature": {
+                  "parameters": [],
+                  "transition": null
+                },
+                "parameter_signature_match": false,
+                "parent_operator_stack": [
+                  "legal_rank_stack_v1"
+                ],
+                "patch_scope": [
+                  "target",
+                  "train"
+                ],
+                "primary_block": "train",
+                "research_knowledge_ids": [],
+                "same_block": true,
+                "same_implementation": false,
+                "same_operator": false,
+                "same_patch_scope": false
+              }
+            ],
+            "revision": 0,
+            "stage": "memory"
+          }
+        ]
+      },
+      {
+        "blocker": null,
+        "candidate_index": 1,
+        "eligible": true,
+        "hypothesis": "The parent LambdaRank branch has tab-structured score miscalibration; a fixed tab-conditional monotone transform can improve top-5 ordering and diversify against the other members without retraining.",
+        "persona": "architecture",
+        "proposal": {
+          "basis_type": "diagnostic",
+          "estimated_cost_s": 20,
+          "evidence": [
+            {
+              "ref": "portfolio_diagnostics.members[w003].slice_specialization.member_disadvantages: tab=0 delta_primary -0.01749022029153391, tab=2 delta_primary -0.009346696620826433",
+              "type": "diagnostic"
+            },
+            {
+              "ref": "directional_feedback.tab latest candidate: tab 0=-0.004685269996118624, tab 1=-0.00604673336187278, tab 2=-0.01631240725522276, tab 6=-0.008923924517829529",
+              "type": "diagnostic"
+            },
+            {
+              "ref": "prediction_api.legal_context_access permits DV.load(split) for inference-time tab",
+              "type": "task_spec"
+            }
+          ],
+          "evidence_adaptation": null,
+          "execution_mode": "custom_patch",
+          "expected_observation": "If tab miscalibration is real, validation primary improves mainly through tabs 0/2/6 or through improved marginal portfolio contribution despite limited standalone movement.",
+          "experiment_contract": {
+            "claim": "A fixed inference-time tab-conditioned monotone transform of LambdaRank scores can improve ranking by correcting context-specific miscalibration.",
+            "expected_observable": "Predictions for identical raw scores but different tabs separate systematically; tabs listed in diagnostics show changed score distributions",
+            "falsification_condition": "Primary does not improve or diagnostics show no tab-specific benefit, refuting the miscalibration hypothesis.",
+            "forbidden_shortcuts": [
+              "using validation-derived fitted calibration",
+              "non-monotone arbitrary per-row rewrites",
+              "changing train-time labels/features while claiming pure calibration",
+              "using any exposure-after-feedback signal at inference"
+            ],
+            "portfolio_role": "error_diversifier",
+            "required_components": [
+              "predict block must read DV.load(split).tab",
+              "predict block must apply different monotone transforms for at least two tab groups",
+              "base scores must originate from unmodified SO.predict"
+            ]
+          },
+          "fallback": "If this fails, escalate to train-time tab interaction features instead of postscore calibration.",
+          "hypothesis": "The parent LambdaRank branch has tab-structured score miscalibration; a fixed tab-conditional monotone transform can improve top-5 ordering and diversify against the other members without retraining.",
+          "implementation_plan": "Patch predict only. After SO.predict, load split rows via DV.load(split), and apply a fixed monotone piecewise-linear transform per coarse tab bucket {0,1,2,4,6,other}. Use predeclared slopes/intercepts centered near identity, with stronger expansion/compression only for tabs where the LambdaRank branch is diagnostically weak in the portfolio. The transform must be monotone within each tab so it changes cross-tab score comparability but preserves within-tab local ordering except for scale shifts; because users can see mixed tabs, this can alter within-user ranking legally using inference-time tab.",
+          "justification": "Because both official metrics rank within user, any lawful context that varies by candidate can be used at prediction time. Tab is an exposed candidate/context field and diagnostics indicate systematic tab-specific weakness, making post-score calibration a targeted structural diversification hypothesis rather than scalar retuning.",
+          "mechanism": "tab-specific monotone score calibration on LambdaRank outputs",
+          "mechanism_tags": [
+            "context_calibration",
+            "tab_specialization",
+            "postscore_transform",
+            "error_diversifier"
+          ],
+          "observation": "Portfolio diagnostics for w003 show strong tab disadvantages: delta_primary -0.01749022029153391 on tab=0 and -0.009346696620826433 on tab=2; the latest candidate also degraded tabs 0/1/2/6. The predict API explicitly allows calling DV.load(split) to read inference-time tab.",
+          "operator_id": null,
+          "parent_operator_stack": [
+            "item_lambdarank"
+          ],
+          "parent_references": [
+            "w003"
+          ],
+          "patch_scope": [
+            "predict"
+          ],
+          "persona": "architecture",
+          "primary_block": "predict",
+          "research_evidence": [],
+          "research_nonuse_reason": "No supplied E### directly studies a fixed tab-specific monotone postscore transform for this single LambdaRank branch. The more direct basis is the exact tab-slice diagnostics plus the legal prediction-time access to tab in the runtime contract.",
+          "risk": [
+            "monotone transforms may not affect enough mixed-tab users",
+            "poorly chosen fixed slopes can hurt already-strong tab 4",
+            "recent predict-only edits have rolled back negatively"
+          ]
+        },
+        "traces": [
+          {
+            "action": "proceed",
+            "matches": [
+              {
+                "conclusion": "rolled back: delta=-0.000152906; paired_ci95=[-0.00036965772729180834, 5.9843739064341325e-05]; lesson=Do not hand-code tab-specific predict-time score remaps from prior slice feedback; prefer learned train-time interactions or richer context features.",
+                "context_similarity": 0.224554,
+                "delta_primary": -0.0001529057691886937,
+                "delta_primary_mean": -0.0001529057691886937,
+                "exact_hypothesis": false,
+                "execution_mode": "custom_patch",
+                "failure_class": "statistical_negative",
+                "hypothesis": "A small tab-specific monotone calibration will improve portfolio marginal gain by correcting weak-slice ordering errors on tabs 2/4/6 without changing train-time behavior.",
+                "hypothesis_similarity": 0.181654,
+                "implementation_plan": "Edit only the predict block. Call SO.predict(model, Xs, split) to get base scores, then read the inference-time tab array via DV.load(split).tab. Apply a fixed monotone affine remap per tab id using a small hard-coded table chosen to downweight tabs with repeated negative directional feedback for the current parent branch (tabs 2,4,6) and mildly upweight tab 0. Example implementation: pred = base.copy(); pred *= scale[tab]; pred += bias[tab], with defaults 1 and 0 for unseen tab ids. Keep the mapping independent of labels and constant across seeds.",
+                "implementation_signature": "35517be1b2c94b8c",
+                "kind": "failure",
+                "lexical_similarity": 0.181654,
+                "mechanism": "tab-aware score calibration at prediction",
+                "mechanism_similarity": 0.52,
+                "memory_id": "m005",
+                "memory_parameter_signature": {
+                  "parameters": [],
+                  "transition": null
+                },
+                "operator_id": null,
+                "parameter_signature": {
+                  "parameters": [],
+                  "transition": null
+                },
+                "parameter_signature_match": false,
+                "parent_operator_stack": [
+                  "legal_rank_stack_v1"
+                ],
+                "patch_scope": [
+                  "predict"
+                ],
+                "primary_block": "predict",
+                "research_knowledge_ids": [],
+                "same_block": true,
+                "same_implementation": false,
+                "same_operator": false,
+                "same_patch_scope": true
+              },
+              {
+                "conclusion": "rolled back: delta=-0.000246674; paired_ci95=[-0.0004971115428910489, 3.2847883175468575e-05]; lesson=A tab-specific correction must change within-user ordering on the weak slice more effectively than a coarse item-popularity prior; otherwise it adds little or no useful diversity.",
+                "context_similarity": 0.146606,
+                "delta_primary": -0.0002466744088756023,
+                "delta_primary_mean": -0.0002466744088756023,
+                "exact_hypothesis": false,
+                "execution_mode": "custom_patch",
+                "failure_class": "statistical_negative",
+                "hypothesis": "Because both current portfolio leaders are strongly disadvantaged on tab=6, injecting a conservative train-only item prior only on tab=6 will create useful error diversity and improve marginal portfolio contribution even if standalone gain is small.",
+                "hypothesis_similarity": 0.041977,
+                "implementation_plan": "Edit only the predict block. Keep the trained parent model score from SO.predict(model, Xs, split), then load DV.load('train') and DV.load(split) inside predict to compute a train-only item long_view rate prior per video_id and a global fallback for unseen items. Construct a deterministic tab-gated convex mixture only for inference: for rows with tab==6, use alpha*model_score + (1-alpha)*item_prior with fixed alpha around 0.6; for all other tabs, return the original model score unchanged. No labels from valid/test are read, and the prior is constant across users only through the candidate item, so it can change within-user rankings across items.",
+                "implementation_signature": "92ebc3a3e1e1d1eb",
+                "kind": "failure",
+                "lexical_similarity": 0.041977,
+                "mechanism": "tab-specific prediction mixture between parent model and item-popularity prior",
+                "mechanism_similarity": 0.242857,
+                "memory_id": "m006",
+                "memory_parameter_signature": {
+                  "parameters": [],
+                  "transition": null
+                },
+                "operator_id": null,
+                "parameter_signature": {
+                  "parameters": [],
+                  "transition": null
+                },
+                "parameter_signature_match": false,
+                "parent_operator_stack": [
+                  "deepfm_engagement_mtl_v1"
+                ],
+                "patch_scope": [
+                  "predict"
+                ],
+                "primary_block": "predict",
+                "research_knowledge_ids": [],
+                "same_block": true,
+                "same_implementation": false,
+                "same_operator": false,
+                "same_patch_scope": true
+              },
+              {
+                "conclusion": "uncertain: delta=+0.000134145; paired_ci95=[-0.0007888344716550366, 0.0011032652758651532]; lesson=Tab-specialized residual fusion can create genuine diversification, but the next test should isolate and constrain the harmful tab segments instead of using one global residual blend.",
+                "context_similarity": 0.172382,
+                "delta_primary": 0.00013414459046257043,
+                "delta_primary_mean": 0.00013414459046257043,
+                "exact_hypothesis": false,
+                "execution_mode": "custom_patch",
+                "failure_class": "statistical_inconclusive",
+                "hypothesis": "A small tab/context residual branch will correct systematic ordering errors where the current tree leaf is weak, especially on tabs 0/2/4/6, producing complementary within-user reordering and better marginal portfolio contribution.",
+                "hypothesis_similarity": 0.1275,
+                "implementation_plan": "Edit features, train, and predict. In features, append a small set of legal interaction columns that expose tab-specific behavior without labels: one-hot flags for major tabs seen in diagnostics (0,1,2,4,6), duration_ms transforms such as log1p(duration_ms), and tab×log_duration interactions, while retaining all base SO.build_features columns. In train, fit the base SO.train LambdaRank model as-is on the augmented matrix, then also fit a lightweight sklearn logistic regression residual head on train rows using only the new interaction columns to predict long_view; standardize only inside train if needed. In predict, output base rank score plus a small fixed-weight residual adjustment from the residual head. This is a bounded two-branch fusion inside one candidate.",
+                "implementation_signature": "168aba4a7ce14cd9",
+                "kind": "inconclusive",
+                "lexical_similarity": 0.1275,
+                "mechanism": "tab-specialized residual blend over base lambdarank",
+                "mechanism_similarity": 0.25,
+                "memory_id": "m008",
+                "memory_parameter_signature": {
+                  "parameters": [],
+                  "transition": null
+                },
+                "operator_id": null,
+                "parameter_signature": {
+                  "parameters": [],
+                  "transition": null
+                },
+                "parameter_signature_match": false,
+                "parent_operator_stack": [
+                  "item_lambdarank"
+                ],
+                "patch_scope": [
+                  "features",
+                  "train",
+                  "predict"
+                ],
+                "primary_block": "train",
+                "research_knowledge_ids": [],
+                "same_block": false,
+                "same_implementation": false,
+                "same_operator": false,
+                "same_patch_scope": false
+              },
+              {
+                "conclusion": "rolled back: delta=-0.000145991; paired_ci95=[-0.0011861589289728525, 0.0009444088297450523]; lesson=Naive train-only pair-count affinity features are too sparse or redundant here; next personalization attempt should use a stronger backoff design rather than raw user-item/video memorization counts.",
+                "context_similarity": 0.12149,
+                "delta_primary": -0.00014599092509692824,
+                "delta_primary_mean": -0.00014599092509692824,
+                "exact_hypothesis": false,
+                "execution_mode": "custom_patch",
+                "failure_class": "statistical_negative",
+                "hypothesis": "Adding explicit train-only pair affinity features for (user,author), (user,video), and (user,tab) will improve within-user ranking and diversify errors relative to the current item/context ranker, which lacks direct pair-personalization features in its fixed 25-column representation.",
+                "hypothesis_similarity": 0.125,
+                "implementation_plan": "Edit features as primary and predict as support. In build_features, after calling SO.build_features(splits, train_idx, OP_CONFIG), load DV.load('train') and compute train-only count dictionaries for user-author, user-video, and user-tab interactions over the training rows referenced by train_idx. For each split, append dense float32 columns: log1p(user_author_count), log1p(user_video_count), log1p(user_tab_count), and normalized user_author_share = user_author_count / max(1,user_total_count). Counts use only train data; unseen pairs map to zero. In predict, keep SO.predict unchanged because the model consumes the expanded matrices directly.",
+                "implementation_signature": "0b47655664d8efdf",
+                "kind": "failure",
+                "lexical_similarity": 0.125,
+                "mechanism": "train-only user-author affinity count features",
+                "mechanism_similarity": 0.0,
+                "memory_id": "m011",
+                "memory_parameter_signature": {
+                  "parameters": [],
+                  "transition": null
+                },
+                "operator_id": null,
+                "parameter_signature": {
+                  "parameters": [],
+                  "transition": null
+                },
+                "parameter_signature_match": false,
+                "parent_operator_stack": [
+                  "item_lambdarank"
+                ],
+                "patch_scope": [
+                  "features"
+                ],
+                "primary_block": "features",
+                "research_knowledge_ids": [],
+                "same_block": false,
+                "same_implementation": false,
+                "same_operator": false,
+                "same_patch_scope": false
+              }
+            ],
+            "revision": 0,
+            "stage": "memory"
+          }
+        ]
+      },
+      {
+        "blocker": null,
+        "candidate_index": 2,
+        "eligible": true,
+        "hypothesis": "A train-only watch-ratio auxiliary model fused at prediction time supplies complementary engagement structure aligned with long_view, improving within-user top-k ordering beyond pure LambdaRank.",
+        "persona": "reward",
+        "proposal": {
+          "basis_type": "curated_research",
+          "estimated_cost_s": 120,
+          "evidence": [
+            {
+              "ref": "E003",
+              "type": "curated_research"
+            },
+            {
+              "ref": "train_target_phi_with_long_view.is_click = 0.7604858188163154; is_like = 0.09916137501207341; is_profile_enter = 0.14612987498722513",
+              "type": "diagnostic"
+            },
+            {
+              "ref": "current target block delegates only SO.build_target with objective pointwise for the parent",
+              "type": "current_code"
+            }
+          ],
+          "evidence_adaptation": {
+            "evidence_id": "E003",
+            "implementation_mapping": "primary block train: fit existing SO.train LambdaRank model plus a secondary regressor on train rows using DV.watch_ratio-derived train-only auxiliary target; target block constructs auxiliary arrays; predict block linearly fuses base rank score and auxiliary prediction",
+            "protocol_caveat": "E003 used an FM with a shared-head auxiliary loss, not a late-fused LambdaRank plus separate regressor. This proposal translates the auxiliary-signal mechanism into the current parent’s available blocks and libraries rather than claiming identical performance.",
+            "source_mechanism": "keep long_view as the main ranking objective and add a small censored watch-time regression head sharing the same legal inference features"
+          },
+          "execution_mode": "custom_patch",
+          "expected_observation": "If true, validation primary rises modestly and slice gains should appear where pure long_view ranking under-orders high watch-depth items; portfolio marginal contribution may improve through engagement-oriented diversity.",
+          "experiment_contract": {
+            "claim": "Test whether adding a train-only watch-ratio auxiliary predictor and late-fusing it with the current LambdaRank score improves ranking over LambdaRank alone.",
+            "expected_observable": "Stored model object contains two trained components and predictions differ from base SO.predict in proportion to auxiliary regressor output",
+            "falsification_condition": "No positive paired delta or ablation shows fused predictions equal the base ranker, invalidating the auxiliary-signal benefit.",
+            "forbidden_shortcuts": [
+              "replacing long_view as the main target",
+              "using watch_ratio or any post-exposure column as an inference feature",
+              "claiming shared-head multitask without actually training the auxiliary predictor",
+              "using unsupported hidden validation feedback to tune fusion weight"
+            ],
+            "portfolio_role": "mechanism_fusion",
+            "required_components": [
+              "target block must call DV.watch_ratio() and create a valid auxiliary target",
+              "train block must fit both the unchanged SO.train LambdaRank model and an auxiliary regressor consuming Xs[train] on valid watch-ratio rows",
+              "predict block must combine both model outputs with a fixed small weight"
+            ]
+          },
+          "fallback": "If promising but noisy, keep the auxiliary target and replace the regressor with a simpler ridge model or smaller fusion weight in a later isolated test.",
+          "hypothesis": "A train-only watch-ratio auxiliary model fused at prediction time supplies complementary engagement structure aligned with long_view, improving within-user top-k ordering beyond pure LambdaRank.",
+          "implementation_plan": "Patch target, train, and predict. Keep main trained ranker as the existing SO.train LambdaRank long_view model. In target, read DV.watch_ratio() on train only and construct a valid-mask plus clipped log1p watch-ratio target for train rows. In train, fit a lightweight secondary sklearn regressor on the same training rows and current Xs[train] to predict the auxiliary target only where valid is true; store both the LambdaRank model and auxiliary regressor. In predict, output base LambdaRank score plus a small fixed-weight auxiliary score contribution from the regressor, with no use of any post-exposure feature at inference because Xs are still the same legal inference-time features.",
+          "justification": "This is a cross-branch mechanism fusion: w003 contributes a strong item/context ranker, while w002 demonstrates engagement modeling value in the portfolio. Adding a train-only continuous engagement auxiliary model preserves legal inference and may create a more complementary ordering, especially near the top of each user's slate.",
+          "mechanism": "LambdaRank plus train-only censored watch-ratio auxiliary score fusion",
+          "mechanism_tags": [
+            "auxiliary_target",
+            "watch_time",
+            "censored_regression",
+            "mechanism_fusion"
+          ],
+          "observation": "Research evidence reports that keeping native long_view as the ranking objective while adding a small censored watch-time head improved validation over BPR alone; deterministic diagnostics show train_target_phi_with_long_view for is_click is 0.7604858188163154 but other native actions are weaker, suggesting watch-depth can add a different continuous signal. The current parent uses only pointwise long_view target through SO.build_target.",
+          "operator_id": null,
+          "parent_operator_stack": [
+            "item_lambdarank"
+          ],
+          "parent_references": [
+            "w003",
+            "w002"
+          ],
+          "patch_scope": [
+            "target",
+            "train",
+            "predict"
+          ],
+          "persona": "reward",
+          "primary_block": "train",
+          "research_evidence": [
+            {
+              "evidence_id": "E003",
+              "kind": "curated_research",
+              "knowledge_id": "K0002",
+              "knowledge_origin": "cached",
+              "persona": "reward",
+              "query": "How should watch time complement native long_view without changing evaluation labels?",
+              "reason": "The native binary label discards engagement magnitude and completed plays are right-censored by duration.",
+              "record_type": "mechanism",
+              "requires_success_mechanisms": [],
+              "source_ids": [
+                "S001",
+                "S004"
+              ],
+              "summary": "Keep native long_view as the ranking objective and add a small censored watch-time regression head sharing FM embeddings. Transform play time and duration with log1p/12. For incomplete plays use exact regression residual; for completed plays use a one-sided lower-bound hinge that stops penalizing predictions above log-duration. Never use evaluation-period feedback as an input feature. BPR plus this auxiliary target at weight 0.2 reached five-seed official-validation primary 0.604023290 ± 0.000282947 versus 0.603517127 ± 0.000631158 for BPR alone; on three random-exposure seeds, unbiased primary was 0.376328528 ± 0.003245064 versus 0.373291085 ± 0.002151737. This is an implementation prior, not permission to replace the fixed relevance label."
+            }
+          ],
+          "research_nonuse_reason": null,
+          "risk": [
+            "late fusion may be weaker than true shared-head multitask",
+            "watch_ratio valid-mask may exclude too many rows",
+            "auxiliary regressor could overfit and wash out rank signal"
+          ]
+        },
+        "traces": [
+          {
+            "action": "proceed",
+            "matches": [
+              {
+                "conclusion": "reject: {\"kind\": \"experiment_contract\", \"audit\": {\"status\": \"REVISE\", \"component_evidence\": [{\"component\": \"target construction from DV.watch_ratio() and duration_ms in target block\", \"code_evidence\": \"In build_target(), base = SO.build_target(...); then ratio, valid = DV.watch_ratio(), duration_ms = np.asarray(train.duration_ms,...), watch_ms = safe_ratio * safe_duration, watch_t = log1p(watch_ms)/12, dur_t = log1p(safe_duration)/12, and outputs include watch_time_target/watch_time_valid/watch_time_complete/watch_time_incomplete/watch_time_duration_target.\"}, {\"component\": \"model extension with one scalar watch-time head in model block\", \"code_evidence\": \"In model block, class DeepFMMTLWatch(nn.Module) defines self.watch_head = nn.Linear(in_dim, 1) and forward() returns {'main': main, 'aux': aux, 'watch': watch}.\"}, {\"component\": \"train loss combining main long_view objective with censored watch-time loss in train block\", \"code_evidence\": \"In train(), main_loss = BCEWithLogits(out['main'], y_main), aux_loss = BCEWithLogits(out['aux'], y_aux); watch loss uses smooth_l1 on incomplete rows and squared hinge relu(dur_b - watch_pred)^2 on complete rows, then loss = main_loss + aux_weight * aux_loss + watch_weight * watch_loss.\"}], \"missing_components\": [], \"forbidden_shortcuts_found\": [\"changed code cannot alter predictions at inference because predict() still delegates to SO.predict(model, Xs, split), while the trusted backend contract only guarantees SO.predict for models returned by SO.train on the delegated torch_deepfm_mtl path; no visible delegated code shows it can consume the custom DeepFMMTLWatch model, so prediction dataflow from the added head/custom trainer to output is unproven\", \"custom training path replaces delegated backend but does not preserve the contract's fixed train-only checkpoint policy evidence. The accepted contract requires a fixed train-only checkpoint policy inside candidate code; candidate uses best total training loss over epochs, but this grouping/checkpoint rule is a new undeclared replacement of the parent training behavior rather than a contract-backed visible equivalent\"], \"changed_runtime_path\": true, \"analysis\": \"The candidate does implement the claimed watch-target construction, custom model head, and mixed censored watch loss with real gradient consumers, and it does not use watch-time as an inference feature. However, fail-closed applies because predictions are still produced by opaque delegated SO.predict on a custom model class outside the trusted backend contract, so executable prediction change is not evidenced. Additionally, the custom replacement introduces its own best-train-loss checkpoint rule without contract support, creating an undeclared runtime behavior change.\"}}; lesson=When replacing a parent training stack, make prediction and checkpoint behavior explicitly contract-safe in-code before interpreting any validation gain.",
+                "context_similarity": 0.249162,
+                "delta_primary": null,
+                "delta_primary_mean": null,
+                "exact_hypothesis": false,
+                "execution_mode": "custom_patch",
+                "failure_class": "implementation_or_runtime",
+                "hypothesis": "A censored watch-time auxiliary objective will shape embeddings toward fine-grained dwell preference complementary to binary long_view, yielding better within-user ordering and potentially more error diversity relative to the current portfolio.",
+                "hypothesis_similarity": 0.333333,
+                "implementation_plan": "Edit target, model, and train blocks. Keep long_view as the main objective. In target, derive a train-only watch-time target from DV.watch_ratio() and RowSet.duration_ms: compute valid rows from the returned mask, transform observed play ratio and duration with a bounded log-scale target such as log1p(ratio * duration_ms)/12 and log1p(duration_ms)/12. In model/train, add one scalar auxiliary regression head sharing the existing representation with the main multitask tower. For rows flagged complete by watch_ratio validity and ratio near/full completion, use a one-sided lower-bound hinge against log-duration; for incomplete valid rows use squared error or smooth L1 to the transformed watch-time target. Combine this with the existing long_view plus engagement auxiliary objective using a small fixed weight (for example retain aux_weight 0.2 for existing heads and add a separate small watch loss weight implemented visibly in train). No watch-time values may be used as inference features.",
+                "implementation_signature": "3a87ed66d9e6d2c1",
+                "kind": "failure",
+                "lexical_similarity": 0.333333,
+                "mechanism": "censored watch-time auxiliary head for long_view",
+                "mechanism_similarity": 0.419231,
+                "memory_id": "m009",
+                "memory_parameter_signature": {
+                  "parameters": [],
+                  "transition": null
+                },
+                "operator_id": null,
+                "parameter_signature": {
+                  "parameters": [
+                    "k"
+                  ],
+                  "transition": null
+                },
+                "parameter_signature_match": false,
+                "parent_operator_stack": [
+                  "deepfm_engagement_mtl_v1"
+                ],
+                "patch_scope": [
+                  "target",
+                  "model",
+                  "train"
+                ],
+                "primary_block": "train",
+                "research_knowledge_ids": [
+                  "K0002"
+                ],
+                "same_block": true,
+                "same_implementation": false,
+                "same_operator": false,
+                "same_patch_scope": false
+              },
+              {
+                "conclusion": "uncertain: delta=+0.000134145; paired_ci95=[-0.0007888344716550366, 0.0011032652758651532]; lesson=Tab-specialized residual fusion can create genuine diversification, but the next test should isolate and constrain the harmful tab segments instead of using one global residual blend.",
+                "context_similarity": 0.205252,
+                "delta_primary": 0.00013414459046257043,
+                "delta_primary_mean": 0.00013414459046257043,
+                "exact_hypothesis": false,
+                "execution_mode": "custom_patch",
+                "failure_class": "statistical_inconclusive",
+                "hypothesis": "A small tab/context residual branch will correct systematic ordering errors where the current tree leaf is weak, especially on tabs 0/2/4/6, producing complementary within-user reordering and better marginal portfolio contribution.",
+                "hypothesis_similarity": 0.163333,
+                "implementation_plan": "Edit features, train, and predict. In features, append a small set of legal interaction columns that expose tab-specific behavior without labels: one-hot flags for major tabs seen in diagnostics (0,1,2,4,6), duration_ms transforms such as log1p(duration_ms), and tab×log_duration interactions, while retaining all base SO.build_features columns. In train, fit the base SO.train LambdaRank model as-is on the augmented matrix, then also fit a lightweight sklearn logistic regression residual head on train rows using only the new interaction columns to predict long_view; standardize only inside train if needed. In predict, output base rank score plus a small fixed-weight residual adjustment from the residual head. This is a bounded two-branch fusion inside one candidate.",
+                "implementation_signature": "168aba4a7ce14cd9",
+                "kind": "inconclusive",
+                "lexical_similarity": 0.163333,
+                "mechanism": "tab-specialized residual blend over base lambdarank",
+                "mechanism_similarity": 0.11875,
+                "memory_id": "m008",
+                "memory_parameter_signature": {
+                  "parameters": [],
+                  "transition": null
+                },
+                "operator_id": null,
+                "parameter_signature": {
+                  "parameters": [
+                    "k"
+                  ],
+                  "transition": null
+                },
+                "parameter_signature_match": false,
+                "parent_operator_stack": [
+                  "item_lambdarank"
+                ],
+                "patch_scope": [
+                  "features",
+                  "train",
+                  "predict"
+                ],
+                "primary_block": "train",
+                "research_knowledge_ids": [],
+                "same_block": true,
+                "same_implementation": false,
+                "same_operator": false,
+                "same_patch_scope": false
+              },
+              {
+                "conclusion": "rolled back: delta=-0.005117702; paired_ci95=[-0.006985271057388248, -0.0033271836431576583]; lesson=Keep the official long_view target if needed, but preserve the pairwise censored-watch objective; objective-family switching alone was a net negative here.",
+                "context_similarity": 0.25462,
+                "delta_primary": -0.005117702403826252,
+                "delta_primary_mean": -0.005117702403826252,
+                "exact_hypothesis": false,
+                "execution_mode": "custom_patch",
+                "failure_class": "statistical_negative",
+                "hypothesis": "A pointwise objective on the official binary target will underperform or match standalone BPR but may add portfolio value by producing less correlated within-user orderings than the current pairwise censored-watch stack.",
+                "hypothesis_similarity": 0.12093,
+                "implementation_plan": "Edit target and train blocks only. In target, return the plain binary long_view label from train rows and DV.assert_trainable(y, 'target'). In train, override config['objective']='pointwise' while keeping the same connected stable_ops train path and existing supported hp keys. Do not alter features or predict. This tests a loss-family change from pairwise censored-watch BPR to pointwise long_view optimization using the same FM architecture.",
+                "implementation_signature": "629658f50fe1de11",
+                "kind": "failure",
+                "lexical_similarity": 0.12093,
+                "mechanism": "pointwise long_view target for probability-style error diversification",
+                "mechanism_similarity": 0.0,
+                "memory_id": "m012",
+                "memory_parameter_signature": {
+                  "parameters": [],
+                  "transition": null
+                },
+                "operator_id": null,
+                "parameter_signature": {
+                  "parameters": [
+                    "k"
+                  ],
+                  "transition": null
+                },
+                "parameter_signature_match": false,
+                "parent_operator_stack": [
+                  "legal_rank_stack_v1"
+                ],
+                "patch_scope": [
+                  "target",
+                  "train"
+                ],
+                "primary_block": "train",
+                "research_knowledge_ids": [],
+                "same_block": true,
+                "same_implementation": false,
+                "same_operator": false,
+                "same_patch_scope": false
+              },
+              {
+                "conclusion": "rolled back: delta=-0.000145991; paired_ci95=[-0.0011861589289728525, 0.0009444088297450523]; lesson=Naive train-only pair-count affinity features are too sparse or redundant here; next personalization attempt should use a stronger backoff design rather than raw user-item/video memorization counts.",
+                "context_similarity": 0.135476,
+                "delta_primary": -0.00014599092509692824,
+                "delta_primary_mean": -0.00014599092509692824,
+                "exact_hypothesis": false,
+                "execution_mode": "custom_patch",
+                "failure_class": "statistical_negative",
+                "hypothesis": "Adding explicit train-only pair affinity features for (user,author), (user,video), and (user,tab) will improve within-user ranking and diversify errors relative to the current item/context ranker, which lacks direct pair-personalization features in its fixed 25-column representation.",
+                "hypothesis_similarity": 0.16,
+                "implementation_plan": "Edit features as primary and predict as support. In build_features, after calling SO.build_features(splits, train_idx, OP_CONFIG), load DV.load('train') and compute train-only count dictionaries for user-author, user-video, and user-tab interactions over the training rows referenced by train_idx. For each split, append dense float32 columns: log1p(user_author_count), log1p(user_video_count), log1p(user_tab_count), and normalized user_author_share = user_author_count / max(1,user_total_count). Counts use only train data; unseen pairs map to zero. In predict, keep SO.predict unchanged because the model consumes the expanded matrices directly.",
+                "implementation_signature": "0b47655664d8efdf",
+                "kind": "failure",
+                "lexical_similarity": 0.16,
+                "mechanism": "train-only user-author affinity count features",
+                "mechanism_similarity": 0.24,
+                "memory_id": "m011",
+                "memory_parameter_signature": {
+                  "parameters": [],
+                  "transition": null
+                },
+                "operator_id": null,
+                "parameter_signature": {
+                  "parameters": [
+                    "k"
+                  ],
+                  "transition": null
+                },
+                "parameter_signature_match": false,
+                "parent_operator_stack": [
+                  "item_lambdarank"
+                ],
+                "patch_scope": [
+                  "features"
+                ],
+                "primary_block": "features",
+                "research_knowledge_ids": [],
+                "same_block": false,
+                "same_implementation": false,
+                "same_operator": false,
+                "same_patch_scope": false
+              }
+            ],
+            "revision": 0,
+            "stage": "memory"
+          }
+        ]
+      }
+    ],
+    "planning_attempt": 1,
+    "stage": "memory_screen"
+  },
+  {
+    "eligible_original_indices": [
+      0,
+      1,
+      2
+    ],
+    "rejected": [
+      "A small within-mechanism ensemble of the current LambdaRank model will reduce variance and produce rank orders complementary to the active portfolio, improving marginal portfolio primary even if standalone gain is small.",
+      "A train-only watch-ratio auxiliary model fused at prediction time supplies complementary engagement structure aligned with long_view, improving within-user top-k ordering beyond pure LambdaRank."
+    ],
+    "selected_index": 1,
+    "selected_viable_index": 1,
+    "selection_rationale": "Candidate 0 is executable and portfolio-aligned because w003 is already the most diverse member, but its evidence is indirect: E002 supports label-free combination of heterogeneous validated rankers, not same-mechanism seed bagging, and the tiny tie-jitter is likely inert unless many exact ties occur. It also has the highest cost and a meaningful risk that averaging nearby LambdaRank replicas reduces the very diversity that makes w003 useful marginally, so expected marginal portfolio gain times reliability is only moderate despite good code connectivity. Candidate 1 is the strongest next experiment because it is directly connected to an executable prediction consumer, uses legal inference-time tab context, targets a concrete diagnosed weakness of w003 on tabs 0 and 2, satisfies the requirement to include a structural residual-targeted/error-diverse idea, and is cheap and highly falsifiable. Although it lacks external research support, its evidence is the most dataset-specific and the implementation is simple enough that measured outcome will be attributable to the hypothesis rather than plumbing risk. Candidate 2 is also connected and offers a true mechanism-fusion path, but its supporting research is only a translated mechanism from a different model family, the implementation spans target/train/predict with more opportunities for mismatch, and late fusion of a censored auxiliary regressor is less reliable than the direct tab-diagnostic correction in Candidate 1. Therefore Candidate 1 has the best expected marginal portfolio primary gain after accounting for evidential reliability, implementation reliability, cost, and risk.",
+    "stage": "select"
+  }
+]

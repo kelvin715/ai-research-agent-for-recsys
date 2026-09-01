@@ -1,0 +1,87 @@
+{
+  "basis_type": "diagnostic",
+  "estimated_cost_s": 900,
+  "evidence": [
+    {
+      "ref": "Current trusted stable-search-parent metrics: directional_feedback.tab entry for tab=6, delta_primary=-0.010934534029859722, rows=5170, users=2212",
+      "type": "diagnostic"
+    },
+    {
+      "ref": "Trusted runtime-backend contract: SO.train consumes Xs[train][train_idx] directly",
+      "type": "current_code"
+    },
+    {
+      "ref": "E001 negative_result: unconsumed pair_group_weight keys produced byte-identical predictions",
+      "type": "curated_research"
+    }
+  ],
+  "evidence_adaptation": null,
+  "execution_mode": "custom_patch",
+  "expected_observation": "Predictions must differ from w001 on tab-6 rows for every seed and remain exactly equal outside tab 6; if the hypothesis is correct, tab-6 directional delta and marginal portfolio primary will be positive.",
+  "experiment_contract": {
+    "claim": "Explicit tab-6 oversampling in a second FM creates a useful context-specialized ordering when blended only on tab-6 impressions.",
+    "expected_observable": "The specialist training row count is larger than the global count, the two model predictions are non-identical, and final predictions differ from the parent exactly on tab-6 rows.",
+    "falsification_condition": "Reject if predictions are identical to the parent, if any non-tab-6 final prediction changes, or if trusted marginal portfolio primary is non-positive without a compensating positive paired interval.",
+    "forbidden_shortcuts": [
+      "Adding pair_group_weight or another unsupported HP key without an executable consumer",
+      "Returning the global model twice",
+      "Reading validation or test labels",
+      "Using any post-exposure feedback as an inference feature"
+    ],
+    "portfolio_role": "member_refinement",
+    "required_components": [
+      "Fit the unchanged global SO.train model",
+      "Construct the specialist train_idx with deterministic duplicated tab-6 training rows",
+      "Fit a distinct specialist through SO.train using that augmented index",
+      "Call both models in predict and apply the fixed blend only where DV.load(split).tab == 6"
+    ]
+  },
+  "fallback": "Rollback both blocks and retain w001; do not convert the failed implementation into unsupported HP keys.",
+  "hypothesis": "A globally trained FM blended with an explicitly tab-6-upweighted specialist will improve within-user ordering on tab 6 without materially changing other rows, yielding positive marginal portfolio primary relative to w001.",
+  "implementation_plan": "In train, fit the unchanged legal_rank_stack_v1 global FM, then fit a second FM using a deterministic training index consisting of all selected training rows plus three additional copies of rows whose train-time tab equals 6. This directly changes the row stream consumed by SO.train rather than adding an ignored configuration key. Return both models. In predict, obtain tab from DV.load(split), score both models through SO.predict, retain the global score outside tab 6, and use the fixed 50/50 mean of global and specialist scores on tab-6 rows. Both models retain the fixed three-epoch train-only checkpoint and supplied seed.",
+  "justification": "Tab 6 is the parent’s clearest fixed-slice deficit and is also a shared weakness in the portfolio diagnostics. Deterministic index duplication is visibly consumed by SO.train through train_idx, so this tests actual gradient exposure rather than repeating the inert configuration-only proposal rejected by E001.",
+  "mechanism": "tab-6 oversampled mixture-of-experts FM",
+  "mechanism_tags": [
+    "context-specialist",
+    "group-reweighting",
+    "mixture-of-experts",
+    "residual-targeting"
+  ],
+  "observation": "The current stable parent directional feedback reports `directional_feedback.tab[tab=6].delta_primary` = -0.010934534029859722, while tab 6 contains 5170 validation rows and 2212 users. E001 also establishes that merely setting unconsumed tab-weight keys was byte-identical to the parent.",
+  "operator_id": null,
+  "parent_operator_stack": [
+    "legal_rank_stack_v1"
+  ],
+  "parent_references": [
+    "w001"
+  ],
+  "patch_scope": [
+    "train",
+    "predict"
+  ],
+  "persona": "optimizer",
+  "primary_block": "train",
+  "research_evidence": [
+    {
+      "evidence_id": "E001",
+      "kind": "curated_research",
+      "knowledge_id": "K0009",
+      "knowledge_origin": "cached",
+      "persona": "optimizer",
+      "query": "Which optimizer-side proposal failed because its configuration was not connected to the training backend?",
+      "reason": "Prevent a later Agent iteration from repeating an executable-looking but semantically inert config-only patch.",
+      "record_type": "negative_result",
+      "requires_success_mechanisms": [],
+      "source_ids": [
+        "S001"
+      ],
+      "summary": "Deprioritize the exact tab inverse-frequency BPR proposal that only adds hp['pair_group_weight']='tab_invfreq' and hp['pair_group_weight_values'] before calling SO.train. In the locked formal run, all three seed predictions were byte-identical to the Legal parent because stable_ops did not consume either key. Before proposing any config-only optimizer change, trace the key to a concrete sampler, loss, or gradient consumer in current code; if no consumer exists within the allowed patch scope, reject the proposal rather than relying on static/smoke success. This is an implementation-specific no-op, not evidence that correctly wired group weighting can never work."
+    }
+  ],
+  "research_nonuse_reason": "The fixed-slice deficit and the documented train_idx consumer provide a more direct basis than a positive research mechanism; E001 is used only to avoid its exact inert implementation.",
+  "risk": [
+    "Duplicated rows may distort BPR sampling more than intended.",
+    "A tab-only specialist can have poor calibration against candidates from other tabs within the same user.",
+    "The tab-6 sample may be too small for a stable second FM."
+  ]
+}

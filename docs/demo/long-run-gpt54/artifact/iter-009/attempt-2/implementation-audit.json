@@ -1,0 +1,21 @@
+{
+  "analysis": "The candidate matches the accepted soft-label experiment: target construction uses DV.train_targets only for train-time supervision, train replaces delegated SO.train with a visible custom pointwise FM+BCE path that consumes the soft target, predict scores with that custom model, and features remain the parent legal inference-time set with no auxiliary-label leakage.",
+  "changed_runtime_path": true,
+  "component_evidence": [
+    {
+      "code_evidence": "In build_target, `aux = DV.train_targets(['is_click', 'is_profile_enter', 'is_like'])` fetches train-only auxiliary labels, `y_long = np.asarray(splits['train'].label, dtype=np.float32)` reads long_view, and `y_soft = 0.70 * y_long + 0.22 * y_click + 0.06 * y_profile + 0.02 * y_like` followed by `np.clip(...).astype(np.float32)` constructs the numeric soft target returned to training.",
+      "component": "target block calls DV.train_targets on train split and constructs a numeric soft target"
+    },
+    {
+      "code_evidence": "In train, `ytr = np.asarray(y[train_idx], dtype=np.float32)` consumes the soft target from build_target; `logits = _fm_predict_logits(model, xb)`, `pred = sigmoid(logits)`, `batch_loss = mean(-(yb*log(pred) + (1-yb)*log(1-pred)))`, and `grad_out = err / max(1, len(idx))` feed `_fm_sgd_step(model, xb, grad_out, lr=lr, l2=l2)`, so the custom BCE objective visibly drives parameter updates.",
+      "component": "train block optimizes that soft target with a visible custom loss consumer"
+    },
+    {
+      "code_evidence": "`predict(model, Xs, split)` does `logits = _fm_predict_logits(model, np.asarray(Xs[split], dtype=np.int64))` and returns `sigmoid(logits).astype(np.float32)`, so inference scores come directly from the custom FM trained in the patched train block.",
+      "component": "predict block emits scores from the custom-trained model"
+    }
+  ],
+  "forbidden_shortcuts_found": [],
+  "missing_components": [],
+  "status": "PASS"
+}

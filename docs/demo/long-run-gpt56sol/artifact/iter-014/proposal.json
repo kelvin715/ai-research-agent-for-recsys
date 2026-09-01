@@ -1,0 +1,73 @@
+{
+  "basis_type": "diagnostic",
+  "estimated_cost_s": 750,
+  "evidence": [
+    {
+      "ref": "train_target_phi_with_long_view: is_click=0.7604858188163154, is_profile_enter=0.14612987498722513, is_like=0.09916137501207341, is_hate=-0.003941107614124816.",
+      "type": "diagnostic"
+    },
+    {
+      "ref": "train_duration_zero_rows=24076.",
+      "type": "diagnostic"
+    },
+    {
+      "ref": "DV.train_targets(names) and DV.watch_ratio() expose post-exposure values for train-only target construction, and the backend requires target[main] plus target[engagement_aux].",
+      "type": "task_spec"
+    }
+  ],
+  "evidence_adaptation": null,
+  "execution_mode": "custom_patch",
+  "expected_observation": "The unchanged DeepFM should show a positive trusted validation-primary and marginal portfolio-primary delta, with the largest plausible benefit on rows where viewing-depth information distinguishes candidates beyond click.",
+  "experiment_contract": {
+    "claim": "The experiment tests an explicitly watch-aligned four-head auxiliary target matrix while keeping the main target, model, auxiliary weight, and training procedure fixed.",
+    "expected_observable": "Target diagnostics must show an engagement_aux matrix with four columns, a bounded soft-completion column in [0,1], exactly 24076 neutralized zero-duration rows if all such rows are marked invalid, and a main target identical to the parent.",
+    "falsification_condition": "The hypothesis is refuted if the connected target replacement yields non-positive trusted marginal portfolio-primary delta; the run is invalid if SO.train does not consume the rebuilt matrix or if any auxiliary value reaches prediction.",
+    "forbidden_shortcuts": [
+      "Using any post-exposure target as an inference feature",
+      "Changing aux_weight from its current value of 0.2",
+      "Silently retaining the original engagement_aux matrix",
+      "Treating invalid watch ratios as observed zero completion",
+      "Using validation or test labels to choose targets or checkpoints"
+    ],
+    "portfolio_role": "member_refinement",
+    "required_components": [
+      "Unchanged binary long_view main target",
+      "Explicit auxiliary columns for is_click, is_like, is_profile_enter, and clipped watch_ratio",
+      "Use of the watch_ratio valid mask with neutral 0.5 values on invalid rows",
+      "DV.assert_trainable checks and exact row alignment with the training RowSet",
+      "Preservation of target keys main and engagement_aux consumed by SO.train"
+    ]
+  },
+  "fallback": "On a shape or semantic-contract failure, restore SO.build_target unchanged. On a valid but non-positive trusted result, reject this reward bundle without changing the current aux_weight or inference features.",
+  "hypothesis": "Replacing the parent's auxiliary reward bundle with three explicit engagement outcomes plus a dense soft watch-completion head will improve the main long_view ranking learned by the unchanged DeepFM.",
+  "implementation_plan": "Modify only build_target. Keep the binary long_view main target unchanged. Build the four-column engagement_aux matrix explicitly from train-only is_click, is_like, is_profile_enter, and a soft completion target clip(watch_ratio,0,1). For rows where DV.watch_ratio() marks the ratio invalid, set the soft-completion auxiliary target to the neutral value 0.5. Validate all arrays with DV.assert_trainable and preserve the exact main and engagement_aux keys and row alignment required by SO.train. No auxiliary target is read during prediction.",
+  "justification": "Click supplies a strongly aligned binary auxiliary signal, while clipped watch ratio supplies a denser graded signal tied to viewing depth. Explicit neutral handling of invalid ratios avoids treating zero-duration rows as certain non-completions. This changes target semantics rather than repeating the rejected scalar aux_weight transition from 0.1 to 0.2.",
+  "mechanism": "watch-aligned multi-task auxiliary targets",
+  "mechanism_tags": [
+    "multi_task_learning",
+    "soft_completion",
+    "watch_ratio",
+    "auxiliary_targets",
+    "reward_alignment"
+  ],
+  "observation": "The deterministic diagnostics report train_target_phi_with_long_view.is_click=0.7604858188163154, is_profile_enter=0.14612987498722513, is_like=0.09916137501207341, and is_hate=-0.003941107614124816; the latter three absolute correlations are weak under the stated 0.2 rule. They also report train_duration_zero_rows=24076, requiring explicit handling of invalid watch ratios.",
+  "operator_id": null,
+  "parent_operator_stack": [
+    "deepfm_engagement_mtl_v1"
+  ],
+  "parent_references": [
+    "w002"
+  ],
+  "patch_scope": [
+    "target"
+  ],
+  "persona": "reward",
+  "primary_block": "target",
+  "research_evidence": [],
+  "research_nonuse_reason": "The exact target redesign is driven by the supplied train-only correlation diagnostics and target API. E003 rejects only a scalar auxiliary-weight transition and provides no positive evidence for this materially different soft-completion reward formulation.",
+  "risk": [
+    "The trainer may assume a different semantic ordering for its four auxiliary outputs.",
+    "Soft completion may be too close to the main-label construction and reduce useful task diversity.",
+    "Neutral 0.5 labels are not a true loss mask and can still contribute gradients after initialization."
+  ]
+}

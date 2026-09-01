@@ -1,0 +1,28 @@
+--- incumbent/pipeline.py
++++ candidate/pipeline.py
+@@ -66,7 +66,24 @@
+ 
+ # <<<BLOCK:predict>>>
+ def predict(model, Xs, split):
+-    return SO.predict(model, Xs, split)
++    base = SO.predict(model, Xs, split)
++    rowset = DV.load(split)
++    tabs = np.asarray(rowset.tab)
++    pred = np.array(base, copy=True)
++
++    # Fixed train-derived residuals from diagnostics; only selected tabs move.
++    # Keep magnitudes small because portfolio slice gaps are relative, not absolute.
++    tab_residual = {
++        0: 0.010,
++        2: 0.006,
++        4: 0.004,
++        6: 0.018,
++    }
++    for tab_value, delta in tab_residual.items():
++        mask = (tabs == tab_value)
++        if np.any(mask):
++            pred[mask] += delta
++    return pred
+ # <<<END:predict>>>
+ 
+ 

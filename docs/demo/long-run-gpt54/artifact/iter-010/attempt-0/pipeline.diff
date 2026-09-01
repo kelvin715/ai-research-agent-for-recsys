@@ -1,0 +1,118 @@
+--- incumbent/pipeline.py
++++ candidate/pipeline.py
+@@ -31,8 +31,114 @@
+ 
+ 
+ # <<<BLOCK:features>>>
++def _fit_sorted_vocab(values):
++    values = np.asarray(values)
++    if values.size == 0:
++        return np.empty(0, dtype=np.int64)
++    return np.unique(values)
++
++
++def _map_to_train_vocab(values, vocab):
++    values = np.asarray(values)
++    out = np.full(values.shape, vocab.size, dtype=np.int64)
++    if vocab.size == 0 or values.size == 0:
++        return out
++    pos = np.searchsorted(vocab, values)
++    valid = pos < vocab.size
++    if valid.any():
++        valid_idx = np.flatnonzero(valid)
++        pos_valid = pos[valid_idx]
++        exact = vocab[pos_valid] == values[valid_idx]
++        if exact.any():
++            out[valid_idx[exact]] = pos_valid[exact]
++    return out
++
++
++def _fit_pair_counts(left_idx, right_idx, right_vocab_size):
++    base = np.int64(right_vocab_size + 1)
++    keys = left_idx.astype(np.int64, copy=False) * base + right_idx.astype(np.int64, copy=False)
++    uniq, counts = np.unique(keys, return_counts=True)
++    return uniq.astype(np.int64, copy=False), counts.astype(np.float32, copy=False), base
++
++
++def _lookup_sorted_counts(query_keys, uniq_keys, counts):
++    out = np.zeros(query_keys.shape[0], dtype=np.float32)
++    if query_keys.size == 0 or uniq_keys.size == 0:
++        return out
++    pos = np.searchsorted(uniq_keys, query_keys)
++    valid = pos < uniq_keys.size
++    if valid.any():
++        valid_idx = np.flatnonzero(valid)
++        pos_valid = pos[valid_idx]
++        exact = uniq_keys[pos_valid] == query_keys[valid_idx]
++        if exact.any():
++            out[valid_idx[exact]] = counts[pos_valid[exact]]
++    return out
++
++
+ def build_features(splits, train_idx):
+-    return SO.build_features(splits, train_idx, OP_CONFIG)
++    Xs, dim = SO.build_features(splits, train_idx, OP_CONFIG)
++
++    train = splits['train']
++    tr_user = np.asarray(train.user_id)[train_idx]
++    tr_author = np.asarray(train.author_id)[train_idx]
++    tr_video = np.asarray(train.video_id)[train_idx]
++    tr_tab = np.asarray(train.tab)[train_idx]
++
++    user_vocab = _fit_sorted_vocab(tr_user)
++    author_vocab = _fit_sorted_vocab(tr_author)
++    video_vocab = _fit_sorted_vocab(tr_video)
++    tab_vocab = _fit_sorted_vocab(tr_tab)
++
++    tr_user_idx = _map_to_train_vocab(tr_user, user_vocab)
++    tr_author_idx = _map_to_train_vocab(tr_author, author_vocab)
++    tr_video_idx = _map_to_train_vocab(tr_video, video_vocab)
++    tr_tab_idx = _map_to_train_vocab(tr_tab, tab_vocab)
++
++    user_total = np.bincount(tr_user_idx, minlength=user_vocab.size).astype(np.float32, copy=False)
++
++    ua_keys, ua_counts, ua_base = _fit_pair_counts(tr_user_idx, tr_author_idx, author_vocab.size)
++    uv_keys, uv_counts, uv_base = _fit_pair_counts(tr_user_idx, tr_video_idx, video_vocab.size)
++    ut_keys, ut_counts, ut_base = _fit_pair_counts(tr_user_idx, tr_tab_idx, tab_vocab.size)
++
++    for split, X in Xs.items():
++        rows = splits[split]
++        user_idx = _map_to_train_vocab(np.asarray(rows.user_id), user_vocab)
++        author_idx = _map_to_train_vocab(np.asarray(rows.author_id), author_vocab)
++        video_idx = _map_to_train_vocab(np.asarray(rows.video_id), video_vocab)
++        tab_idx = _map_to_train_vocab(np.asarray(rows.tab), tab_vocab)
++
++        ua = _lookup_sorted_counts(
++            user_idx.astype(np.int64, copy=False) * ua_base + author_idx.astype(np.int64, copy=False),
++            ua_keys,
++            ua_counts,
++        )
++        uv = _lookup_sorted_counts(
++            user_idx.astype(np.int64, copy=False) * uv_base + video_idx.astype(np.int64, copy=False),
++            uv_keys,
++            uv_counts,
++        )
++        ut = _lookup_sorted_counts(
++            user_idx.astype(np.int64, copy=False) * ut_base + tab_idx.astype(np.int64, copy=False),
++            ut_keys,
++            ut_counts,
++        )
++
++        user_seen = np.zeros(rows.n, dtype=np.float32)
++        known_user = user_idx < user_vocab.size
++        if known_user.any():
++            user_seen[known_user] = user_total[user_idx[known_user]]
++
++        extra = np.column_stack([
++            np.log1p(ua),
++            np.log1p(uv),
++            np.log1p(ut),
++            ua / np.maximum(user_seen, 1.0),
++        ]).astype(np.float32, copy=False)
++
++        Xs[split] = np.concatenate([np.asarray(X, dtype=np.float32), extra], axis=1)
++
++    return Xs, dim + 4
+ # <<<END:features>>>
+ 
+ 

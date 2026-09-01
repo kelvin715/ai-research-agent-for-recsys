@@ -1,0 +1,161 @@
+--- incumbent/pipeline.py
++++ candidate/pipeline.py
+@@ -38,7 +38,12 @@
+ 
+ # <<<BLOCK:target>>>
+ def build_target(splits, train_idx):
+-    return SO.build_target(splits, train_idx, OP_CONFIG)
++    y_all = np.asarray(splits['train'].label, dtype=np.float32)
++    y = y_all[np.asarray(train_idx, dtype=np.int64)]
++    DV.assert_trainable(y, 'target.long_view')
++    if y.ndim != 1 or not np.all((y == 0.0) | (y == 1.0)):
++        raise ValueError('long_view must be a one-dimensional binary target')
++    return y
+ # <<<END:target>>>
+ 
+ 
+@@ -58,15 +63,140 @@
+ 
+ 
+ def train(splits, train_idx, Xs, dim, y, seed, verbose=False):
+-    config = dict(OP_CONFIG)
+-    config['hp'] = dict(HP)
+-    return SO.train(splits, train_idx, Xs, dim, y, seed, config, verbose)
++    import torch
++    import torch.nn as nn
++    import torch.nn.functional as F
++
++    class PairwiseFM(nn.Module):
++        def __init__(self, dimension, k):
++            super().__init__()
++            self.bias = nn.Parameter(torch.zeros(1))
++            self.linear = nn.Embedding(dimension, 1)
++            self.factors = nn.Embedding(dimension, k)
++            nn.init.zeros_(self.linear.weight)
++            nn.init.normal_(self.factors.weight, mean=0.0, std=0.01)
++
++        def forward(self, x):
++            linear_term = self.linear(x).sum(dim=1).squeeze(-1)
++            v = self.factors(x)
++            summed = v.sum(dim=1)
++            interaction = 0.5 * (summed.square() - v.square().sum(dim=1)).sum(dim=1)
++            return self.bias + linear_term + interaction
++
++    train_idx = np.asarray(train_idx, dtype=np.int64)
++    x_train = np.asarray(Xs['train'][train_idx], dtype=np.int64)
++    y_train = np.asarray(y, dtype=np.float32)
++    users = np.asarray(splits['train'].user_id)[train_idx]
++    if x_train.ndim != 2 or len(x_train) != len(y_train) or len(users) != len(y_train):
++        raise ValueError('misaligned training arrays')
++    if x_train.size and (x_train.min() < 0 or x_train.max() >= int(dim)):
++        raise ValueError('categorical feature id outside embedding dimension')
++
++    pos_rows = np.flatnonzero(y_train > 0.5)
++    neg_rows = np.flatnonzero(y_train <= 0.5)
++    pos_order = np.argsort(users[pos_rows], kind='stable')
++    neg_order = np.argsort(users[neg_rows], kind='stable')
++    pos_rows = pos_rows[pos_order]
++    neg_rows = neg_rows[neg_order]
++    pos_users, pos_starts, pos_counts = np.unique(
++        users[pos_rows], return_index=True, return_counts=True)
++    neg_users, neg_starts, neg_counts = np.unique(
++        users[neg_rows], return_index=True, return_counts=True)
++    eligible_users, pos_map, neg_map = np.intersect1d(
++        pos_users, neg_users, assume_unique=True, return_indices=True)
++    if len(eligible_users) == 0:
++        raise ValueError('no users contain both long_view classes')
++
++    pos_starts = pos_starts[pos_map].astype(np.int64, copy=False)
++    neg_starts = neg_starts[neg_map].astype(np.int64, copy=False)
++    pos_counts = pos_counts[pos_map].astype(np.int64, copy=False)
++    neg_counts = neg_counts[neg_map].astype(np.int64, copy=False)
++    pairs_per_user = 8
++    pair_count = int(len(eligible_users) * pairs_per_user)
++
++    torch.manual_seed(int(seed))
++    rng = np.random.default_rng(int(seed))
++    model = PairwiseFM(int(dim), int(HP['k']))
++    optimizer = torch.optim.Adam(
++        model.parameters(), lr=float(HP['lr']), weight_decay=float(HP['l2']))
++    batch_size = int(HP['batch'])
++    epochs = int(HP['epochs'])
++    epoch_losses = []
++    cross_user_pairs = 0
++
++    model.train()
++    for epoch in range(epochs):
++        shape = (len(eligible_users), pairs_per_user)
++        pos_offsets = np.floor(rng.random(shape) * pos_counts[:, None]).astype(np.int64)
++        neg_offsets = np.floor(rng.random(shape) * neg_counts[:, None]).astype(np.int64)
++        sampled_pos = pos_rows[pos_starts[:, None] + pos_offsets].reshape(-1)
++        sampled_neg = neg_rows[neg_starts[:, None] + neg_offsets].reshape(-1)
++
++        mismatches = int(np.count_nonzero(users[sampled_pos] != users[sampled_neg]))
++        cross_user_pairs += mismatches
++        if mismatches:
++            raise AssertionError('same-user pair sampler produced cross-user pairs')
++
++        order = rng.permutation(pair_count)
++        sampled_pos = sampled_pos[order]
++        sampled_neg = sampled_neg[order]
++        loss_sum = 0.0
++        seen_pairs = 0
++        for start in range(0, pair_count, batch_size):
++            stop = min(start + batch_size, pair_count)
++            p = torch.from_numpy(x_train[sampled_pos[start:stop]])
++            n = torch.from_numpy(x_train[sampled_neg[start:stop]])
++            optimizer.zero_grad(set_to_none=True)
++            diff = model(p) - model(n)
++            loss = F.softplus(-diff).mean()
++            loss.backward()
++            optimizer.step()
++            count = stop - start
++            loss_sum += float(loss.detach()) * count
++            seen_pairs += count
++        epoch_losses.append(loss_sum / max(seen_pairs, 1))
++        if verbose:
++            print('epoch=%d pairs=%d loss=%.6f' % (
++                epoch + 1, seen_pairs, epoch_losses[-1]))
++
++    model.eval()
++    info = {
++        'model': 'macro_user_balanced_pairwise_fm',
++        'eligible_user_count': int(len(eligible_users)),
++        'pairs_per_eligible_user_per_epoch': int(pairs_per_user),
++        'pairs_per_epoch': int(pair_count),
++        'epochs': int(epochs),
++        'batch_size': int(batch_size),
++        'embedding_k': int(HP['k']),
++        'learning_rate': float(HP['lr']),
++        'l2': float(HP['l2']),
++        'zero_cross_user_pairs': int(cross_user_pairs),
++        'train_loss_by_epoch': [float(v) for v in epoch_losses],
++        'checkpoint_policy': 'fixed_final_epoch'
++    }
++    wrapped = {'net': model, 'info': info}
++    return wrapped, info
+ # <<<END:train>>>
+ 
+ 
+ # <<<BLOCK:predict>>>
+ def predict(model, Xs, split):
+-    return SO.predict(model, Xs, split)
++    import hashlib
++    import torch
++
++    net = model['net']
++    x = np.asarray(Xs[split], dtype=np.int64)
++    batch_size = int(HP['batch'])
++    outputs = []
++    net.eval()
++    with torch.no_grad():
++        for start in range(0, len(x), batch_size):
++            xb = torch.from_numpy(x[start:start + batch_size])
++            outputs.append(net(xb).cpu().numpy().astype(np.float32, copy=False))
++    pred = np.concatenate(outputs) if outputs else np.empty(0, dtype=np.float32)
++    model['info']['prediction_hash'] = hashlib.sha256(
++        np.ascontiguousarray(pred).view(np.uint8)).hexdigest()
++    return pred
+ # <<<END:predict>>>
+ 
+ 

@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Experiment graphs · AI Research Agent for Recommendation</title>
+<style>
+  :root { color-scheme: light; --ink:#24334d; --muted:#70809a; --line:#e4eaf3; --blue:#6688d9; }
+  * { box-sizing: border-box; }
+  body { margin:0; padding:56px 24px 72px; background:#f5f8fd; color:var(--ink);
+         font:400 15px/1.65 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; }
+  main { max-width: 880px; margin: 0 auto; }
+  h1 { font-size: 30px; margin: 0 0 10px; letter-spacing: -0.02em; }
+  .lede { color: var(--muted); margin: 0 0 8px; }
+  .note { color: var(--muted); font-size: 13px; margin: 0 0 34px; }
+  .grid { display: grid; gap: 16px; }
+  .card { display:block; padding:22px 24px; background:#fff; border:1px solid var(--line);
+          border-radius:14px; text-decoration:none; color:inherit;
+          transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease; }
+  .card:hover { transform: translateY(-2px); border-color:#ccd8ea;
+                box-shadow: 0 8px 22px rgba(73,94,131,.09); }
+  .card h2 { font-size: 17px; margin: 0 0 7px; }
+  .card p { margin: 0 0 12px; color: var(--muted); font-size: 14px; }
+  .meta { font-size: 11.5px; font-weight: 700; color: #98a5b8;
+          text-transform: uppercase; letter-spacing: .06em; }
+  footer { margin-top: 38px; font-size: 13px; color: var(--muted); }
+  a.plain { color: var(--blue); }
+</style>
+</head>
+<body>
+  <main>
+    <h1>Experiment graphs</h1>
+    <p class="lede">Read-only replays of the search graphs saved by the research agent.
+      Select a node to see its hypothesis, parent, three-seed scores, paired interval,
+      effect on the deployed combination, and the exact evidence files.</p>
+    <p class="note">These are frozen snapshots. The identical dashboard runs live against
+      an in-progress experiment with
+      <code>python3 scripts/serve_experiment_graph.py --run-dir runs/&lt;id&gt;</code>.</p>
+    <div class="grid">
+      <a class="card" href="demo/submitted-run/">
+        <h2>Submitted run · GPT-5.4</h2>
+        <p>The challenge-compliant run behind the submission: warm start reproduced, then three new experiments before the N=3 stopping rule fired.</p>
+        <span class="meta">8 experiment nodes · 22 linked evidence files</span>
+      </a>
+      <a class="card" href="demo/long-run-gpt54/">
+        <h2>Extended search · GPT-5.4</h2>
+        <p>13 rounds with the convergence stop lifted. Includes the strongest challenger of either run, rejected on matched-seed evidence.</p>
+        <span class="meta">18 experiment nodes · 87 linked evidence files</span>
+      </a>
+      <a class="card" href="demo/long-run-gpt56sol/">
+        <h2>Extended search · GPT-5.6-sol</h2>
+        <p>15 rounds to the declared iteration cap, same controller on a different model. Same parent rotation, same verdicts.</p>
+        <span class="meta">19 experiment nodes · 116 linked evidence files</span>
+      </a>
+    </div>
+    <footer>
+      <a class="plain" href="https://github.com/kelvin715/ai-research-agent-for-recsys">
+        Source repository</a> · TikTok TechJam 2026 Track 2
+    </footer>
+  </main>
+</body>
+</html>

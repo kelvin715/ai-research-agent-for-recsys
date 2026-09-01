@@ -1,0 +1,25 @@
+{
+  "analysis": "trusted operator materialization; no LLM patch fidelity gap",
+  "changed_runtime_path": true,
+  "component_evidence": [
+    {
+      "code_evidence": "trusted registry operator legal_temporal_context with locked source and unit-tested materialization",
+      "component": "Append hourmin//100 as a categorical field."
+    },
+    {
+      "code_evidence": "trusted registry operator legal_temporal_context with locked source and unit-tested materialization",
+      "component": "Append a strictly-earlier per-user exposure-gap bucket."
+    },
+    {
+      "code_evidence": "trusted registry operator legal_temporal_context with locked source and unit-tested materialization",
+      "component": "Fit gap bucket boundaries on selected training rows only."
+    },
+    {
+      "code_evidence": "trusted registry operator legal_temporal_context with locked source and unit-tested materialization",
+      "component": "Feed both fields through the existing DeepFM embedding and interaction paths."
+    }
+  ],
+  "forbidden_shortcuts_found": [],
+  "missing_components": [],
+  "status": "PASS"
+}

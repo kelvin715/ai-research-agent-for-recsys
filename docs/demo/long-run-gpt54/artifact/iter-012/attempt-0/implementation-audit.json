@@ -1,0 +1,21 @@
+{
+  "analysis": "PASS. The candidate edits only the declared target and train blocks and concretely implements the accepted mechanism: official train long_view labels are returned directly, and the delegated FM backend is trained with supported objective `pointwise`. Features and predict remain unchanged, so attribution to the loss-family switch is preserved. No forbidden auxiliary target swap, unsupported opaque hyperparameter pass-through, or inference-time post-exposure feature use is present.",
+  "changed_runtime_path": true,
+  "component_evidence": [
+    {
+      "code_evidence": "In block target, `y = np.asarray(splits['train'].label, dtype=np.float32)` reads the train split's official label exposed only on `RowSet('train')`, then `y = y[train_idx]` aligns it to selected training rows, and `DV.assert_trainable(y, 'target')` validates the target before returning `y`.",
+      "component": "target returns official long_view labels"
+    },
+    {
+      "code_evidence": "In block train, `config = dict(OP_CONFIG)` and `config['hp'] = dict(HP)` copy the parent config, then `config['objective'] = 'pointwise'` overrides the delegated backend objective immediately before `return SO.train(splits, train_idx, Xs, dim, y, seed, config, verbose)`. The trusted backend contract explicitly lists `pointwise` as a supported objective for this family.",
+      "component": "train sets config objective to pointwise before calling SO.train"
+    },
+    {
+      "code_evidence": "Block features is unchanged: `return SO.build_features(splits, train_idx, OP_CONFIG)`, preserving the parent feature path and config. Block predict is unchanged: `return SO.predict(model, Xs, split)`. No other edited block injects inference features or alters prediction logic.",
+      "component": "no feature or predict changes confounding attribution"
+    }
+  ],
+  "forbidden_shortcuts_found": [],
+  "missing_components": [],
+  "status": "PASS"
+}

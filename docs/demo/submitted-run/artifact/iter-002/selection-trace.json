@@ -1,0 +1,678 @@
+[
+  {
+    "candidates": [
+      {
+        "blocker": null,
+        "candidate_index": 0,
+        "eligible": true,
+        "hypothesis": "Adding legal temporal context fields that DeepFM can cross with user/item ids will improve within-user ranking and likely add marginal portfolio gain by correcting context-specific ordering errors without using any post-exposure inference feature.",
+        "persona": "optimizer",
+        "proposal": {
+          "basis_type": "task_spec",
+          "estimated_cost_s": 60,
+          "evidence": [
+            {
+              "ref": "Trusted operator catalog applicable to this parent: legal_temporal_context, search_priority=\"first_round_exploit\"",
+              "type": "task_spec"
+            },
+            {
+              "ref": "features block calls SO.build_features(splits, train_idx, OP_CONFIG) and current OP_CONFIG has \"features\": []",
+              "type": "current_code"
+            },
+            {
+              "ref": "directional_feedback.tab includes delta_primary -0.009983512134817851 for tab 6 and positive deltas for tabs 0/2/4",
+              "type": "diagnostic"
+            }
+          ],
+          "evidence_adaptation": null,
+          "execution_mode": "operator",
+          "expected_observation": "Per-seed predictions differ from the parent, with strongest gains on context-heavy slices and positive paired portfolio contribution if temporal context repairs residual tab-specific misranking.",
+          "experiment_contract": {
+            "claim": "Trusted legal temporal context features improve the current DeepFM parent when consumed by SO.build_features and the unchanged DeepFM trainer.",
+            "expected_observable": "feature count and resulting predictions change relative to the current parent across seeds",
+            "falsification_condition": "No material prediction change or non-positive trusted paired validation effect versus the current parent/portfolio",
+            "forbidden_shortcuts": [
+              "changing only metadata or unused config keys outside the trusted operator path",
+              "using evaluation-period feedback as features",
+              "editing model/loss/train to introduce a different mechanism"
+            ],
+            "portfolio_role": "member_refinement",
+            "required_components": [
+              "features block updated through the legal_temporal_context operator",
+              "SO.build_features must append hour and strictly-earlier user-gap categorical columns",
+              "unchanged SO.train/SO.predict consume the expanded X matrices"
+            ]
+          },
+          "fallback": "If gains are negligible, move to a structurally different custom objective or an error-diverse branch rather than more scalar tuning.",
+          "hypothesis": "Adding legal temporal context fields that DeepFM can cross with user/item ids will improve within-user ranking and likely add marginal portfolio gain by correcting context-specific ordering errors without using any post-exposure inference feature.",
+          "implementation_plan": "Apply the trusted legal_temporal_context operator exactly as catalogued. This changes the features block only by configuring SO.build_features to append hour and strictly-earlier user exposure-gap buckets fit on selected train rows, leaving model/loss/train unchanged.",
+          "justification": "This is the mandated applicable first-round exploit for the baseline parent and is directly consumable by the current backend. DeepFM benefits from additional categorical context because its interaction mechanism is feature crossing; hour and prior-gap are legal pre-impression pair features that can alter ordering within a user while preserving leakage safety.",
+          "mechanism": "temporal-context categorical augmentation",
+          "mechanism_tags": [
+            "temporal",
+            "context",
+            "feature-cross",
+            "operator",
+            "fm"
+          ],
+          "observation": "The trusted operator catalog marks legal_temporal_context with search_priority=\"first_round_exploit\" and describes it as adding hour and strictly-earlier exposure-gap buckets without evaluation feedback. The current parent config has \"features\": [] so these fields are absent. The portfolio diagnostics show heterogeneous tab behavior, with fixed-slice directional feedback deltas of 0.012522871535952329 on tab 0, 0.017592661227471718 on tab 2, 0.006423778553562576 on tab 4, but -0.009983512134817851 on tab 6, suggesting context-conditioned residual error remains.",
+          "operator_id": "legal_temporal_context",
+          "parent_operator_stack": [
+            "deepfm_engagement_mtl_v1"
+          ],
+          "parent_references": [
+            "w002"
+          ],
+          "patch_scope": [
+            "features"
+          ],
+          "persona": "optimizer",
+          "primary_block": "features",
+          "research_evidence": [],
+          "research_nonuse_reason": "The operator catalog and backend contract are the most direct basis here. This is a trusted, parent-applicable exploit with explicit implementation support, so external research is unnecessary and less binding than the task-spec operator evidence.",
+          "risk": [
+            "Temporal buckets may overlap with existing latent context and add little signal",
+            "Extra categorical fields may slightly overfit or correlate too strongly with already-modeled ids"
+          ]
+        },
+        "traces": [
+          {
+            "action": "proceed",
+            "matches": [
+              {
+                "conclusion": "rolled back: delta=-0.000820385; paired_ci95=[-0.0030028916984608856, 0.0014032335319028113]; lesson=Retain this exact operator only through the verified portfolio contract.",
+                "context_similarity": 0.07193,
+                "delta_primary": -0.0008203851079435776,
+                "delta_primary_mean": -0.0008203851079435776,
+                "exact_hypothesis": false,
+                "execution_mode": "operator",
+                "failure_class": "statistical_negative",
+                "hypothesis": "Verify item_lambdarank as member 3 of empirical portfolio validated_rank_router_v2.",
+                "hypothesis_similarity": 0.125758,
+                "implementation_plan": "Materialize the provenance-locked trusted operator from the baseline root.",
+                "implementation_signature": "61eac9be9685fdf4",
+                "kind": "failure",
+                "lexical_similarity": 0.125758,
+                "mechanism": "Item/context LambdaRank",
+                "mechanism_similarity": 0.283333,
+                "memory_id": "wm003",
+                "memory_parameter_signature": {
+                  "parameters": [],
+                  "transition": null
+                },
+                "operator_id": "item_lambdarank",
+                "parameter_signature": {
+                  "parameters": [],
+                  "transition": null
+                },
+                "parameter_signature_match": false,
+                "parent_operator_stack": [],
+                "patch_scope": [
+                  "features",
+                  "target",
+                  "model",
+                  "train"
+                ],
+                "primary_block": "model",
+                "research_knowledge_ids": [],
+                "same_block": false,
+                "same_implementation": false,
+                "same_operator": false,
+                "same_patch_scope": false
+              },
+              {
+                "conclusion": "accepted: delta=+0.003035403; paired_ci95=[0.0013411214604212463, 0.004889614316386501]; lesson=Retain this exact operator only through the verified portfolio contract.",
+                "context_similarity": 0.07531,
+                "delta_primary": 0.003035402673347898,
+                "delta_primary_mean": 0.003035402673347898,
+                "exact_hypothesis": false,
+                "execution_mode": "operator",
+                "failure_class": null,
+                "hypothesis": "Verify legal_rank_stack_v1 as member 1 of empirical portfolio validated_rank_router_v2.",
+                "hypothesis_similarity": 0.125758,
+                "implementation_plan": "Materialize the provenance-locked trusted operator from the baseline root.",
+                "implementation_signature": "c60229c47e1c97ec",
+                "kind": "success",
+                "lexical_similarity": 0.125758,
+                "mechanism": "Validated legal ranking stack",
+                "mechanism_similarity": 0.0,
+                "memory_id": "wm001",
+                "memory_parameter_signature": {
+                  "parameters": [],
+                  "transition": null
+                },
+                "operator_id": "legal_rank_stack_v1",
+                "parameter_signature": {
+                  "parameters": [],
+                  "transition": null
+                },
+                "parameter_signature_match": false,
+                "parent_operator_stack": [],
+                "patch_scope": [
+                  "features",
+                  "target",
+                  "model",
+                  "loss",
+                  "train"
+                ],
+                "primary_block": "train",
+                "research_knowledge_ids": [],
+                "same_block": false,
+                "same_implementation": false,
+                "same_operator": false,
+                "same_patch_scope": false
+              },
+              {
+                "conclusion": "accepted: delta=+0.002873787; paired_ci95=[0.0013664469124173545, 0.004268526767862965]; lesson=Retain this exact operator only through the verified portfolio contract.",
+                "context_similarity": 0.07531,
+                "delta_primary": 0.00287378659498827,
+                "delta_primary_mean": 0.00287378659498827,
+                "exact_hypothesis": false,
+                "execution_mode": "operator",
+                "failure_class": null,
+                "hypothesis": "Verify deepfm_engagement_mtl_v1 as member 2 of empirical portfolio validated_rank_router_v2.",
+                "hypothesis_similarity": 0.125758,
+                "implementation_plan": "Materialize the provenance-locked trusted operator from the baseline root.",
+                "implementation_signature": "a186656e96d89dfd",
+                "kind": "success",
+                "lexical_similarity": 0.125758,
+                "mechanism": "CPU DeepFM + four engagement heads",
+                "mechanism_similarity": 0.0,
+                "memory_id": "wm002",
+                "memory_parameter_signature": {
+                  "parameters": [],
+                  "transition": null
+                },
+                "operator_id": "deepfm_engagement_mtl_v1",
+                "parameter_signature": {
+                  "parameters": [],
+                  "transition": null
+                },
+                "parameter_signature_match": false,
+                "parent_operator_stack": [],
+                "patch_scope": [
+                  "target",
+                  "model",
+                  "loss",
+                  "train"
+                ],
+                "primary_block": "model",
+                "research_knowledge_ids": [],
+                "same_block": false,
+                "same_implementation": false,
+                "same_operator": false,
+                "same_patch_scope": false
+              }
+            ],
+            "revision": 0,
+            "stage": "memory"
+          }
+        ]
+      },
+      {
+        "blocker": null,
+        "candidate_index": 1,
+        "eligible": true,
+        "hypothesis": "Appending selected static user profile fields will improve personalization of the DeepFM parent by creating more useful user-item-context crosses than raw user_id alone, yielding better within-user ordering and possibly complementary portfolio behavior.",
+        "persona": "architecture",
+        "proposal": {
+          "basis_type": "task_spec",
+          "estimated_cost_s": 60,
+          "evidence": [
+            {
+              "ref": "Trusted operator catalog applicable to this parent: selected_user_profile",
+              "type": "task_spec"
+            },
+            {
+              "ref": "Current OP_CONFIG has no extra features, so user_core fields are absent despite backend support",
+              "type": "current_code"
+            },
+            {
+              "ref": "Both metrics rank rows independently within each user; personalization must depend on a (user, candidate-item) pair",
+              "type": "task_spec"
+            }
+          ],
+          "evidence_adaptation": null,
+          "execution_mode": "operator",
+          "expected_observation": "Predictions change for all seeds, with likely gains on users whose behavior is better captured by coarse profile-item interactions than by user_id alone.",
+          "experiment_contract": {
+            "claim": "Adding the trusted user_core fields to the current DeepFM feature set improves representation quality through additional legal user-item-context interactions.",
+            "expected_observable": "expanded feature matrix and changed ranking predictions relative to the parent",
+            "falsification_condition": "No prediction change or negative/non-robust trusted validation effect",
+            "forbidden_shortcuts": [
+              "adding post-exposure user statistics as inference features",
+              "changing the loss or target while attributing gains to representation",
+              "re-implementing the catalogued primitive as unrelated custom code"
+            ],
+            "portfolio_role": "member_refinement",
+            "required_components": [
+              "features block updated through the selected_user_profile operator",
+              "SO.build_features must append the seven user_core categorical/profile columns",
+              "unchanged DeepFM backend must consume the expanded categorical matrix"
+            ]
+          },
+          "fallback": "If standalone gain is weak, reserve this mechanism for later fusion with another branch rather than adding more profile fields ad hoc.",
+          "hypothesis": "Appending selected static user profile fields will improve personalization of the DeepFM parent by creating more useful user-item-context crosses than raw user_id alone, yielding better within-user ordering and possibly complementary portfolio behavior.",
+          "implementation_plan": "Apply the trusted selected_user_profile operator exactly as catalogued. This edits only the features block so SO.build_features appends seven low-cardinality static pre-impression user profile fields, enabling additional FM/DeepFM interactions with candidate item and context features.",
+          "justification": "Low-cardinality user descriptors can provide smoother generalization than user_id-only embeddings, especially for users or contexts where the raw id embedding is sparse or unstable. Because DeepFM already models pairwise interactions over categorical fields, this is a natural representation refinement that does not alter the optimizer or objective.",
+          "mechanism": "static-user-profile feature crossing",
+          "mechanism_tags": [
+            "user-profile",
+            "feature-cross",
+            "representation",
+            "operator",
+            "fm"
+          ],
+          "observation": "The operator catalog states selected_user_profile adds seven low-cardinality pre-impression user profile fields and that FM crosses them with candidate item and context fields. The current parent has no extra configured features. The task spec emphasizes that both metrics rank rows independently within each user and require personalization to depend on a (user, candidate-item) pair.",
+          "operator_id": "selected_user_profile",
+          "parent_operator_stack": [
+            "deepfm_engagement_mtl_v1"
+          ],
+          "parent_references": [
+            "w002"
+          ],
+          "patch_scope": [
+            "features"
+          ],
+          "persona": "architecture",
+          "primary_block": "features",
+          "research_evidence": [],
+          "research_nonuse_reason": "This proposal is directly grounded in the trusted operator catalog and current backend feature API, which is more specific than generic representation research for this environment.",
+          "risk": [
+            "Profile fields may be redundant with user_id embedding",
+            "Low-cardinality attributes can underfit fine-grained preference if too coarse"
+          ]
+        },
+        "traces": [
+          {
+            "action": "proceed",
+            "matches": [
+              {
+                "conclusion": "accepted: delta=+0.003035403; paired_ci95=[0.0013411214604212463, 0.004889614316386501]; lesson=Retain this exact operator only through the verified portfolio contract.",
+                "context_similarity": 0.113824,
+                "delta_primary": 0.003035402673347898,
+                "delta_primary_mean": 0.003035402673347898,
+                "exact_hypothesis": false,
+                "execution_mode": "operator",
+                "failure_class": null,
+                "hypothesis": "Verify legal_rank_stack_v1 as member 1 of empirical portfolio validated_rank_router_v2.",
+                "hypothesis_similarity": 0.126667,
+                "implementation_plan": "Materialize the provenance-locked trusted operator from the baseline root.",
+                "implementation_signature": "c60229c47e1c97ec",
+                "kind": "success",
+                "lexical_similarity": 0.126667,
+                "mechanism": "Validated legal ranking stack",
+                "mechanism_similarity": 0.0,
+                "memory_id": "wm001",
+                "memory_parameter_signature": {
+                  "parameters": [],
+                  "transition": null
+                },
+                "operator_id": "legal_rank_stack_v1",
+                "parameter_signature": {
+                  "parameters": [],
+                  "transition": null
+                },
+                "parameter_signature_match": false,
+                "parent_operator_stack": [],
+                "patch_scope": [
+                  "features",
+                  "target",
+                  "model",
+                  "loss",
+                  "train"
+                ],
+                "primary_block": "train",
+                "research_knowledge_ids": [],
+                "same_block": false,
+                "same_implementation": false,
+                "same_operator": false,
+                "same_patch_scope": false
+              },
+              {
+                "conclusion": "accepted: delta=+0.002873787; paired_ci95=[0.0013664469124173545, 0.004268526767862965]; lesson=Retain this exact operator only through the verified portfolio contract.",
+                "context_similarity": 0.113824,
+                "delta_primary": 0.00287378659498827,
+                "delta_primary_mean": 0.00287378659498827,
+                "exact_hypothesis": false,
+                "execution_mode": "operator",
+                "failure_class": null,
+                "hypothesis": "Verify deepfm_engagement_mtl_v1 as member 2 of empirical portfolio validated_rank_router_v2.",
+                "hypothesis_similarity": 0.126667,
+                "implementation_plan": "Materialize the provenance-locked trusted operator from the baseline root.",
+                "implementation_signature": "a186656e96d89dfd",
+                "kind": "success",
+                "lexical_similarity": 0.126667,
+                "mechanism": "CPU DeepFM + four engagement heads",
+                "mechanism_similarity": 0.0,
+                "memory_id": "wm002",
+                "memory_parameter_signature": {
+                  "parameters": [],
+                  "transition": null
+                },
+                "operator_id": "deepfm_engagement_mtl_v1",
+                "parameter_signature": {
+                  "parameters": [],
+                  "transition": null
+                },
+                "parameter_signature_match": false,
+                "parent_operator_stack": [],
+                "patch_scope": [
+                  "target",
+                  "model",
+                  "loss",
+                  "train"
+                ],
+                "primary_block": "model",
+                "research_knowledge_ids": [],
+                "same_block": false,
+                "same_implementation": false,
+                "same_operator": false,
+                "same_patch_scope": false
+              },
+              {
+                "conclusion": "rolled back: delta=-0.000820385; paired_ci95=[-0.0030028916984608856, 0.0014032335319028113]; lesson=Retain this exact operator only through the verified portfolio contract.",
+                "context_similarity": 0.108738,
+                "delta_primary": -0.0008203851079435776,
+                "delta_primary_mean": -0.0008203851079435776,
+                "exact_hypothesis": false,
+                "execution_mode": "operator",
+                "failure_class": "statistical_negative",
+                "hypothesis": "Verify item_lambdarank as member 3 of empirical portfolio validated_rank_router_v2.",
+                "hypothesis_similarity": 0.126667,
+                "implementation_plan": "Materialize the provenance-locked trusted operator from the baseline root.",
+                "implementation_signature": "61eac9be9685fdf4",
+                "kind": "failure",
+                "lexical_similarity": 0.126667,
+                "mechanism": "Item/context LambdaRank",
+                "mechanism_similarity": 0.0,
+                "memory_id": "wm003",
+                "memory_parameter_signature": {
+                  "parameters": [],
+                  "transition": null
+                },
+                "operator_id": "item_lambdarank",
+                "parameter_signature": {
+                  "parameters": [],
+                  "transition": null
+                },
+                "parameter_signature_match": false,
+                "parent_operator_stack": [],
+                "patch_scope": [
+                  "features",
+                  "target",
+                  "model",
+                  "train"
+                ],
+                "primary_block": "model",
+                "research_knowledge_ids": [],
+                "same_block": false,
+                "same_implementation": false,
+                "same_operator": false,
+                "same_patch_scope": false
+              }
+            ],
+            "revision": 0,
+            "stage": "memory"
+          }
+        ]
+      },
+      {
+        "blocker": null,
+        "candidate_index": 2,
+        "eligible": true,
+        "hypothesis": "A small censored watch-time auxiliary objective will shape embeddings toward duration-aware engagement quality and improve long_view ranking or portfolio diversity beyond the current engagement-only DeepFM parent.",
+        "persona": "reward",
+        "proposal": {
+          "basis_type": "curated_research",
+          "estimated_cost_s": 600,
+          "evidence": [
+            {
+              "ref": "E003",
+              "type": "curated_research"
+            },
+            {
+              "ref": "Trusted runtime-backend contract: current parent objective is pointwise_engagement_mtl and changing objective to bpr or bpr_censored_watch is incompatible unless model, loss, target, and train are all replaced by a visible custom implementation",
+              "type": "current_code"
+            },
+            {
+              "ref": "train_feature_cardinality.duration_ms.distinct = 5726",
+              "type": "diagnostic"
+            },
+            {
+              "ref": "train_duration_zero_rows = 24076",
+              "type": "diagnostic"
+            }
+          ],
+          "evidence_adaptation": {
+            "evidence_id": "E003",
+            "implementation_mapping": "Primary block train: replace delegated SO.train with a custom torch loop using shared FM/DeepFM-style embeddings and an added watch-time head; target block computes masked log-watch targets from DV.watch_ratio() and duration_ms; predict block returns only the long_view score.",
+            "protocol_caveat": "E003 is an implementation prior from related KuaiRand solutions, not this exact locked split or evaluator; borrow only the auxiliary-target mechanism, keep official long_view ranking target unchanged, and use watch feedback only as a train-only auxiliary target.",
+            "source_mechanism": "Keep native long_view as the ranking objective and add a small censored watch-time regression head sharing FM embeddings; use exact regression residual for incomplete plays and a one-sided lower-bound hinge for completed plays."
+          },
+          "execution_mode": "custom_patch",
+          "expected_observation": "If connected correctly, training curves and predictions differ materially from the parent; validation may show modest standalone gain or positive portfolio marginal contribution from duration-sensitive ordering, especially on harder slices where current members disagree.",
+          "experiment_contract": {
+            "claim": "Adding a train-only censored watch-time auxiliary loss to a shared DeepFM-style model improves or diversifies long_view ranking without leaking feedback into inference.",
+            "expected_observable": "training backend no longer delegates unchanged to SO.train; predictions differ from parent across seeds and metadata reflects custom training",
+            "falsification_condition": "No prediction change versus parent, training code does not consume the watch target, or trusted validation shows no gain/no complementary portfolio effect",
+            "forbidden_shortcuts": [
+              "passing new unused hp keys into SO.train",
+              "using watch_ratio or any post-exposure feedback as an inference feature",
+              "changing the evaluation target away from long_view",
+              "claiming mechanism fusion while referencing fewer than two parents"
+            ],
+            "portfolio_role": "mechanism_fusion",
+            "required_components": [
+              "target block computes masked train-only watch-time targets from DV.watch_ratio and duration_ms",
+              "train block contains a visible consumer of the new auxiliary target and optimizes the censored loss",
+              "predict block outputs only the main long_view score for valid/test"
+            ]
+          },
+          "fallback": "If the full censored auxiliary is too unstable, retain the custom scaffolding and next try a lower-weight masked MSE-only watch head without changing inference features.",
+          "hypothesis": "A small censored watch-time auxiliary objective will shape embeddings toward duration-aware engagement quality and improve long_view ranking or portfolio diversity beyond the current engagement-only DeepFM parent.",
+          "implementation_plan": "Edit target, train, and predict blocks. In target, keep the native long_view main label via SO.build_target-compatible main target construction, and additionally compute a train-only censored watch-time regression target from DV.watch_ratio() and split duration_ms: use z=log1p(ratio*duration_ms)/12 for valid rows, mask invalid watch_ratio rows, and compute c=log1p(duration_ms)/12 as the completion lower bound. In train, replace delegated SO.train with a visible torch training loop built on SO.FM for shared embeddings plus an MLP tower mirroring parent hidden=[128,64]. Optimize BCE for long_view plus existing engagement auxiliaries from SO.build_target if desired, and add aux_weight_watch * masked regression: squared error for incomplete plays (z<c-eps) and one-sided hinge-squared max(0,c-pred)^2 for completed plays, using only train rows and fixed epochs/checkpoint policy. In predict, output only the long_view ranking score. Do not use watch feedback as an inference feature.",
+          "justification": "Watch ratio is train-only post-exposure information, so it is legal as an auxiliary target but not as a feature. A censored formulation uses more of the play-time signal than binary auxiliaries alone while respecting completion censoring. This is materially different from the current parent and from the tree branch, and could add portfolio diversity through duration-sensitive ordering.",
+          "mechanism": "censored watch-time auxiliary head for long_view ranking",
+          "mechanism_tags": [
+            "multitask",
+            "auxiliary-target",
+            "watch-time",
+            "deepfm",
+            "error-diversifier"
+          ],
+          "observation": "Curated research E003 reports that keeping native long_view as the ranking objective and adding a small censored watch-time regression head sharing FM embeddings improved official-validation primary over BPR alone, while warning never to use evaluation-period feedback as an input feature. The current parent already uses multitask engagement auxiliaries with aux_weight 0.2, so the architecture is amenable to one more shared-head supervision signal. Train diagnostics show duration_ms has 5726 distinct values and train_duration_zero_rows is 24076, indicating substantial watch-length structure but also some censoring/edge cases to mask carefully.",
+          "operator_id": null,
+          "parent_operator_stack": [
+            "deepfm_engagement_mtl_v1"
+          ],
+          "parent_references": [
+            "w002",
+            "w003"
+          ],
+          "patch_scope": [
+            "target",
+            "train",
+            "predict"
+          ],
+          "persona": "reward",
+          "primary_block": "train",
+          "research_evidence": [
+            {
+              "evidence_id": "E003",
+              "kind": "curated_research",
+              "knowledge_id": "K0002",
+              "knowledge_origin": "cached",
+              "persona": "reward",
+              "query": "How should watch time complement native long_view without changing evaluation labels?",
+              "reason": "The native binary label discards engagement magnitude and completed plays are right-censored by duration.",
+              "record_type": "mechanism",
+              "requires_success_mechanisms": [],
+              "source_ids": [
+                "S003",
+                "S004"
+              ],
+              "summary": "Keep native long_view as the ranking objective and add a small censored watch-time regression head sharing FM embeddings. Transform play time and duration with log1p/12. For incomplete plays use exact regression residual; for completed plays use a one-sided lower-bound hinge that stops penalizing predictions above log-duration. Never use evaluation-period feedback as an input feature. BPR plus this auxiliary target at weight 0.2 reached five-seed official-validation primary 0.604023290 ± 0.000282947 versus 0.603517127 ± 0.000631158 for BPR alone; on three random-exposure seeds, unbiased primary was 0.376328528 ± 0.003245064 versus 0.373291085 ± 0.002151737. This is an implementation prior, not permission to replace the fixed relevance label."
+            }
+          ],
+          "research_nonuse_reason": null,
+          "risk": [
+            "Custom torch implementation may underperform the optimized delegated backend",
+            "Watch-ratio masking/censoring bugs could destabilize training",
+            "Added head may dilute the main objective if its weight is mis-scaled"
+          ]
+        },
+        "traces": [
+          {
+            "action": "proceed",
+            "matches": [
+              {
+                "conclusion": "accepted: delta=+0.003035403; paired_ci95=[0.0013411214604212463, 0.004889614316386501]; lesson=Retain this exact operator only through the verified portfolio contract.",
+                "context_similarity": 0.112377,
+                "delta_primary": 0.003035402673347898,
+                "delta_primary_mean": 0.003035402673347898,
+                "exact_hypothesis": false,
+                "execution_mode": "operator",
+                "failure_class": null,
+                "hypothesis": "Verify legal_rank_stack_v1 as member 1 of empirical portfolio validated_rank_router_v2.",
+                "hypothesis_similarity": 0.127778,
+                "implementation_plan": "Materialize the provenance-locked trusted operator from the baseline root.",
+                "implementation_signature": "c60229c47e1c97ec",
+                "kind": "success",
+                "lexical_similarity": 0.127778,
+                "mechanism": "Validated legal ranking stack",
+                "mechanism_similarity": 0.205,
+                "memory_id": "wm001",
+                "memory_parameter_signature": {
+                  "parameters": [],
+                  "transition": null
+                },
+                "operator_id": "legal_rank_stack_v1",
+                "parameter_signature": {
+                  "parameters": [],
+                  "transition": null
+                },
+                "parameter_signature_match": false,
+                "parent_operator_stack": [],
+                "patch_scope": [
+                  "features",
+                  "target",
+                  "model",
+                  "loss",
+                  "train"
+                ],
+                "primary_block": "train",
+                "research_knowledge_ids": [],
+                "same_block": true,
+                "same_implementation": false,
+                "same_operator": false,
+                "same_patch_scope": false
+              },
+              {
+                "conclusion": "accepted: delta=+0.002873787; paired_ci95=[0.0013664469124173545, 0.004268526767862965]; lesson=Retain this exact operator only through the verified portfolio contract.",
+                "context_similarity": 0.112377,
+                "delta_primary": 0.00287378659498827,
+                "delta_primary_mean": 0.00287378659498827,
+                "exact_hypothesis": false,
+                "execution_mode": "operator",
+                "failure_class": null,
+                "hypothesis": "Verify deepfm_engagement_mtl_v1 as member 2 of empirical portfolio validated_rank_router_v2.",
+                "hypothesis_similarity": 0.127778,
+                "implementation_plan": "Materialize the provenance-locked trusted operator from the baseline root.",
+                "implementation_signature": "a186656e96d89dfd",
+                "kind": "success",
+                "lexical_similarity": 0.127778,
+                "mechanism": "CPU DeepFM + four engagement heads",
+                "mechanism_similarity": 0.0,
+                "memory_id": "wm002",
+                "memory_parameter_signature": {
+                  "parameters": [],
+                  "transition": null
+                },
+                "operator_id": "deepfm_engagement_mtl_v1",
+                "parameter_signature": {
+                  "parameters": [],
+                  "transition": null
+                },
+                "parameter_signature_match": false,
+                "parent_operator_stack": [],
+                "patch_scope": [
+                  "target",
+                  "model",
+                  "loss",
+                  "train"
+                ],
+                "primary_block": "model",
+                "research_knowledge_ids": [],
+                "same_block": false,
+                "same_implementation": false,
+                "same_operator": false,
+                "same_patch_scope": false
+              },
+              {
+                "conclusion": "rolled back: delta=-0.000820385; paired_ci95=[-0.0030028916984608856, 0.0014032335319028113]; lesson=Retain this exact operator only through the verified portfolio contract.",
+                "context_similarity": 0.107317,
+                "delta_primary": -0.0008203851079435776,
+                "delta_primary_mean": -0.0008203851079435776,
+                "exact_hypothesis": false,
+                "execution_mode": "operator",
+                "failure_class": "statistical_negative",
+                "hypothesis": "Verify item_lambdarank as member 3 of empirical portfolio validated_rank_router_v2.",
+                "hypothesis_similarity": 0.127778,
+                "implementation_plan": "Materialize the provenance-locked trusted operator from the baseline root.",
+                "implementation_signature": "61eac9be9685fdf4",
+                "kind": "failure",
+                "lexical_similarity": 0.127778,
+                "mechanism": "Item/context LambdaRank",
+                "mechanism_similarity": 0.0,
+                "memory_id": "wm003",
+                "memory_parameter_signature": {
+                  "parameters": [],
+                  "transition": null
+                },
+                "operator_id": "item_lambdarank",
+                "parameter_signature": {
+                  "parameters": [],
+                  "transition": null
+                },
+                "parameter_signature_match": false,
+                "parent_operator_stack": [],
+                "patch_scope": [
+                  "features",
+                  "target",
+                  "model",
+                  "train"
+                ],
+                "primary_block": "model",
+                "research_knowledge_ids": [],
+                "same_block": false,
+                "same_implementation": false,
+                "same_operator": false,
+                "same_patch_scope": false
+              }
+            ],
+            "revision": 0,
+            "stage": "memory"
+          }
+        ]
+      }
+    ],
+    "planning_attempt": 1,
+    "stage": "memory_screen"
+  },
+  {
+    "eligible_original_indices": [
+      0,
+      1,
+      2
+    ],
+    "rejected": [
+      "Appending selected static user profile fields will improve personalization of the DeepFM parent by creating more useful user-item-context crosses than raw user_id alone, yielding better within-user ordering and possibly complementary portfolio behavior.",
+      "A small censored watch-time auxiliary objective will shape embeddings toward duration-aware engagement quality and improve long_view ranking or portfolio diversity beyond the current engagement-only DeepFM parent."
+    ],
+    "selected_index": 0,
+    "selected_viable_index": 0,
+    "selection_rationale": "Candidate 0 is the best next experiment because it offers the strongest expected marginal portfolio primary gain after weighting for evidence and implementation reliability. It is a trusted task-spec operator explicitly marked first_round_exploit for this exact parent, edits only the features block, and has a clear executable consumer path through SO.build_features into the unchanged DeepFM trainer/predictor. That makes attribution clean and the probability of a real connected intervention high. Its mechanism also matches the current model family well: DeepFM can exploit new categorical crosses, and the cited tab-slice heterogeneity gives a concrete reason temporal context could repair residual context-specific ranking errors and help the active portfolio as a member_refinement. Cost is low and risk is modest.\n\nCandidate 1 is also viable and similarly cheap/reliable, but it is weaker than Candidate 0 on expected marginal gain. It is another trusted features-only operator with clean connectivity, yet its evidence is more generic: static profile fields may help representation, but the current diagnostics specifically point to context-conditioned errors, which temporal features address more directly. Profile features are also more plausibly redundant with user_id embeddings than hour/prior-gap buckets are redundant with the current empty extra-feature set. So Candidate 1 ranks second.\n\nCandidate 2 has potentially interesting information value and could diversify the portfolio, but it is clearly lower-ranked for the next measured experiment because the code-path reliability is much lower and the implementation is much costlier. It requires replacing delegated training with a custom torch loop across target/train/predict, so there are many more ways for the change to be misconnected or degraded relative to the optimized backend. Its evidence is curated research adapted from related work rather than a trusted operator applicable to this exact parent, and the diagnostics note censoring/edge cases that increase bug risk. Since a credible smaller connected gain outranks a more speculative larger one, Candidate 2 should not be chosen before the simpler trusted feature exploits.\n\nOverall ranking: Candidate 0 > Candidate 1 > Candidate 2.",
+    "stage": "select"
+  }
+]

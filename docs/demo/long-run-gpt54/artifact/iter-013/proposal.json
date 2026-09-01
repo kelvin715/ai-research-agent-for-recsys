@@ -1,0 +1,69 @@
+{
+  "basis_type": "diagnostic",
+  "estimated_cost_s": 20,
+  "evidence": [
+    {
+      "ref": "portfolio_diagnostics.members[w003].slice_specialization.member_disadvantages: tab=0 delta_primary -0.01749022029153391, tab=2 delta_primary -0.009346696620826433",
+      "type": "diagnostic"
+    },
+    {
+      "ref": "directional_feedback.tab latest candidate: tab 0=-0.004685269996118624, tab 1=-0.00604673336187278, tab 2=-0.01631240725522276, tab 6=-0.008923924517829529",
+      "type": "diagnostic"
+    },
+    {
+      "ref": "prediction_api.legal_context_access permits DV.load(split) for inference-time tab",
+      "type": "task_spec"
+    }
+  ],
+  "evidence_adaptation": null,
+  "execution_mode": "custom_patch",
+  "expected_observation": "If tab miscalibration is real, validation primary improves mainly through tabs 0/2/6 or through improved marginal portfolio contribution despite limited standalone movement.",
+  "experiment_contract": {
+    "claim": "A fixed inference-time tab-conditioned monotone transform of LambdaRank scores can improve ranking by correcting context-specific miscalibration.",
+    "expected_observable": "Predictions for identical raw scores but different tabs separate systematically; tabs listed in diagnostics show changed score distributions",
+    "falsification_condition": "Primary does not improve or diagnostics show no tab-specific benefit, refuting the miscalibration hypothesis.",
+    "forbidden_shortcuts": [
+      "using validation-derived fitted calibration",
+      "non-monotone arbitrary per-row rewrites",
+      "changing train-time labels/features while claiming pure calibration",
+      "using any exposure-after-feedback signal at inference"
+    ],
+    "portfolio_role": "error_diversifier",
+    "required_components": [
+      "predict block must read DV.load(split).tab",
+      "predict block must apply different monotone transforms for at least two tab groups",
+      "base scores must originate from unmodified SO.predict"
+    ]
+  },
+  "fallback": "If this fails, escalate to train-time tab interaction features instead of postscore calibration.",
+  "hypothesis": "The parent LambdaRank branch has tab-structured score miscalibration; a fixed tab-conditional monotone transform can improve top-5 ordering and diversify against the other members without retraining.",
+  "implementation_plan": "Patch predict only. After SO.predict, load split rows via DV.load(split), and apply a fixed monotone piecewise-linear transform per coarse tab bucket {0,1,2,4,6,other}. Use predeclared slopes/intercepts centered near identity, with stronger expansion/compression only for tabs where the LambdaRank branch is diagnostically weak in the portfolio. The transform must be monotone within each tab so it changes cross-tab score comparability but preserves within-tab local ordering except for scale shifts; because users can see mixed tabs, this can alter within-user ranking legally using inference-time tab.",
+  "justification": "Because both official metrics rank within user, any lawful context that varies by candidate can be used at prediction time. Tab is an exposed candidate/context field and diagnostics indicate systematic tab-specific weakness, making post-score calibration a targeted structural diversification hypothesis rather than scalar retuning.",
+  "mechanism": "tab-specific monotone score calibration on LambdaRank outputs",
+  "mechanism_tags": [
+    "context_calibration",
+    "tab_specialization",
+    "postscore_transform",
+    "error_diversifier"
+  ],
+  "observation": "Portfolio diagnostics for w003 show strong tab disadvantages: delta_primary -0.01749022029153391 on tab=0 and -0.009346696620826433 on tab=2; the latest candidate also degraded tabs 0/1/2/6. The predict API explicitly allows calling DV.load(split) to read inference-time tab.",
+  "operator_id": null,
+  "parent_operator_stack": [
+    "item_lambdarank"
+  ],
+  "parent_references": [
+    "w003"
+  ],
+  "patch_scope": [
+    "predict"
+  ],
+  "persona": "architecture",
+  "primary_block": "predict",
+  "research_evidence": [],
+  "research_nonuse_reason": "No supplied E### directly studies a fixed tab-specific monotone postscore transform for this single LambdaRank branch. The more direct basis is the exact tab-slice diagnostics plus the legal prediction-time access to tab in the runtime contract.",
+  "risk": [
+    "monotone transforms may not affect enough mixed-tab users",
+    "poorly chosen fixed slopes can hurt already-strong tab 4",
+    "recent predict-only edits have rolled back negatively"
+  ]
+}

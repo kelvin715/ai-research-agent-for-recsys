@@ -1,0 +1,25 @@
+{
+  "analysis": "The patch changes only the declared features block, adds exactly three label-free exposure-history columns, freezes all evaluation lookups to selected training data, and leaves the contracted LambdaRank target, parameters, grouping, training, and prediction paths unchanged. The appended pair-keyed values can affect model splits and predictions, while no validation/test exposures or post-exposure feedback enter the maps.",
+  "changed_runtime_path": true,
+  "component_evidence": [
+    {
+      "code_evidence": "_pair_history and _user_history use np.lexsort with (time_ms, stable_order) inside each user/pair, then compute prior counts as the zero-based position within the sorted group. Thus each selected training row receives counts only from preceding rows, excluding itself and all later-time rows; train_idx supplies the stable original-row tie breaker.",
+      "component": "Training-row statistics exclude the current row and every later time_ms row"
+    },
+    {
+      "code_evidence": "ua_keys/ua_final, uv_keys/uv_final, and known_users/user_final are constructed exclusively from splits['train'] arrays indexed by train_idx. Evaluation features are produced only through _lookup_pairs and _lookup_users against those finalized arrays, with no mutation or incorporation of evaluation exposures.",
+      "component": "Validation and test use frozen maps built from training rows only"
+    },
+    {
+      "code_evidence": "The first two columns are functions of keys (user_id, author_id) and (user_id, video_id), respectively, via _lookup_pairs; the third uses the user-author pair count divided by user history. Therefore rows for the same user can receive different values when candidate authors/videos have different prior exposure counts, rather than receiving only a per-user constant.",
+      "component": "At least one appended value varies across candidates for users with heterogeneous author or video histories"
+    },
+    {
+      "code_evidence": "train_extra, selected_extra, and evaluation extra matrices are explicitly allocated as np.float32; concatenated matrices are forced contiguous with dtype=np.float32. build_features returns feature_count + 3, and the unchanged train block passes these Xs and the updated dim directly to SO.train.",
+      "component": "The three appended columns are float32 and are consumed by unchanged SO.train"
+    }
+  ],
+  "forbidden_shortcuts_found": [],
+  "missing_components": [],
+  "status": "PASS"
+}

@@ -1,0 +1,5 @@
+{
+  "analysis": "The candidate reached a higher validation primary than the search parent (0.6052800193 vs. 0.6047517555), but the experiment did not satisfy its contract. The matcher accepted either a thresholded direct match to is_hate or its complement, so it did not fail closed unless exactly one auxiliary column equaled is_hate. Consequently, the observed score cannot be treated as evidence for the stated hypothesis that replacing the hate auxiliary with profile-enter improves the model; the actual replaced target could violate that intervention definition.",
+  "next_lesson": "Require exactly one direct equality match to the train-only is_hate array and reject complement-only or ambiguous matches before rerunning.",
+  "result": "failed"
+}

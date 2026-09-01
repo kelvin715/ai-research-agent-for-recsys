@@ -1,0 +1,43 @@
+--- incumbent/pipeline.py
++++ candidate/pipeline.py
+@@ -58,9 +58,39 @@
+ 
+ 
+ def train(splits, train_idx, Xs, dim, y, seed, verbose=False):
++    train_idx = np.asarray(train_idx, dtype=np.int64)
++    train_pos = np.arange(train_idx.size, dtype=np.int64)
++    tab6_mask = np.asarray(splits['train'].tab)[train_idx] == 6
++
++    raw_idx = np.concatenate([train_idx, train_idx[tab6_mask]])
++    raw_source_pos = np.concatenate([train_pos, train_pos[tab6_mask]])
++    order = np.argsort(raw_idx, kind='stable')
++    expanded_train_idx = raw_idx[order]
++    expanded_source_pos = raw_source_pos[order]
++
++    def replicate_target(obj):
++        if isinstance(obj, np.ndarray):
++            if obj.ndim > 0 and obj.shape[0] == train_idx.size:
++                return obj[expanded_source_pos]
++            return obj
++        if isinstance(obj, dict):
++            return {key: replicate_target(value) for key, value in obj.items()}
++        if isinstance(obj, tuple):
++            values = [replicate_target(value) for value in obj]
++            if hasattr(obj, '_fields'):
++                return type(obj)(*values)
++            return tuple(values)
++        if isinstance(obj, list):
++            if len(obj) == train_idx.size and all(np.isscalar(value) for value in obj):
++                return [obj[int(pos)] for pos in expanded_source_pos]
++            return [replicate_target(value) for value in obj]
++        return obj
++
++    expanded_y = replicate_target(y)
+     config = dict(OP_CONFIG)
+     config['hp'] = dict(HP)
+-    return SO.train(splits, train_idx, Xs, dim, y, seed, config, verbose)
++    return SO.train(splits, expanded_train_idx, Xs, dim, expanded_y,
++                    seed, config, verbose)
+ # <<<END:train>>>
+ 
+ 

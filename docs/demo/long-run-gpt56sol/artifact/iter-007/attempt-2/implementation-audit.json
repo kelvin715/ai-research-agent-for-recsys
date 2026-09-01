@@ -1,0 +1,33 @@
+{
+  "analysis": "The features-only patch faithfully implements causal, strictly-prior-date user-by-tab encoding. Same-date emission precedes all updates, evaluation uses frozen train-only statistics, feature dimension rises from 25 to 27, column 5 remains unchanged for delegated categorical handling, and the LambdaRank training and prediction paths are otherwise unchanged.",
+  "changed_runtime_path": true,
+  "component_evidence": [
+    {
+      "code_evidence": "build_features indexes train_rows.user_id, tab, date, and train_rows.label exclusively with train_idx; labels are checked by DV.assert_trainable, and pair/global accumulators are updated only from those selected labels.",
+      "component": "statistics fitted only from train_idx labels"
+    },
+    {
+      "code_evidence": "Rows are stably sorted by dates, boundaries identify complete date blocks, selected_extra is computed from pair_sum/pair_count and global_sum/global_count before the block's labels are added via np.bincount and block_labels.sum().",
+      "component": "date-batched emission before update for training rows"
+    },
+    {
+      "code_evidence": "After all date blocks update the accumulators, frozen_global_rate is computed and each non-train split is passed to _frozen_user_tab_features with the final pair_keys, pair_sum, pair_count, and frozen_global_rate; evaluation labels are never accessed.",
+      "component": "frozen full-train statistics for validation and test"
+    },
+    {
+      "code_evidence": "Both training emission and frozen evaluation emission use (pair_sum + 10.0 * prior_rate) / (pair_count + 10.0).",
+      "component": "fixed smoothing strength of 10"
+    },
+    {
+      "code_evidence": "_frozen_user_tab_features initializes sums and counts to zero and fills them only for searchsorted matches; unmatched user-tab pairs therefore receive rate=(0+10*global_rate)/(0+10) and log1p(0).",
+      "component": "UNK behavior via global prior and zero count"
+    },
+    {
+      "code_evidence": "The rate and log1p-count columns are assembled as float32, concatenated to every delegated base matrix, and build_features returns base_dim + 2; unchanged train passes these Xs and the resulting dim directly to SO.train.",
+      "component": "two appended float32 columns consumed by SO.train"
+    }
+  ],
+  "forbidden_shortcuts_found": [],
+  "missing_components": [],
+  "status": "PASS"
+}

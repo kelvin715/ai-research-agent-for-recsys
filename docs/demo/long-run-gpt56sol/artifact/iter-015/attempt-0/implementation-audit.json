@@ -1,0 +1,33 @@
+{
+  "analysis": "The declared target, train, and predict blocks concretely replace delegated target/training/prediction with train-only binary-label pools, uniform same-user sampling of exactly eight pairs per eligible user per epoch, a second-order categorical Torch FM, three final-checkpoint epochs, and raw-logit inference. Diagnostics expose eligible-user count, pair cap, total pairs, zero cross-user count, and prediction hash. No validation-dependent weighting, cross-user negatives, history-proportional pair allocation, feature change, feedback inference feature, or user-only scoring mechanism is present.",
+  "changed_runtime_path": true,
+  "component_evidence": [
+    {
+      "code_evidence": "build_target reads only splits['train'].label, subsets it by train_idx, validates it with DV.assert_trainable, and train constructs pos_rows and neg_rows solely from this returned binary y_train.",
+      "component": "Only train long_view labels are used to construct positive and negative pools."
+    },
+    {
+      "code_evidence": "train separately derives pos_users and neg_users from positive and negative rows, then defines eligible_users with np.intersect1d(pos_users, neg_users, ...), raising an error if the intersection is empty.",
+      "component": "Only users containing both classes are eligible."
+    },
+    {
+      "code_evidence": "pairs_per_user is fixed to 8; each epoch samples arrays of shape (len(eligible_users), pairs_per_user), flattens them to pair_count = len(eligible_users) * 8, and trains once over every sampled pair.",
+      "component": "Each eligible user contributes exactly eight sampled pairs per epoch."
+    },
+    {
+      "code_evidence": "Positive and negative pools are sorted and indexed by the same eligible_users ordering; offsets are sampled within each user's pos_starts/pos_counts and neg_starts/neg_counts. The explicit users[sampled_pos] != users[sampled_neg] check raises on any mismatch and accumulates the reported cross-user count.",
+      "component": "Every pair's positive and negative row belongs to the same user."
+    },
+    {
+      "code_evidence": "Features remain SO.build_features(splits, train_idx, OP_CONFIG), yielding the existing globally offset categorical matrix. PairwiseFM applies a linear embedding sum plus 0.5 * ((sum v)^2 - sum(v^2)) across fields, using dim as the embedding-table size and k=HP['k'].",
+      "component": "The model remains a second-order FM over the existing globally offset categorical fields."
+    },
+    {
+      "code_evidence": "predict converts only Xs[split] to integer tensors and directly concatenates net(xb) outputs without sigmoid or other transformation. Xs is the unchanged trusted feature representation; no train target, watch feedback, or evaluation label is accessed in prediction.",
+      "component": "Prediction returns raw FM logits and uses no feedback columns."
+    }
+  ],
+  "forbidden_shortcuts_found": [],
+  "missing_components": [],
+  "status": "PASS"
+}

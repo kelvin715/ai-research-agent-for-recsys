@@ -1,0 +1,73 @@
+{
+  "basis_type": "task_spec",
+  "estimated_cost_s": 700,
+  "evidence": [
+    {
+      "ref": "DV.watch_ratio() returns train-only ratio and validity arrays, and post-exposure feedback is permitted as a training or auxiliary target but never as an inference feature.",
+      "type": "task_spec"
+    },
+    {
+      "ref": "Exact key train_duration_zero_rows has value 24076.",
+      "type": "diagnostic"
+    },
+    {
+      "ref": "SO.train consumes the object returned by build_target under objective pointwise_engagement_mtl.",
+      "type": "current_code"
+    }
+  ],
+  "evidence_adaptation": null,
+  "execution_mode": "custom_patch",
+  "expected_observation": "If the shaped reward carries useful ordinal information, the trusted primary and marginal portfolio score will increase, especially nDCG@5, while predictions remain label-free at inference and differ within users rather than by a user constant.",
+  "experiment_contract": {
+    "claim": "The experiment tests whether bounded valid watch-ratio information improves the existing pointwise main reward while all features, architecture, auxiliaries, and training hyperparameters remain fixed.",
+    "expected_observable": "Target diagnostics must show fractional main labels on valid train rows, exactly binary unchanged labels on invalid rows, and unchanged auxiliary-target shapes and values.",
+    "falsification_condition": "The hypothesis is refuted if trusted marginal portfolio primary does not improve after target audits pass; the run is invalid if any ratio-derived value enters validation or test features.",
+    "forbidden_shortcuts": [
+      "using watch ratio or its validity flag as an inference feature",
+      "imputing invalid duration-zero ratios as genuine zeros",
+      "changing aux_weight from 0.2",
+      "altering model or training hyperparameters in the same experiment",
+      "reading validation or test feedback"
+    ],
+    "portfolio_role": "member_refinement",
+    "required_components": [
+      "DV.watch_ratio called only during target construction",
+      "DV.assert_trainable applied to ratio and validity arrays",
+      "ratio clipped to [0,1]",
+      "main target set to 0.85*long_view+0.15*ratio only where valid",
+      "original binary main target retained where invalid",
+      "unchanged engagement auxiliary targets"
+    ]
+  },
+  "fallback": "Rollback the target block to SO.build_target unchanged and retain the binary long_view main target.",
+  "hypothesis": "A small continuous watch-ratio component in the main training reward will break ties among binary long_view outcomes and improve top-of-list within-user ordering without sacrificing the parent’s engagement auxiliary signal.",
+  "implementation_plan": "In build_target, first obtain the unchanged pointwise_engagement_mtl target from SO.build_target. Read train-only (ratio, valid)=DV.watch_ratio(), assert the arrays are trainable, clip valid ratios to [0,1], and replace only the main long_view target on valid rows with 0.85*long_view+0.15*clipped_ratio. Keep the original binary long_view target for invalid rows and leave all four engagement auxiliary targets unchanged. SO.train already consumes target['main'], so no unsupported configuration key is introduced.",
+  "justification": "Binary long_view discards intensity information among impressions with the same class. A bounded 15% continuous component supplies finer supervision related to viewing quality, while masking invalid rows and retaining 85% of the official label limits objective drift. This is a target-formulation change consumed directly by the existing trainer, not an inert auxiliary-weight setting.",
+  "mechanism": "valid-watch-ratio soft-label shaping",
+  "mechanism_tags": [
+    "soft-target",
+    "watch-ratio",
+    "duration-normalization",
+    "multitask-reward"
+  ],
+  "observation": "DV.watch_ratio() is explicitly available as a train-only auxiliary target, while the deterministic diagnostic reports train_duration_zero_rows=24076, requiring an explicit valid mask rather than treating every ratio as reliable.",
+  "operator_id": null,
+  "parent_operator_stack": [
+    "deepfm_engagement_mtl_v1"
+  ],
+  "parent_references": [
+    "w002"
+  ],
+  "patch_scope": [
+    "target"
+  ],
+  "persona": "reward",
+  "primary_block": "target",
+  "research_evidence": [],
+  "research_nonuse_reason": "This proposal is directly based on the task-provided train-only watch-ratio API and its invalid-duration diagnostic. E003 concerns a rejected bpr_censored_watch auxiliary-weight transition on a different parent stack, while this experiment uses a fixed pointwise soft main target and does not repeat that transition.",
+  "risk": [
+    "Watch ratio may encode duration-dependent behavior that is misaligned with binary long_view.",
+    "Softening positives and negatives could reduce class separation.",
+    "The existing BCE implementation might assume binary labels even though fractional BCE targets are mathematically valid."
+  ]
+}

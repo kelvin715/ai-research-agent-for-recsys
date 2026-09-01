@@ -1,0 +1,183 @@
+{
+  "GAUC_mean": 0.6709014449173276,
+  "bootstrap_ci95_primary_mean": [
+    0.6000709040486008,
+    0.6083545425827126
+  ],
+  "bootstrap_sd_primary_mean": 0.0021062210565574026,
+  "directional_feedback": {
+    "candidate_vs_incumbent": true,
+    "fixed_dimensions": [
+      "train_user_history_quartile",
+      "train_item_popularity_quartile",
+      "tab"
+    ],
+    "status": "diagnostic_only_not_official_metric",
+    "tab": [
+      {
+        "delta_primary": -0.0017011058902565157,
+        "rows": 13726,
+        "tab": 0,
+        "users": 5579
+      },
+      {
+        "delta_primary": -0.000541626247807736,
+        "rows": 92672,
+        "tab": 1,
+        "users": 20119
+      },
+      {
+        "delta_primary": -0.004738620736890686,
+        "rows": 3834,
+        "tab": 2,
+        "users": 1126
+      },
+      {
+        "delta_primary": -0.005241128435804598,
+        "rows": 7877,
+        "tab": 4,
+        "users": 4209
+      },
+      {
+        "delta_primary": -0.004047385767926126,
+        "rows": 5170,
+        "tab": 6,
+        "users": 2212
+      }
+    ],
+    "train_item_popularity_quartile": {
+      "cutpoints": [
+        144,
+        365,
+        856
+      ],
+      "slices": [
+        {
+          "delta_primary": -0.000908933825401026,
+          "max_inclusive": 144,
+          "min_inclusive": null,
+          "rows": 31341,
+          "users": 13329
+        },
+        {
+          "delta_primary": 1.979211424307792e-06,
+          "max_inclusive": 365,
+          "min_inclusive": 145,
+          "rows": 31162,
+          "users": 14170
+        },
+        {
+          "delta_primary": 0.00033323241550675675,
+          "max_inclusive": 856,
+          "min_inclusive": 366,
+          "rows": 31185,
+          "users": 14168
+        },
+        {
+          "delta_primary": 0.0005595395082288457,
+          "max_inclusive": null,
+          "min_inclusive": 857,
+          "rows": 31221,
+          "users": 14215
+        }
+      ]
+    },
+    "train_user_history_quartile": {
+      "cutpoints": [
+        16,
+        35,
+        64
+      ],
+      "slices": [
+        {
+          "delta_primary": 0.0007301731987962023,
+          "max_inclusive": 16,
+          "min_inclusive": null,
+          "rows": 19132,
+          "users": 5803
+        },
+        {
+          "delta_primary": -0.0007129204036375736,
+          "max_inclusive": 35,
+          "min_inclusive": 17,
+          "rows": 24731,
+          "users": 5563
+        },
+        {
+          "delta_primary": -0.001745476384422684,
+          "max_inclusive": 64,
+          "min_inclusive": 36,
+          "rows": 31956,
+          "users": 5495
+        },
+        {
+          "delta_primary": -0.000808287873501512,
+          "max_inclusive": null,
+          "min_inclusive": 65,
+          "rows": 49090,
+          "users": 5516
+        }
+      ]
+    }
+  },
+  "ensemble": {
+    "GAUC": 0.6710370365822413,
+    "bootstrap_ci95_primary": [
+      0.6000470382933191,
+      0.6083959145449571
+    ],
+    "bootstrap_sd_primary": 0.0021310236667710994,
+    "nDCG@5": 0.5373141056915127,
+    "n_users_in_gauc": 12929,
+    "pred_sha256": "d26c15ad10e8f840",
+    "primary": 0.604175571136877,
+    "rows": 124909,
+    "split": "valid",
+    "users": 22377
+  },
+  "nDCG@5_mean": 0.5373669003864158,
+  "n_seeds": 3,
+  "paired_vs_incumbent": {
+    "delta_primary": -0.0007378004158260509,
+    "excludes_zero": true,
+    "paired_ci95": [
+      -0.0014161918261403532,
+      -3.7182088574294706e-05
+    ],
+    "paired_sd": 0.00035975245007906703
+  },
+  "per_seed": [
+    {
+      "GAUC": 0.6715281907134737,
+      "nDCG@5": 0.5375917510081691,
+      "pred_sha256": "b1b15f8ff5c29165",
+      "primary": 0.6045599708608214
+    },
+    {
+      "GAUC": 0.670780012416982,
+      "nDCG@5": 0.537522402534832,
+      "pred_sha256": "a87f726ac85f4876",
+      "primary": 0.604151207475907
+    },
+    {
+      "GAUC": 0.6703961316215271,
+      "nDCG@5": 0.5369865476162461,
+      "pred_sha256": "20a1fa214a68cc90",
+      "primary": 0.6036913396188865
+    }
+  ],
+  "per_seed_paired_vs_incumbent": {
+    "delta_primary": -0.0003029994780544554,
+    "excludes_zero": false,
+    "paired_ci95": [
+      -0.0007359232253856263,
+      0.00018466650181980492
+    ],
+    "paired_sd": 0.0002454126442139041
+  },
+  "primary_mean": 0.6041341726518716,
+  "primary_seed_sd": 0.00043456610261126134,
+  "selection_metric": "within-user normalized-rank average over fixed seeds",
+  "selection_primary": 0.604175571136877,
+  "split": "valid"
+}

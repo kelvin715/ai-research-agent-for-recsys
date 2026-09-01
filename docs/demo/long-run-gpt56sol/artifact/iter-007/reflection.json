@@ -1,0 +1,5 @@
+{
+  "analysis": "The experiment was rejected by static policy gate G2 because the features block accessed train.label; under the block policy, only the target block may read labels. Therefore the candidate was not validly evaluated, and the reported validation value cannot establish whether strictly-prior user-by-tab affinity improves ranking or portfolio contribution. The architectural hypothesis remains untested rather than refuted.",
+  "next_lesson": "Construct all label-derived historical statistics inside the target block and expose only policy-compliant derived artifacts to features, with both blocks declared in patch_scope.",
+  "result": "failed"
+}

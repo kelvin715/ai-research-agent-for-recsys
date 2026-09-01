@@ -1,0 +1,29 @@
+{
+  "analysis": "The declared target and train blocks faithfully implement the sole reward change `2*long_view+is_click`. Native long_view has strict precedence because negative grades are at most 1 and positive grades are at least 2. The graded target reaches the contracted LambdaRank consumer, metadata records all four grade counts, and features, configuration, grouping, checkpoint rounds, and inference behavior remain unchanged.",
+  "changed_runtime_path": true,
+  "component_evidence": [
+    {
+      "code_evidence": "`long_view` is obtained from `SO.build_target(splits, train_idx, OP_CONFIG)`, whose contracted return is aligned to `train_idx`, and its length is checked against `train_idx_arr`. Train-only `is_click` is obtained through `DV.train_targets(['is_click'])` and explicitly aligned as `click_all[train_idx_arr]`, with bounds checking.",
+      "component": "Both targets are read only for train rows and aligned exactly to train_idx."
+    },
+    {
+      "code_evidence": "The target block executes `DV.assert_trainable(long_view, 'ordinal_reward.long_view')` and `DV.assert_trainable(is_click, 'ordinal_reward.is_click')` before constructing the grade.",
+      "component": "DV.assert_trainable is called for long_view and is_click."
+    },
+    {
+      "code_evidence": "Both inputs are validated as binary, converted to `np.int32`, and combined by `grade = 2 * long_view + is_click`. The range is checked and the function returns `grade.astype(np.int32, copy=False)`.",
+      "component": "The resulting relevance values are integers in {0,1,2,3}."
+    },
+    {
+      "code_evidence": "The train block normalizes `y` to integer `grade` and passes it directly as the target in `SO.train(splits, train_idx, Xs, dim, grade, seed, config, verbose)`. `config` is an unchanged copy of `OP_CONFIG` with an unchanged copy of `HP`; therefore the contracted stable backend retains its fixed LambdaRank parameters, stable `(user_id,date)` grouping, and `num_boost_round=100` in scored runs.",
+      "component": "SO.train receives the graded vector while retaining the parent's fixed parameters and grouping."
+    },
+    {
+      "code_evidence": "The unchanged prediction path is `SO.predict(model, Xs, split)`. It neither loads nor retains `is_click`; click is used only to form the training target.",
+      "component": "Prediction consumes only the trained tree and legal Xs features."
+    }
+  ],
+  "forbidden_shortcuts_found": [],
+  "missing_components": [],
+  "status": "PASS"
+}

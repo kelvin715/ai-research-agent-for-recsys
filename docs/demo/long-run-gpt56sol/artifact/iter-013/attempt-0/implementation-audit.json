@@ -1,0 +1,29 @@
+{
+  "analysis": "The features block faithfully implements two label-free, train_idx-derived pair-count features. Training counts exclude all current-date exposures, evaluation counts use train totals only, unseen pairs map to zero, and the resulting 27-column matrices flow through the unchanged LambdaRank training and prediction paths. No feedback targets, evaluation history, per-user-only substitute, or hyperparameter changes are present.",
+  "changed_runtime_path": true,
+  "component_evidence": [
+    {
+      "code_evidence": "pair_exposure_feature('video_id') reads train.user_id, train.video_id, and train.date only at train_idx; np.lexsort groups by user/entity/date, and prior_sorted = date_origins - pair_origins counts only rows in earlier date groups before assignment to features['train'][train_idx].",
+      "component": "Prior-date (user_id, video_id) exposure count for training rows"
+    },
+    {
+      "code_evidence": "pair_exposure_feature('author_id') applies the same prior-date computation to (user_id, author_id), with date_start including every pair or date boundary so same-date exposures are excluded.",
+      "component": "Prior-date (user_id, author_id) exposure count for training rows"
+    },
+    {
+      "code_evidence": "unique_keys and totals = ends - starts are constructed solely from train arrays indexed by train_idx; the loop over non-train splits uses np.searchsorted to look up those fixed train totals without updating them from evaluation rows.",
+      "component": "Train-total pair counts for validation and test rows"
+    },
+    {
+      "code_evidence": "Evaluation values are initialized with np.zeros(rowset.n, dtype=np.float32), and totals are assigned only to matched_rows after exact structured-key equality; unmatched pairs remain zero before np.log1p.",
+      "component": "Zero values for unseen pairs"
+    },
+    {
+      "code_evidence": "video_affinity and author_affinity are column-stacked and cast to float32, concatenated after each base_Xs matrix, and returned with base_dim + 2; the unchanged train block passes these Xs and dimension to the contract-supported SO.train LambdaRank backend.",
+      "component": "Both columns appended as float32 inputs to the unchanged LambdaRank consumer"
+    }
+  ],
+  "forbidden_shortcuts_found": [],
+  "missing_components": [],
+  "status": "PASS"
+}

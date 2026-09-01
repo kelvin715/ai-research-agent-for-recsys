@@ -1,0 +1,80 @@
+--- incumbent/pipeline.py
++++ candidate/pipeline.py
+@@ -38,7 +38,76 @@
+ 
+ # <<<BLOCK:target>>>
+ def build_target(splits, train_idx):
+-    return SO.build_target(splits, train_idx, OP_CONFIG)
++    parent_target = SO.build_target(splits, train_idx, OP_CONFIG)
++    main = np.asarray(parent_target['main'])
++
++    train_idx = np.asarray(train_idx, dtype=np.int64)
++    n_full = int(splits['train'].n)
++    n_fit = int(train_idx.shape[0])
++    assert main.shape[0] == n_fit
++    assert np.all((train_idx >= 0) & (train_idx < n_full))
++
++    def load_target_column(name):
++        values = np.asarray(DV.train_targets([name]))
++        assert values.size == n_full, (
++            name, values.shape, n_full
++        )
++        values = values.reshape(-1)
++        DV.assert_trainable(values, 'build_target.' + name + '_full')
++        return values
++
++    click_full = load_target_column('is_click')
++    like_full = load_target_column('is_like')
++    profile_full = load_target_column('is_profile_enter')
++
++    watch_ratio_full, watch_valid_full = DV.watch_ratio()
++    watch_ratio_full = np.asarray(watch_ratio_full)
++    watch_valid_full = np.asarray(watch_valid_full, dtype=bool)
++    assert watch_ratio_full.size == n_full
++    assert watch_valid_full.size == n_full
++    watch_ratio_full = watch_ratio_full.reshape(-1)
++    watch_valid_full = watch_valid_full.reshape(-1)
++
++    click = click_full[train_idx]
++    like = like_full[train_idx]
++    profile = profile_full[train_idx]
++    watch_ratio = watch_ratio_full[train_idx]
++    watch_valid = watch_valid_full[train_idx]
++
++    assert click.shape == (n_fit,)
++    assert like.shape == (n_fit,)
++    assert profile.shape == (n_fit,)
++    assert watch_ratio.shape == (n_fit,)
++    assert watch_valid.shape == (n_fit,)
++
++    DV.assert_trainable(main, 'build_target.main')
++    DV.assert_trainable(click, 'build_target.is_click')
++    DV.assert_trainable(like, 'build_target.is_like')
++    DV.assert_trainable(profile, 'build_target.is_profile_enter')
++    DV.assert_trainable(watch_ratio, 'build_target.watch_ratio')
++
++    soft_completion = np.full(n_fit, 0.5, dtype=np.float32)
++    if np.any(watch_valid):
++        soft_completion[watch_valid] = np.clip(
++            watch_ratio[watch_valid], 0.0, 1.0
++        ).astype(np.float32, copy=False)
++
++    engagement_aux = np.column_stack((
++        click,
++        like,
++        profile,
++        soft_completion,
++    )).astype(np.float32, copy=False)
++
++    assert engagement_aux.shape == (n_fit, 4)
++    assert np.isfinite(engagement_aux).all()
++    assert np.all((soft_completion >= 0.0) & (soft_completion <= 1.0))
++    assert np.all(soft_completion[~watch_valid] == 0.5)
++
++    DV.assert_trainable(soft_completion, 'build_target.soft_completion')
++    DV.assert_trainable(engagement_aux, 'build_target.engagement_aux')
++
++    return {'main': main, 'engagement_aux': engagement_aux}
+ # <<<END:target>>>
+ 
+ 

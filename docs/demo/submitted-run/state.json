@@ -1,0 +1,555 @@
+{
+ "edges": [
+  {
+   "label": "built from",
+   "source": "w002",
+   "target": "n002",
+   "type": "execution"
+  },
+  {
+   "label": "built from",
+   "source": "w001",
+   "target": "n003",
+   "type": "execution"
+  },
+  {
+   "label": "built from",
+   "source": "w003",
+   "target": "n004",
+   "type": "execution"
+  },
+  {
+   "label": "built from",
+   "source": "n000",
+   "target": "w001",
+   "type": "execution"
+  },
+  {
+   "label": "built from",
+   "source": "n000",
+   "target": "w002",
+   "type": "execution"
+  },
+  {
+   "label": "built from",
+   "source": "n000",
+   "target": "w003",
+   "type": "execution"
+  },
+  {
+   "label": "member",
+   "source": "w001",
+   "target": "portfolio-best",
+   "type": "portfolio",
+   "weight": 0.4
+  },
+  {
+   "label": "member",
+   "source": "w002",
+   "target": "portfolio-best",
+   "type": "portfolio",
+   "weight": 0.4
+  },
+  {
+   "label": "member",
+   "source": "w003",
+   "target": "portfolio-best",
+   "type": "portfolio",
+   "weight": 0.2
+  }
+ ],
+ "generated_at": "2026-09-01T04:09:32.467129+00:00",
+ "nodes": [
+  {
+   "artifacts": {},
+   "candidate_entered_combination": null,
+   "combination_ci95": null,
+   "combination_delta": null,
+   "decision": "BASELINE",
+   "execution_mode": "baseline",
+   "expected": null,
+   "hypothesis": null,
+   "id": "n000",
+   "is_best_standalone": false,
+   "is_portfolio_member": false,
+   "iteration": 0,
+   "kind": "baseline",
+   "label": "official FM baseline",
+   "lesson": null,
+   "mechanism": "official FM baseline",
+   "operator_id": null,
+   "parent_id": null,
+   "parent_references": [],
+   "patch_scope": null,
+   "portfolio_weight": null,
+   "result": null,
+   "score": 0.6018779688793552,
+   "score_ci95": null,
+   "score_delta": null,
+   "status": "COMPLETE",
+   "status_key": "baseline",
+   "status_label": "Baseline",
+   "times_selected_as_parent": 0,
+   "why": null
+  },
+  {
+   "artifacts": {
+    "code change": "iter-002/attempt-0/pipeline.diff",
+    "combination": "iter-002/ensemble-selection.json",
+    "implementation check": "iter-002/attempt-0/implementation-audit.json",
+    "metrics": "iter-002/metrics.json",
+    "proposal": "iter-002/proposal.json",
+    "reflection": "iter-002/reflection.json",
+    "selection": "iter-002/selection-trace.json"
+   },
+   "candidate_entered_combination": true,
+   "combination_ci95": [
+    -0.0011832933222168441,
+    0.0007566694622673477
+   ],
+   "combination_delta": -0.0002527445864699551,
+   "decision": "UNCERTAIN",
+   "execution_mode": "operator",
+   "expected": "Per-seed predictions differ from the parent, with strongest gains on context-heavy slices and positive paired portfolio contribution if temporal context repairs residual tab-specific misranking.",
+   "hypothesis": "Adding legal temporal context fields that DeepFM can cross with user/item ids will improve within-user ranking and likely add marginal portfolio gain by correcting context-specific ordering errors without using any post-exposure inference feature.",
+   "id": "n002",
+   "is_best_standalone": true,
+   "is_portfolio_member": false,
+   "iteration": 2,
+   "kind": "experiment",
+   "label": "temporal-context categorical augmentation",
+   "lesson": "Legal temporal context can alter rankings but, here, its signal was too weak and inconsistent to justify keeping it as a standalone refinement.",
+   "mechanism": "temporal-context categorical augmentation",
+   "operator_id": "legal_temporal_context",
+   "parent_id": "w002",
+   "parent_references": [
+    "w002"
+   ],
+   "patch_scope": [
+    "features"
+   ],
+   "portfolio_weight": null,
+   "result": "The experiment successfully changed predictions, so the legal_temporal_context operator was active and consumed by the unchanged DeepFM pipeline. On standalone validation it produced only a very small mean gain over the search parent/incumbent (delta_primary about +0.00053), but the paired 95% CI crossed zero, so the improvement is not statistically reliable. Slice diagnostics show mixed effects rather than the expected broad context repair: gains appeared for some tabs and user-history/popularity segments, but several context-heavy slices regressed, including tabs 2, 4, and 6 and higher-popularity item quartiles. Portfolio impact was slightly negative versus the incumbent ensemble and also not significant, so the hypothesis that these temporal-context categorical features would likely add useful portfolio gain is not established by this run.",
+   "score": 0.6052800193085559,
+   "score_ci95": [
+    -0.0008303693600360373,
+    0.00193394072380294
+   ],
+   "score_delta": 0.0005282638342124502,
+   "status": "COMPLETE",
+   "status_key": "uncertain",
+   "status_label": "Promising, not proven",
+   "times_selected_as_parent": 0,
+   "why": "This is the mandated applicable first-round exploit for the baseline parent and is directly consumable by the current backend. DeepFM benefits from additional categorical context because its interaction mechanism is feature crossing; hour and prior-gap are legal pre-impression pair features that can alter ordering within a user while preserving leakage safety."
+  },
+  {
+   "artifacts": {
+    "code change": "iter-003/attempt-0/pipeline.diff",
+    "combination": "iter-003/ensemble-selection.json",
+    "implementation check": "iter-003/attempt-0/implementation-audit.json",
+    "metrics": "iter-003/metrics.json",
+    "proposal": "iter-003/proposal.json",
+    "reflection": "iter-003/reflection.json",
+    "selection": "iter-003/selection-trace.json"
+   },
+   "candidate_entered_combination": true,
+   "combination_ci95": [
+    -0.0009750958069591143,
+    0.0010155268297818987
+   ],
+   "combination_delta": -3.368225314370754e-05,
+   "decision": "UNCERTAIN",
+   "execution_mode": "custom_patch",
+   "expected": "If connected, predictions will differ from the parent on rows with tabs 2/4/6, with possible small standalone change but improved portfolio marginal contribution through rank diversity on those slices.",
+   "hypothesis": "A small tab-specific monotone recalibration will improve marginal portfolio contribution by shifting ordering in weak tabs 2/4/6 where the current parent underperforms, while preserving most of the parent's strong global ordering.",
+   "id": "n003",
+   "is_best_standalone": false,
+   "is_portfolio_member": false,
+   "iteration": 3,
+   "kind": "experiment",
+   "label": "tab-aware score calibration at prediction",
+   "lesson": "Predict-time tab-only affine calibration is too crude here; prefer a stronger train-time interaction mechanism over further hand-tuned tab score shifts.",
+   "mechanism": "tab-aware score calibration at prediction",
+   "operator_id": null,
+   "parent_id": "w001",
+   "parent_references": [
+    "w001"
+   ],
+   "patch_scope": [
+    "predict"
+   ],
+   "portfolio_weight": null,
+   "result": "The experiment successfully changed predictions versus the parent, so the predict-time tab-aware affine calibration was implemented and active. However, the core hypothesis is not supported by trusted evaluation: standalone delta was only +0.000101 with a 95% paired CI spanning zero, and portfolio delta was slightly negative (-3.37e-05), also with CI spanning zero. Diagnostic slice feedback also failed to show the intended targeted improvement on weak tabs 2/4/6: tab 2 and 4 remained negative and tab 6 was neutral, while gains appeared more on other dimensions such as item-popularity slices. Thus the mechanism produced measurable ranking changes, but evidence does not establish that tab-specific posthoc calibration improved weak-tab contribution or portfolio value.",
+   "score": 0.6050145220543199,
+   "score_ci95": [
+    -0.00015504766112815204,
+    0.00034961750379227107
+   ],
+   "score_delta": 0.00010115050161685346,
+   "status": "COMPLETE",
+   "status_key": "uncertain",
+   "status_label": "Promising, not proven",
+   "times_selected_as_parent": 0,
+   "why": "Within-user metrics are unaffected by per-user constants but can change under candidate-specific transformations. Since tab is an allowed inference-time context field and diagnostics identify tab-specific weaknesses, a bounded tab-aware calibration is a directly connected way to seek error diversity without touching training."
+  },
+  {
+   "artifacts": {
+    "code change": "iter-004/attempt-0/pipeline.diff",
+    "combination": "iter-004/ensemble-selection.json",
+    "implementation check": "iter-004/attempt-0/implementation-audit.json",
+    "metrics": "iter-004/metrics.json",
+    "proposal": "iter-004/proposal.json",
+    "reflection": "iter-004/reflection.json",
+    "selection": "iter-004/selection-trace.json"
+   },
+   "candidate_entered_combination": false,
+   "combination_ci95": null,
+   "combination_delta": null,
+   "decision": "UNCERTAIN",
+   "execution_mode": "custom_patch",
+   "expected": "If the hypothesis is right, official validation primary should rise modestly through better contribution on tabs 0/2/6, with prediction hashes changing for affected rows only.",
+   "hypothesis": "A small tab-conditional residual on top of the LambdaRank score will improve marginal portfolio value by nudging the tree member toward slices where current portfolio feedback shows systematic underperformance by tab.",
+   "id": "n004",
+   "is_best_standalone": false,
+   "is_portfolio_member": false,
+   "iteration": 4,
+   "kind": "experiment",
+   "label": "tab-aware prediction residual blend",
+   "lesson": "Do not rely on portfolio-relative tab weaknesses alone to set fixed prediction-time tab offsets; require direct standalone slice evidence before adding inference-only residual corrections.",
+   "mechanism": "tab-aware prediction residual blend",
+   "operator_id": null,
+   "parent_id": "w003",
+   "parent_references": [
+    "w003"
+   ],
+   "patch_scope": [
+    "predict"
+   ],
+   "portfolio_weight": null,
+   "result": "The experiment successfully changed predictions, so the mechanism was implemented and testable, but the evidence does not support a reliable gain. Standalone validation showed only a tiny mean improvement over the search parent (delta_primary 1.54e-05) with a 95% paired CI spanning zero, and paired-vs-incumbent also did not exclude zero. Portfolio impact was slightly negative (-3.37e-05) and not significant. Slice diagnostics show the tab-based residual did not consistently help the intended tabs: tab=2 improved, tab=4 worsened materially, tab=0 worsened slightly, and tab=6 showed no effect. This weakly suggests that hard-coded tab residuals derived from portfolio-relative disadvantages did not transfer cleanly into a useful standalone prediction-time correction.",
+   "score": 0.6010729591013781,
+   "score_ci95": [
+    -5.0260285732708906e-05,
+    8.633185389451125e-05
+   ],
+   "score_delta": 1.537532996653823e-05,
+   "status": "COMPLETE",
+   "status_key": "uncertain",
+   "status_label": "Promising, not proven",
+   "times_selected_as_parent": 0,
+   "why": "Because ranking is within-user, a global shift is inert, but a tab-varying residual changes ordering when a user has candidates from multiple tabs. The large tab-specific disadvantages suggest this member's errors are structured by tab rather than random. A prediction-side residual is directly executable, cheap, and targets error diversity without changing the delegated training backend."
+  },
+  {
+   "artifacts": {},
+   "candidate_entered_combination": null,
+   "combination_ci95": null,
+   "combination_delta": null,
+   "decision": "ACCEPT",
+   "execution_mode": "empirical_prior_portfolio",
+   "expected": null,
+   "hypothesis": null,
+   "id": "w001",
+   "is_best_standalone": false,
+   "is_portfolio_member": true,
+   "iteration": null,
+   "kind": "warmstart",
+   "label": "Validated legal ranking stack",
+   "lesson": null,
+   "mechanism": "Validated legal ranking stack",
+   "operator_id": "legal_rank_stack_v1",
+   "parent_id": "n000",
+   "parent_references": [],
+   "patch_scope": [
+    "features",
+    "target",
+    "model",
+    "loss",
+    "train"
+   ],
+   "portfolio_weight": 0.4,
+   "result": null,
+   "score": 0.6049133715527031,
+   "score_ci95": null,
+   "score_delta": null,
+   "status": "COMPLETE",
+   "status_key": "accepted",
+   "status_label": "Kept",
+   "times_selected_as_parent": 1,
+   "why": null
+  },
+  {
+   "artifacts": {},
+   "candidate_entered_combination": null,
+   "combination_ci95": null,
+   "combination_delta": null,
+   "decision": "ACCEPT",
+   "execution_mode": "empirical_prior_portfolio",
+   "expected": null,
+   "hypothesis": null,
+   "id": "w002",
+   "is_best_standalone": false,
+   "is_portfolio_member": true,
+   "iteration": null,
+   "kind": "warmstart",
+   "label": "CPU DeepFM + four engagement heads",
+   "lesson": null,
+   "mechanism": "CPU DeepFM + four engagement heads",
+   "operator_id": "deepfm_engagement_mtl_v1",
+   "parent_id": "n000",
+   "parent_references": [],
+   "patch_scope": [
+    "target",
+    "model",
+    "loss",
+    "train"
+   ],
+   "portfolio_weight": 0.4,
+   "result": null,
+   "score": 0.6047517554743435,
+   "score_ci95": null,
+   "score_delta": null,
+   "status": "COMPLETE",
+   "status_key": "accepted",
+   "status_label": "Kept",
+   "times_selected_as_parent": 1,
+   "why": null
+  },
+  {
+   "artifacts": {},
+   "candidate_entered_combination": null,
+   "combination_ci95": null,
+   "combination_delta": null,
+   "decision": "ROLLBACK",
+   "execution_mode": "empirical_prior_portfolio",
+   "expected": null,
+   "hypothesis": null,
+   "id": "w003",
+   "is_best_standalone": false,
+   "is_portfolio_member": true,
+   "iteration": null,
+   "kind": "warmstart",
+   "label": "Item/context LambdaRank",
+   "lesson": null,
+   "mechanism": "Item/context LambdaRank",
+   "operator_id": "item_lambdarank",
+   "parent_id": "n000",
+   "parent_references": [],
+   "patch_scope": [
+    "features",
+    "target",
+    "model",
+    "train"
+   ],
+   "portfolio_weight": 0.2,
+   "result": null,
+   "score": 0.6010575837714116,
+   "score_ci95": null,
+   "score_delta": null,
+   "status": "COMPLETE",
+   "status_key": "rollback",
+   "status_label": "Rolled back",
+   "times_selected_as_parent": 1,
+   "why": null
+  },
+  {
+   "artifacts": {
+    "combination": "ensemble/selection.json"
+   },
+   "candidate_entered_combination": null,
+   "combination_ci95": null,
+   "combination_delta": null,
+   "decision": "INCUMBENT_RETAINED",
+   "execution_mode": "combination",
+   "expected": null,
+   "hypothesis": "Combine models that make different ranking errors.",
+   "id": "portfolio-best",
+   "is_best_standalone": false,
+   "is_portfolio_member": false,
+   "iteration": null,
+   "kind": "portfolio",
+   "label": "Best model combination",
+   "lesson": null,
+   "mechanism": "exhaustive best-subset within-user rank average over node seed ensembles with bounded 0.1-step global weights with pre-registered label-free tab routing",
+   "operator_id": null,
+   "parent_id": null,
+   "parent_references": [],
+   "patch_scope": [],
+   "portfolio_weight": null,
+   "result": "INCUMBENT_RETAINED",
+   "score": 0.6061277485758569,
+   "score_ci95": null,
+   "score_delta": 0.000914708117099261,
+   "status": "INCUMBENT_RETAINED",
+   "status_key": "portfolio",
+   "status_label": "Best combination",
+   "times_selected_as_parent": 0,
+   "why": "The combination is kept only when its validation evidence is stronger than the alternatives."
+  }
+ ],
+ "run": {
+  "current_iteration": null,
+  "directory": "/home/zhihan/techjam/track2-agent/techjam-track2-submission/artifacts/experiment-records",
+  "heartbeat_age_s": null,
+  "id": "formal-router-gpt54-20260831-002",
+  "last_completed_iteration": 4,
+  "last_update_age_s": 72787.8,
+  "model": "gpt-5.4",
+  "phase": null,
+  "role": "formal",
+  "status": "complete",
+  "status_label": "Complete",
+  "stop_reason": "converged"
+ },
+ "schema_version": "experiment-graph-view-1.0",
+ "selection": {
+  "artifact": "ensemble/selection.json",
+  "context_router": {
+   "fallback": "global member weights",
+   "feature": "tab",
+   "min_rows": 1000,
+   "routes": [
+    {
+     "member_weights": {
+      "w001": 0.1,
+      "w002": 0.6,
+      "w003": 0.3
+     },
+     "rows": 13726,
+     "value": 0
+    },
+    {
+     "member_weights": {
+      "w001": 0.3,
+      "w002": 0.4,
+      "w003": 0.3
+     },
+     "rows": 92672,
+     "value": 1
+    },
+    {
+     "member_weights": {
+      "w001": 0.9,
+      "w002": 0.0,
+      "w003": 0.1
+     },
+     "rows": 3834,
+     "value": 2
+    },
+    {
+     "member_weights": {
+      "w001": 0.5,
+      "w002": 0.4,
+      "w003": 0.1
+     },
+     "rows": 7877,
+     "value": 4
+    },
+    {
+     "member_weights": {
+      "w001": 0.0,
+      "w002": 0.3,
+      "w003": 0.7
+     },
+     "rows": 5170,
+     "value": 6
+    }
+   ],
+   "source": "pre_registered_empirical_prior",
+   "test_label_free": true,
+   "weight_grid_step": 0.1
+  },
+  "members": [
+   {
+    "mechanism": "Validated legal ranking stack",
+    "node_id": "w001",
+    "operator_stack": [
+     "legal_rank_stack_v1"
+    ],
+    "pipeline_path": "warmstart/members/member-001/attempt-0/pipeline.py",
+    "pipeline_sha256": "960c2c3af18107d8def79c6e969d2be9870d70f29465e1ed68f033f23aad4f8d",
+    "standalone_primary": 0.6049133715527031,
+    "weight": 0.4
+   },
+   {
+    "mechanism": "CPU DeepFM + four engagement heads",
+    "node_id": "w002",
+    "operator_stack": [
+     "deepfm_engagement_mtl_v1"
+    ],
+    "pipeline_path": "warmstart/members/member-002/attempt-0/pipeline.py",
+    "pipeline_sha256": "2b3ae1494c2fe98e6dc6de77f09d3488d094f2f40c27837031b5a7e5ecedc447",
+    "standalone_primary": 0.6047517554743435,
+    "weight": 0.4
+   },
+   {
+    "mechanism": "Item/context LambdaRank",
+    "node_id": "w003",
+    "operator_stack": [
+     "item_lambdarank"
+    ],
+    "pipeline_path": "warmstart/members/member-003/attempt-0/pipeline.py",
+    "pipeline_sha256": "5a61d820798d697c7c097c674315d9ac31aeb101a97c152ec46cfa9ff58e54c0",
+    "standalone_primary": 0.6010575837714116,
+    "weight": 0.2
+   }
+  ],
+  "node_id": "portfolio-best",
+  "score": 0.6061277485758569,
+  "status": "INCUMBENT_RETAINED"
+ },
+ "stats": {
+  "accepted": 0,
+  "best_combination": 0.6061277485758569,
+  "best_standalone": 0.6052800193085559,
+  "best_standalone_node": "n002",
+  "completed_rounds": 4,
+  "failed": 0,
+  "graph_nodes": 7,
+  "measured_models": 6,
+  "new_experiments": 3,
+  "planning_stops": 0,
+  "rolled_back": 0,
+  "total_tokens": 115645,
+  "uncertain": 3,
+  "wall_s": 809.3729999999999
+ },
+ "timeline": [
+  {
+   "decision": "WARMSTART_VERIFIED",
+   "iteration": 1,
+   "label": "Reproduce the locked validation-only portfolio before LLM search.",
+   "score": 0.6061277485758569,
+   "status": "COMPLETE",
+   "tokens": 0,
+   "wall_s": 158.867
+  },
+  {
+   "decision": "UNCERTAIN",
+   "iteration": 2,
+   "label": "temporal-context categorical augmentation",
+   "score": 0.6052800193085559,
+   "status": "COMPLETE",
+   "tokens": 39427,
+   "wall_s": 234.314
+  },
+  {
+   "decision": "UNCERTAIN",
+   "iteration": 3,
+   "label": "tab-aware score calibration at prediction",
+   "score": 0.6050145220543199,
+   "status": "COMPLETE",
+   "tokens": 37479,
+   "wall_s": 193.883
+  },
+  {
+   "decision": "UNCERTAIN",
+   "iteration": 4,
+   "label": "tab-aware prediction residual blend",
+   "score": 0.6010729591013781,
+   "status": "COMPLETE",
+   "tokens": 38739,
+   "wall_s": 222.309
+  }
+ ],
+ "warnings": []
+}

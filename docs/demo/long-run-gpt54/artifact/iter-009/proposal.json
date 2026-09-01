@@ -1,0 +1,115 @@
+{
+  "basis_type": "curated_research",
+  "estimated_cost_s": 140,
+  "evidence": [
+    {
+      "ref": "E003",
+      "type": "curated_research"
+    },
+    {
+      "ref": "E002",
+      "type": "curated_research"
+    },
+    {
+      "ref": "train_target_phi_with_long_view: is_click 0.7604858188163154, is_profile_enter 0.14612987498722513, is_like 0.09916137501207341",
+      "type": "diagnostic"
+    },
+    {
+      "ref": "DV.train_targets(names) -> train-only post-exposure targets; may be a training/auxiliary target, never an inference feature",
+      "type": "task_spec"
+    },
+    {
+      "ref": "current objective is bpr_censored_watch with aux_weight 0.1",
+      "type": "current_code"
+    }
+  ],
+  "evidence_adaptation": {
+    "evidence_id": "E003",
+    "implementation_mapping": "Primary block target builds a train-only soft label from DV.train_targets and long_view; train block consumes that target in a custom SO.FM pointwise objective; predict block outputs sigmoid scores from the custom FM.",
+    "protocol_caveat": "This borrows only the negative boundary from E003 and the diversity rationale from E002; it does not claim their reported scores transfer because the loss and target are changed.",
+    "source_mechanism": "E003 rejects only the exact aux_weight increase 0.1->0.2 under the existing bpr_censored_watch loss scaling on legal_rank_stack_v1, leaving materially different reward formulations eligible."
+  },
+  "execution_mode": "custom_patch",
+  "expected_observation": "Predictions become less correlated with the parent than a pure long_view FM, with possible modest standalone change but improved portfolio complementarity if the blended supervision captures different user preference cues.",
+  "experiment_contract": {
+    "claim": "Training on a train-only soft target blended from long_view and auxiliary engagement labels tests whether alternative reward shaping improves marginal portfolio ranking.",
+    "expected_observable": "Predictions differ materially from the parent and training metadata can report the auxiliary target weights used.",
+    "falsification_condition": "Official validation and portfolio marginal contribution do not improve, or the custom target path is disconnected and predictions remain parent-like.",
+    "forbidden_shortcuts": [
+      "using auxiliary targets as inference-time features",
+      "reusing the parent SO.build_target unchanged",
+      "changing only aux_weight inside delegated SO.train"
+    ],
+    "portfolio_role": "error_diversifier",
+    "required_components": [
+      "target block calls DV.train_targets on train split and constructs a numeric soft target",
+      "train block optimizes that soft target with a visible custom loss consumer",
+      "predict block emits scores from the custom-trained model"
+    ]
+  },
+  "fallback": "If over-smoothed, reduce to a simpler two-target blend long_view+click in a later isolated experiment, not in this one.",
+  "hypothesis": "A soft target that blends long_view with moderately correlated engagement signals can produce smoother supervision and a ranking distinct from the parent's censored-watch BPR, improving portfolio marginal gain even if standalone gain is modest.",
+  "implementation_plan": "Edit target, train, and predict blocks to train a custom pointwise FM on a soft target built from train-only post-exposure targets. In target, construct y_soft from long_view plus a bounded weighted mixture of auxiliary engagement signals available from DV.train_targets(names), emphasizing is_click and is_profile_enter and lightly is_like while excluding hate as a positive signal; clip to [0,1] and return trainable arrays aligned to train_idx. In train, use weighted BCE or MSE-to-logit on the custom soft target with SO.FM and fixed epochs. Predict returns sigmoid scores. No auxiliary targets are used as inference features.",
+  "justification": "The exact failed result E003 only rules out one scalar change inside the existing censored-watch loss scaling. A materially different reward formulation—train-only soft labels from multiple targets—tests a new signal-design hypothesis and is likely to change ranking structure. Because click has strong positive phi and profile_enter/like add weaker but distinct supervision, the FM may learn a smoother preference signal that complements current members.",
+  "mechanism": "multi-target soft-label long_view training",
+  "mechanism_tags": [
+    "reward",
+    "auxiliary-target",
+    "soft-label",
+    "error-diversifier"
+  ],
+  "observation": "Train-only diagnostics show target correlations with long_view: \"is_click\": 0.7604858188163154, \"is_profile_enter\": 0.14612987498722513, \"is_like\": 0.09916137501207341, while the parent already uses objective \"bpr_censored_watch\" with aux_weight 0.1 and the exact transition to aux_weight 0.2 was a negative result in E003. Portfolio search is active and explicitly values error diversity; E002 says a lower-standalone but different mechanism can still help the blend.",
+  "operator_id": null,
+  "parent_operator_stack": [
+    "legal_rank_stack_v1"
+  ],
+  "parent_references": [
+    "w001",
+    "w002"
+  ],
+  "patch_scope": [
+    "target",
+    "train",
+    "predict"
+  ],
+  "persona": "reward",
+  "primary_block": "target",
+  "research_evidence": [
+    {
+      "evidence_id": "E002",
+      "kind": "curated_research",
+      "knowledge_id": "K0007",
+      "knowledge_origin": "cached",
+      "persona": "architecture",
+      "query": "Can a leakage-safe tree ranker add complementary signal to the three-seed FM?",
+      "reason": "The reference solution's gain came from heterogeneous scorers, but its item-rate tree needed adaptation to the stricter candidate-label boundary.",
+      "record_type": "mechanism",
+      "requires_success_mechanisms": [],
+      "source_ids": [
+        "S002"
+      ],
+      "summary": "Use the standalone item_lambdarank operator as an ensemble leaf, not as an FM-stack mutation. Its 25 features combine legal context with strictly-prior-date train aggregates for long_view, click, like, follow, hate, play ratio, and completion over item/author/tag/music/video-type/upload-type keys. Group LambdaRank by (user,date), use a fixed 100-round train-only checkpoint, and never early-stop on candidate-visible validation labels. Do not use row-wise leave-one-out target encoding: removing the current positive lowers its rate while removing a current negative raises it, creating a mechanical anti-label signal. In a three-seed pre-run check, the tree seed ensemble scored official-validation primary 0.601057584 versus 0.601877969 for the pinned FM seed ensemble; their equal-weight within-user rank blend scored 0.603346495, delta +0.001468526 with paired CI95 [+0.000340311,+0.002804302]. The tree is valuable for error diversity, not standalone dominance, and the normal positive-paired-CI ensemble gate must still rerun and approve it in each Agent run."
+    },
+    {
+      "evidence_id": "E003",
+      "kind": "curated_research",
+      "knowledge_id": "K0011",
+      "knowledge_origin": "cached",
+      "persona": "reward",
+      "query": "Should bpr_censored_watch aux_weight increase from 0.1 to 0.2 on legal_rank_stack_v1?",
+      "reason": "The exact connected scalar retune was measured after atomic warm-start and trended negative.",
+      "record_type": "negative_result",
+      "requires_success_mechanisms": [],
+      "source_ids": [
+        "S003"
+      ],
+      "summary": "Do not repeat the exact aux_weight transition 0.1 to 0.2 for bpr_censored_watch on parent stack ['legal_rank_stack_v1']. It reached mean primary 0.604399212 and was -0.000493931 in selection_primary versus the parent, with paired CI95 [-0.000983860,+0.000042216]. This rejects only the measured weight transition under current stable_ops loss scaling; materially different reward formulations remain eligible."
+    }
+  ],
+  "research_nonuse_reason": null,
+  "risk": [
+    "High click correlation may over-dominate and optimize a proxy not perfectly aligned with long_view",
+    "Soft-label mixing can wash out top-rank discrimination",
+    "Custom pointwise training may lose some pairwise ranking strength"
+  ]
+}

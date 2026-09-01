@@ -1,0 +1,21 @@
+{
+  "analysis": "The candidate faithfully implements the accepted predict-only contract. The modified predict path calls the delegated base scorer, reads legal inference-time tab context via DV.load(split), and applies a deterministic per-tab affine remap that can change within-user ordering when tabs differ. No unsupported config plumbing, label access, post-exposure feature leakage, or prediction-invariant global-only shift is present.",
+  "changed_runtime_path": true,
+  "component_evidence": [
+    {
+      "code_evidence": "In predict(), `base = SO.predict(model, Xs, split)` obtains the parent backend scores from the trusted prediction API.",
+      "component": "predict block calls SO.predict"
+    },
+    {
+      "code_evidence": "In predict(), `rows = DV.load(split)` followed by `tab = np.asarray(rows.tab)` reads the legal inference-time tab field for the requested split.",
+      "component": "predict block reads DV.load(split).tab"
+    },
+    {
+      "code_evidence": "In predict(), `scale` and `bias` arrays are created, filled from the explicit `adjustments = {0: (1.02, 0.01), 2: (0.97, -0.01), 4: (0.985, -0.005), 6: (0.97, -0.01)}` table, and then consumed by `pred = pred * scale[tab] + bias[tab]`, which remaps scores by tab id with default 1/0 for other tabs.",
+      "component": "predict block applies explicit tab-indexed scale/bias arrays to scores"
+    }
+  ],
+  "forbidden_shortcuts_found": [],
+  "missing_components": [],
+  "status": "PASS"
+}

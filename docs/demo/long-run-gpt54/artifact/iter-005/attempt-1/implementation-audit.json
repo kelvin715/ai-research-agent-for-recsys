@@ -1,0 +1,25 @@
+{
+  "analysis": "The candidate faithfully implements the accepted predict-only experiment. The only edited block is predict, it computes parent scores via SO.predict, derives a train-only item long_view prior from DV.load('train') and DV.train_targets, loads the inference split for tab/video_id context, and applies a deterministic convex mixture only on rows with tab==6. No validation/test labels or post-exposure inference features are used, and no training/features are changed.",
+  "changed_runtime_path": true,
+  "component_evidence": [
+    {
+      "code_evidence": "In predict: `pred = np.asarray(SO.predict(model, Xs, split), dtype=np.float64)`. This directly obtains the parent model score from the trusted adapter and uses it as the base prediction.",
+      "component": "predict computes parent score via SO.predict"
+    },
+    {
+      "code_evidence": "In predict: `train = DV.load('train')` and `y = np.asarray(DV.train_targets(['long_view'])['long_view'], dtype=np.float64)`, followed by `video_id_train = np.asarray(train.video_id)`, `uniq_vid, inv = np.unique(video_id_train, return_inverse=True)`, `cnt = np.bincount(inv)`, `pos = np.bincount(inv, weights=y)`, and `item_prior = pos / np.maximum(cnt, 1)`. This is a concrete train-only per-video long_view rate prior.",
+      "component": "predict loads train split to estimate per-video long_view prior"
+    },
+    {
+      "code_evidence": "In predict: `target = DV.load(split)`, then `video_id_target = np.asarray(target.video_id)` and `tab_target = np.asarray(target.tab)`. These arrays are used to map priors to candidate items and gate the mixture by tab.",
+      "component": "predict loads target split to access tab and video_id"
+    },
+    {
+      "code_evidence": "In predict: `mask = (tab_target == 6)` and only inside `if np.any(mask):` does the code modify predictions with `pred[mask] = alpha * pred[mask] + (1.0 - alpha) * prior_target[mask]`. All non-tab-6 rows remain equal to the parent `SO.predict` output.",
+      "component": "blend is applied only when tab==6"
+    }
+  ],
+  "forbidden_shortcuts_found": [],
+  "missing_components": [],
+  "status": "PASS"
+}

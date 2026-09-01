@@ -1,0 +1,33 @@
+{
+  "analysis": "The target replacement has a concrete path into SO.train and can alter predictions while preserving the parent configuration. However, the run does not fail closed when no unique auxiliary column equal to is_hate exists: a unique complemented match is accepted instead. Revise the matcher to require exactly one direct is_hate match on the applicable rows and reject complement-only or ambiguous cases.",
+  "changed_runtime_path": true,
+  "component_evidence": [
+    {
+      "code_evidence": "load_single_feedback calls DV.train_targets([name]) for both 'is_hate' and 'is_profile_enter', resolves each to a one-dimensional array, and checks its train-view length.",
+      "component": "Use DV.train_targets for train-only is_hate and is_profile_enter arrays."
+    },
+    {
+      "code_evidence": "The loop compares thresholded auxiliary columns with thresholded is_hate, but `matches = sorted(set(direct_matches + complemented_matches))` also accepts a complemented is_hate column. Thus the code does not require a unique column equal to is_hate as specified.",
+      "component": "Verify which existing engagement_aux column equals is_hate before replacement."
+    },
+    {
+      "code_evidence": "`aux_new = aux.copy()` followed by `aux_new[:, column] = ...` changes one selected column; `result = dict(target)` and changing only `result['engagement_aux']` preserves `target['main']` and other entries.",
+      "component": "Replace exactly one auxiliary column and preserve the main long_view target."
+    },
+    {
+      "code_evidence": "OP_CONFIG remains identical with aux_weight 0.2, and the features, model, loss, train, and predict blocks are unchanged from the parent.",
+      "component": "Keep hp.aux_weight=0.2 and all model, feature, training, and prediction settings unchanged."
+    },
+    {
+      "code_evidence": "After assignment, `DV.assert_trainable(aux_new[:, column], 'build_target.engagement_aux.is_profile_enter')` validates the replacement auxiliary column.",
+      "component": "Run DV.assert_trainable on the new auxiliary target."
+    }
+  ],
+  "forbidden_shortcuts_found": [
+    "The identification logic permits a column equal to the complement of is_hate and uses thresholded binary equality rather than requiring the existing auxiliary column to equal is_hate. It can therefore replace a column without finding the contract-required unique hate column."
+  ],
+  "missing_components": [
+    "Verify which existing engagement_aux column equals is_hate before replacement."
+  ],
+  "status": "REVISE"
+}

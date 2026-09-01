@@ -1,0 +1,5 @@
+{
+  "analysis": "The temporal-context variant produced distinct predictions and a small positive standalone mean delta (+0.000528), but its paired 95% CI crossed zero (-0.000830 to +0.001934), so the claimed improvement is not statistically established. It also failed the portfolio acceptance gate: replacing w003 with the refined w002 variant reduced portfolio primary by 0.000253, again with a CI crossing zero, and was not promoted. Diagnostic slices were heterogeneous, with gains on tab 0 and some history/popularity groups but losses on tabs 2, 4, and 6 and on more-popular items; these exploratory results cannot support a general benefit. Thus the experiment suggests possible context-specific signal but does not demonstrate that the combined hour and strictly-prior gap operator reliably improves either standalone ranking or portfolio value.",
+  "next_lesson": "Treat the combined temporal fields as unproven; only revisit with a prespecified context-targeted mechanism motivated by the heterogeneous slice effects.",
+  "result": "inconclusive"
+}

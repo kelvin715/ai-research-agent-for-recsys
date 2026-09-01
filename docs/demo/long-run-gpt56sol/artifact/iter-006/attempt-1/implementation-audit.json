@@ -1,0 +1,25 @@
+{
+  "analysis": "The candidate faithfully implements the two-model tab-6 oversampling contract within the declared train and predict blocks. The augmented index is visibly consumed by SO.train, both models are independently fitted and scored, and non-tab-6 outputs remain exactly the global prediction. No unsupported HP key, evaluation-label access, or inference-time post-exposure feature is present.",
+  "changed_runtime_path": true,
+  "component_evidence": [
+    {
+      "code_evidence": "train() copies OP_CONFIG and HP unchanged, converts train_idx only to int64, and calls SO.train(splits, train_idx, Xs, dim, y, seed, config, verbose) to produce global_model.",
+      "component": "Fit the unchanged global SO.train model"
+    },
+    {
+      "code_evidence": "train_tab = np.asarray(splits['train'].tab); tab6_idx = train_idx[train_tab[train_idx] == 6]; specialist_idx = np.concatenate([train_idx, tab6_idx, tab6_idx, tab6_idx]), yielding all selected rows plus three additional deterministic copies of tab-6 rows.",
+      "component": "Construct the specialist train_idx with deterministic duplicated tab-6 training rows"
+    },
+    {
+      "code_evidence": "specialist_y = SO.build_target(splits, specialist_idx, config) aligns the training target with the augmented occurrence stream, and a separate SO.train(..., specialist_idx, ..., specialist_y, ...) call produces specialist_model, which is stored separately from global_model.",
+      "component": "Fit a distinct specialist through SO.train using that augmented index"
+    },
+    {
+      "code_evidence": "predict() separately calls SO.predict for model['global'] and model['specialist'], constructs tab6_mask = np.asarray(DV.load(split).tab) == 6, copies global_pred for every row, and replaces only masked rows with 0.5 * global_pred + 0.5 * specialist_pred.",
+      "component": "Call both models in predict and apply the fixed blend only where DV.load(split).tab == 6"
+    }
+  ],
+  "forbidden_shortcuts_found": [],
+  "missing_components": [],
+  "status": "PASS"
+}

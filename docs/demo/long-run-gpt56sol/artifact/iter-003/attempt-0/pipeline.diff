@@ -1,0 +1,11 @@
+--- incumbent/pipeline.py
++++ candidate/pipeline.py
+@@ -22,7 +22,7 @@
+ # <<<BLOCK:data_view>>>
+ # Stable operator adapter. Configuration is controller-generated.
+ import stable_ops as SO
+-OP_CONFIG = {"dur_buckets": 10, "features": ["hour", "user_gap"], "hp": {"aux_weight": 0.1, "batch": 8192, "epochs": 3, "k": 32, "l2": 1e-06, "lr": 0.0005, "n_neg": 4}, "objective": "bpr_censored_watch"}
++OP_CONFIG = {"dur_buckets": 10, "features": ["hour", "user_gap", "user_core"], "hp": {"aux_weight": 0.1, "batch": 8192, "epochs": 3, "k": 32, "l2": 1e-06, "lr": 0.0005, "n_neg": 4}, "objective": "bpr_censored_watch"}
+ 
+ 
+ def build_data_view():

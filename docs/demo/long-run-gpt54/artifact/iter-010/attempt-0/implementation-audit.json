@@ -1,0 +1,21 @@
+{
+  "analysis": "The candidate faithfully implements the accepted feature-only experiment. The only edited block with behavioral impact is `features`, where train-only user-author/user-video/user-tab count features plus normalized user-author share are concretely computed from `train_idx` rows and appended for every split. Train and predict remain delegated, so no silent LightGBM parameter change occurs. No validation/test labels or post-exposure targets are used as features, and the added columns are not merely per-user constants because they vary by author/video/tab pair within user.",
+  "changed_runtime_path": true,
+  "component_evidence": [
+    {
+      "code_evidence": "In build_features, baseline features are first obtained via `Xs, dim = SO.build_features(splits, train_idx, OP_CONFIG)`. Train-only rows are selected from `splits['train']` with `tr_user = np.asarray(train.user_id)[train_idx]`, `tr_author = np.asarray(train.author_id)[train_idx]`, `tr_video = np.asarray(train.video_id)[train_idx]`, `tr_tab = np.asarray(train.tab)[train_idx]`. Pair-count tables are fit only from these arrays using `_fit_pair_counts(...)` for user-author (`ua_keys, ua_counts`), user-video (`uv_keys, uv_counts`), and user-tab (`ut_keys, ut_counts`). For every split, lookup counts are computed and appended as `extra = np.column_stack([np.log1p(ua), np.log1p(uv), np.log1p(ut), ua / np.maximum(user_seen, 1.0)]).astype(np.float32, copy=False)` and then `Xs[split] = np.concatenate([np.asarray(X, dtype=np.float32), extra], axis=1)`, with returned dimension `dim + 4`.",
+      "component": "features block must append new columns derived from train-only user-author/user-video/user-tab counts"
+    },
+    {
+      "code_evidence": "The aggregate indices are built exclusively from ID fields: training keys use `tr_user`, `tr_author`, `tr_video`, `tr_tab`; split-time lookup uses `user_idx = _map_to_train_vocab(np.asarray(rows.user_id), user_vocab)`, `author_idx = _map_to_train_vocab(np.asarray(rows.author_id), author_vocab)`, `video_idx = _map_to_train_vocab(np.asarray(rows.video_id), video_vocab)`, and `tab_idx = _map_to_train_vocab(np.asarray(rows.tab), tab_vocab)`. No labels or post-exposure targets are read in features.",
+      "component": "only inference-time IDs user_id/video_id/author_id/tab may index those aggregates"
+    },
+    {
+      "code_evidence": "The loop `for split, X in Xs.items():` applies the same four-column construction `extra = np.column_stack([...])` to every split and overwrites each `Xs[split]` with the same appended schema. The function returns one shared `dim + 4`, so training and prediction consume aligned matrices across train/valid/test.",
+      "component": "all splits must receive the same appended feature schema"
+    }
+  ],
+  "forbidden_shortcuts_found": [],
+  "missing_components": [],
+  "status": "PASS"
+}

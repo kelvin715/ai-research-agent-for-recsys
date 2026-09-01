@@ -1,0 +1,96 @@
+--- incumbent/pipeline.py
++++ candidate/pipeline.py
+@@ -38,7 +38,92 @@
+ 
+ # <<<BLOCK:target>>>
+ def build_target(splits, train_idx):
+-    return SO.build_target(splits, train_idx, OP_CONFIG)
++    target = SO.build_target(splits, train_idx, OP_CONFIG)
++    if not isinstance(target, dict) or 'main' not in target or 'engagement_aux' not in target:
++        raise AssertionError('pointwise_engagement_mtl target contract is missing required entries')
++
++    def load_single_feedback(name):
++        raw = DV.train_targets([name])
++        if isinstance(raw, dict):
++            if name not in raw:
++                raise AssertionError('missing train-only feedback target: %s' % name)
++            value = raw[name]
++        elif hasattr(raw, 'columns') and name in raw.columns:
++            value = raw[name]
++        elif isinstance(raw, (list, tuple)) and len(raw) == 1:
++            value = raw[0]
++        else:
++            value = raw
++
++        arr = np.asarray(value)
++        if arr.dtype.names is not None:
++            if name not in arr.dtype.names:
++                raise AssertionError('missing structured feedback field: %s' % name)
++            arr = np.asarray(arr[name])
++        if arr.ndim == 2 and arr.shape[1] == 1:
++            arr = arr[:, 0]
++        elif arr.ndim == 2 and arr.shape[0] == 1:
++            arr = arr[0]
++        if arr.ndim != 1:
++            raise AssertionError('%s must resolve to one train-only feedback column' % name)
++        if not np.isfinite(arr.astype(np.float64, copy=False)).all():
++            raise AssertionError('%s contains non-finite values' % name)
++        return arr
++
++    hate = load_single_feedback('is_hate')
++    profile_enter = load_single_feedback('is_profile_enter')
++    DV.assert_trainable(hate, 'build_target.is_hate')
++    DV.assert_trainable(profile_enter, 'build_target.is_profile_enter')
++
++    n_train = int(splits['train'].n)
++    if hate.shape[0] != n_train or profile_enter.shape[0] != n_train:
++        raise AssertionError('feedback target length does not match the train view')
++
++    aux = np.asarray(target['engagement_aux'])
++    if aux.ndim != 2:
++        raise AssertionError('engagement_aux must be a two-dimensional array')
++
++    idx = np.asarray(train_idx, dtype=np.int64)
++    if aux.shape[0] == n_train:
++        aux_check = aux
++        hate_check = hate
++        replacement = profile_enter
++    elif aux.shape[0] == idx.shape[0]:
++        aux_check = aux
++        hate_check = hate[idx]
++        replacement = profile_enter[idx]
++    else:
++        raise AssertionError('engagement_aux row count is incompatible with train_idx')
++
++    hate_binary = np.asarray(hate_check, dtype=np.float64) > 0.5
++    direct_matches = []
++    complemented_matches = []
++    for column in range(aux.shape[1]):
++        candidate = np.asarray(aux_check[:, column], dtype=np.float64)
++        if not np.isfinite(candidate).all():
++            continue
++        candidate_binary = candidate > 0.5
++        if np.array_equal(candidate_binary, hate_binary):
++            direct_matches.append(column)
++        if np.array_equal(candidate_binary, np.logical_not(hate_binary)):
++            complemented_matches.append(column)
++
++    matches = sorted(set(direct_matches + complemented_matches))
++    if len(matches) != 1:
++        raise AssertionError(
++            'expected exactly one engagement_aux column encoding is_hate or its complement; found %d'
++            % len(matches))
++
++    aux_new = aux.copy()
++    column = matches[0]
++    replacement_binary = (np.asarray(replacement, dtype=np.float64) > 0.5)
++    aux_new[:, column] = replacement_binary.astype(aux_new.dtype, copy=False)
++    DV.assert_trainable(aux_new[:, column],
++                        'build_target.engagement_aux.is_profile_enter')
++
++    result = dict(target)
++    result['engagement_aux'] = aux_new
++    return result
+ # <<<END:target>>>
+ 
+ 

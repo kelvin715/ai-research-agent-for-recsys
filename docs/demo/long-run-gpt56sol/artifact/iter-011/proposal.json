@@ -1,0 +1,80 @@
+{
+  "basis_type": "diagnostic",
+  "estimated_cost_s": 360,
+  "evidence": [
+    {
+      "ref": "train_target_phi_with_long_view.is_hate=-0.003941107614124816",
+      "type": "diagnostic"
+    },
+    {
+      "ref": "train_target_rates.is_hate=0.0004206423208238981",
+      "type": "diagnostic"
+    },
+    {
+      "ref": "train_target_phi_with_long_view.is_profile_enter=0.14612987498722513",
+      "type": "diagnostic"
+    },
+    {
+      "ref": "train_target_rates.is_profile_enter=0.02539102209073255",
+      "type": "diagnostic"
+    },
+    {
+      "ref": "Trusted backend contract: the DeepFM trainer consumes target['main'] plus target['engagement_aux'] with hp.aux_weight=0.2",
+      "type": "current_code"
+    }
+  ],
+  "evidence_adaptation": null,
+  "execution_mode": "custom_patch",
+  "expected_observation": "If the weak hate task causes negative transfer, the replacement will improve trusted primary while leaving inference inputs and feature dimensions unchanged; training metadata should show the same four-head shape but a changed auxiliary-target checksum.",
+  "experiment_contract": {
+    "claim": "The experiment tests only whether profile-enter is a better fourth shared-representation auxiliary target than hate at the unchanged auxiliary weight.",
+    "expected_observable": "The engagement_aux shape remains unchanged, exactly one target column checksum changes from is_hate to is_profile_enter, and resulting model predictions differ despite identical inference features.",
+    "falsification_condition": "Invalidate the run if no unique hate column is found; otherwise reject the hypothesis if trusted marginal portfolio primary is non-positive or the paired acceptance gate fails.",
+    "forbidden_shortcuts": [
+      "Do not expose profile-enter, hate, or any post-exposure feedback as an inference feature.",
+      "Do not change auxiliary weight, head count, architecture, epochs, or learning rate.",
+      "Do not assume a column position without verifying it against the train-only is_hate array.",
+      "Do not replace multiple auxiliary tasks."
+    ],
+    "portfolio_role": "member_refinement",
+    "required_components": [
+      "Use DV.train_targets for train-only is_hate and is_profile_enter arrays.",
+      "Verify which existing engagement_aux column equals is_hate before replacement.",
+      "Replace exactly one auxiliary column and preserve the main long_view target.",
+      "Keep hp.aux_weight=0.2 and all model, feature, training, and prediction settings unchanged.",
+      "Run DV.assert_trainable on the new auxiliary target."
+    ]
+  },
+  "fallback": "If the hate-column assertion fails, mark the proposal incompatible rather than guessing a column; if it runs but fails trusted acceptance, restore SO.build_target unchanged.",
+  "hypothesis": "Replacing the extremely sparse, essentially uncorrelated hate auxiliary with the denser profile-enter signal will reduce negative transfer and improve w002's long_view ranking and marginal portfolio contribution.",
+  "implementation_plan": "In build_target, first obtain the existing pointwise_engagement_mtl target from SO.build_target. Load train-only is_hate and is_profile_enter through DV.train_targets. Identify and assert the single engagement_aux column exactly matching is_hate on selected train rows, copy the auxiliary matrix, and replace only that column with is_profile_enter. Preserve target['main'], every other auxiliary column, model architecture, auxiliary weight, optimizer, and prediction path unchanged. Call DV.assert_trainable on the replacement target.",
+  "justification": "At the fixed auxiliary weight of 0.2, an almost label-orthogonal event can inject noisy or conflicting shared-representation gradients. A denser auxiliary with a weak but positive relationship to long_view should provide more stable supervision while changing only one head's target, making the measured delta attributable to auxiliary-task selection rather than scalar tuning.",
+  "mechanism": "replace weak hate auxiliary head with profile-enter supervision",
+  "mechanism_tags": [
+    "multi-task-learning",
+    "auxiliary-target",
+    "profile-enter",
+    "negative-transfer"
+  ],
+  "observation": "The exact train diagnostics report train_target_phi_with_long_view.is_hate=-0.003941107614124816 and train_target_rates.is_hate=0.0004206423208238981, versus train_target_phi_with_long_view.is_profile_enter=0.14612987498722513 and train_target_rates.is_profile_enter=0.02539102209073255. The profile-enter correlation is still weak because its absolute phi is below 0.2, but it is materially larger and the event is much denser.",
+  "operator_id": null,
+  "parent_operator_stack": [
+    "deepfm_engagement_mtl_v1"
+  ],
+  "parent_references": [
+    "w002"
+  ],
+  "patch_scope": [
+    "target"
+  ],
+  "persona": "reward",
+  "primary_block": "target",
+  "research_evidence": [],
+  "research_nonuse_reason": "This proposal is directly motivated by exact train-only target statistics and the current four-head target consumer. E003 tests a different auxiliary-weight transition on legal_rank_stack_v1, while no supplied research record evaluates replacing hate with profile-enter on this DeepFM parent.",
+  "risk": [
+    "Profile-enter has only weak phi correlation with long_view and may still induce negative transfer.",
+    "The existing four auxiliary heads may not include hate, in which case the required uniqueness assertion will deliberately fail.",
+    "Profile-enter behavior may drift over the date split.",
+    "Previous target-block rollbacks indicate elevated empirical risk for auxiliary redesigns."
+  ]
+}

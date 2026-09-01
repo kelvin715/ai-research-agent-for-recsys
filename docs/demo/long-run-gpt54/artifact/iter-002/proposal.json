@@ -1,0 +1,72 @@
+{
+  "basis_type": "task_spec",
+  "estimated_cost_s": 60,
+  "evidence": [
+    {
+      "ref": "Trusted operator catalog applicable to this parent: operator_id=legal_temporal_context, primary_block=features, search_priority=first_round_exploit",
+      "type": "task_spec"
+    },
+    {
+      "ref": "build_features(splits, train_idx) returns SO.build_features(splits, train_idx, OP_CONFIG)",
+      "type": "current_code"
+    },
+    {
+      "ref": "Trusted runtime-backend contract feature_api.supported_config_keys.features.hour and features.user_gap",
+      "type": "task_spec"
+    },
+    {
+      "ref": "Both metrics rank rows independently within each user. A per-user constant cannot change either metric, so personalization must depend on a (user, candidate-item) pair.",
+      "type": "task_spec"
+    }
+  ],
+  "evidence_adaptation": null,
+  "execution_mode": "operator",
+  "expected_observation": "If connected, per-seed predictions will differ from the parent and validation primary should rise modestly, with strongest gains plausibly in tab/context slices rather than uniform uplift.",
+  "experiment_contract": {
+    "claim": "Test whether adding legal hour and strictly-earlier user-gap categorical features to the existing DeepFM MTL backend improves marginal portfolio contribution.",
+    "expected_observable": "feature_dim increases and prediction hashes change versus parent across seeds",
+    "falsification_condition": "No prediction change, unchanged feature_dim, or measured validation primary not improving within noise",
+    "forbidden_shortcuts": [
+      "Adding unused hp/config keys outside feature_api",
+      "Any post-exposure feedback as inference feature",
+      "Changing train or loss simultaneously"
+    ],
+    "portfolio_role": "member_refinement",
+    "required_components": [
+      "SO.build_features must receive config enabling hour and user_gap",
+      "DeepFM field_count must increase because Xs[split].shape[1] changes",
+      "training and prediction must consume the augmented X matrices"
+    ]
+  },
+  "fallback": "If gains are weak, keep the mechanism as a portfolio-diversifying member only if paired marginal contribution remains positive.",
+  "hypothesis": "Adding hour-of-day and strictly-earlier user-gap categorical fields will improve within-user ordering by giving the DeepFM more legal context-dependent interaction signal for each (user,candidate-item) pair.",
+  "implementation_plan": "Apply the trusted catalog operator legal_temporal_context exactly as registered, which edits only the features block by adding categorical hour and strictly-earlier user exposure-gap buckets through SO.build_features consumer-visible config. No other blocks change.",
+  "justification": "This is the required first-round exploit for the current baseline parent and is directly connected to an executable consumer in the delegated backend. Because metrics rank within user, context features that vary by impression can change ordering, unlike per-user constants.",
+  "mechanism": "temporal-context feature augmentation",
+  "mechanism_tags": [
+    "temporal",
+    "context",
+    "feature-cross",
+    "operator",
+    "first-round-exploit"
+  ],
+  "observation": "The trusted operator catalog marks \"legal_temporal_context\" with search_priority=\"first_round_exploit\" and says it \"Adds hour and strictly-earlier exposure-gap buckets without evaluation feedback.\" The runtime contract states supported feature keys are \"hour\" and \"user_gap\" inside SO.build_features.",
+  "operator_id": "legal_temporal_context",
+  "parent_operator_stack": [
+    "deepfm_engagement_mtl_v1"
+  ],
+  "parent_references": [
+    "w002"
+  ],
+  "patch_scope": [
+    "features"
+  ],
+  "persona": "optimizer",
+  "primary_block": "features",
+  "research_evidence": [],
+  "research_nonuse_reason": "A directly applicable trusted operator exists and is the more precise basis than external research here; the key requirement is using a connected first-round exploit already supported by SO.build_features.",
+  "risk": [
+    "Added fields may overlap with signal already learned by the FM and yield only tiny gain",
+    "Temporal buckets may overfit train-period rhythms with limited transfer to hidden dates"
+  ]
+}

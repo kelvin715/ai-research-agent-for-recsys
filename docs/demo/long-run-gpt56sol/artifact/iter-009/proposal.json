@@ -1,0 +1,77 @@
+{
+  "basis_type": "diagnostic",
+  "estimated_cost_s": 230,
+  "evidence": [
+    {
+      "ref": "portfolio_diagnostics.members[w001].slice_specialization.member_disadvantages: tab=6 delta_primary=-0.036711203406393667, rows=5170, users=2212",
+      "type": "diagnostic"
+    },
+    {
+      "ref": "Fixed aggregate directional feedback from the last measured candidate, tab=6: delta_primary=-0.011354706892621413",
+      "type": "diagnostic"
+    },
+    {
+      "ref": "tab is an inference-time legal array exposed by RowSet, and training may use train-only labels/targets",
+      "type": "task_spec"
+    },
+    {
+      "ref": "SO.train consumes the supplied train_idx directly as Xs[train][train_idx], so deterministic index replication changes training mass",
+      "type": "current_code"
+    }
+  ],
+  "evidence_adaptation": null,
+  "execution_mode": "custom_patch",
+  "expected_observation": "Predictions should differ most on users with tab-6 candidates; trusted fixed-slice feedback should improve on tab=6, and the portfolio gate should show positive marginal primary if that specialist gain outweighs any degradation elsewhere.",
+  "experiment_contract": {
+    "claim": "A deterministic twofold training weight for tab-6 rows creates a useful residual-targeted specialist from w001.",
+    "expected_observable": "Training row count passed to SO.train should rise by exactly the number of selected train tab-6 rows, prediction hashes should change, and trusted tab-6 slice ordering should move relative to the parent.",
+    "falsification_condition": "Reject if tab=6 fixed-slice primary does not improve or if trusted marginal portfolio primary is non-positive; invalidate if the expanded index count does not match the declared replication rule.",
+    "forbidden_shortcuts": [
+      "Using validation or test labels to choose rows or weights",
+      "Changing aux_weight from 0.1 to 0.2",
+      "Applying a prediction-time constant to all tab-6 rows",
+      "Adding post-exposure feedback as an inference feature",
+      "Simultaneously retuning learning rate, epochs, negative count, or FM rank"
+    ],
+    "portfolio_role": "error_diversifier",
+    "required_components": [
+      "Selection of tab-6 indices only from the provided training index set",
+      "Exactly one additional copy of each selected tab-6 training index",
+      "Sorted expanded indices passed to the existing SO.train call",
+      "Unchanged target, features, hp dictionary, checkpoint policy, and prediction function"
+    ]
+  },
+  "fallback": "Roll back to the unweighted parent; if the tab-6 slice improves but portfolio primary declines, record it as a specialist trade-off rather than tuning the replication factor in the same iteration.",
+  "hypothesis": "Doubling the training mass of tab-6 impressions will produce a tab-6-specialized ordering that improves the selected parent's largest diagnosed residual slice and yields positive marginal contribution to the heterogeneous portfolio without materially degrading dominant tab=1 traffic.",
+  "implementation_plan": "Edit only the train block. Before calling SO.train, read the legal pre-impression tab array from splits['train'].tab, select indices in the supplied train_idx whose tab equals 6, concatenate one additional copy of those indices with train_idx, sort the resulting index array, and pass that expanded index array to SO.train. Keep Xs, target construction, objective, all HP values, and prediction unchanged. This deterministic row replication gives tab-6 observations approximately double training mass in both the pairwise and censored-watch training paths without exposing evaluation labels or adding tab as a post-feedback feature.",
+  "justification": "The large, repeated tab-6 deficit identifies a concrete residual segment rather than motivating an undirected scalar tune. Deterministically replicating only train tab-6 rows connects that diagnostic to the existing executable BPR/auxiliary training consumer and should shift learned item/context interactions toward this segment. Because the portfolio already contains strong but correlated generalists, a bounded specialist can succeed through complementary ordering even if its standalone average gain is modest.",
+  "mechanism": "tab-6 importance-weighted BPR training",
+  "mechanism_tags": [
+    "importance-weighting",
+    "tab-specialist",
+    "residual-targeting",
+    "bpr",
+    "error-diversity"
+  ],
+  "observation": "The supplied portfolio diagnostic reports w001's largest tab disadvantage at portfolio_diagnostics.members[w001].slice_specialization.member_disadvantages for tab=6 with delta_primary=-0.036711203406393667 over 5,170 rows and 2,212 users. The last measured candidate also had directional_feedback.tab for tab=6 equal to -0.011354706892621413 versus the incumbent, while changes on most other tabs were near zero.",
+  "operator_id": null,
+  "parent_operator_stack": [
+    "legal_rank_stack_v1"
+  ],
+  "parent_references": [
+    "w001"
+  ],
+  "patch_scope": [
+    "train"
+  ],
+  "persona": "reward",
+  "primary_block": "train",
+  "research_evidence": [],
+  "research_nonuse_reason": "The exact tab-6 residual diagnostics and the visible train_idx consumer directly motivate this reward reweighting. E003 only rejects increasing bpr_censored_watch aux_weight from 0.1 to 0.2 and supplies no evidence for tab-conditional weighting; this proposal leaves aux_weight unchanged.",
+  "risk": [
+    "Uniform tab-6 replication may amplify noisy or distribution-shifted examples.",
+    "The extra rows may alter same-user negative pools in unintended ways.",
+    "A tab-6 gain may be outweighed by degradation on tab=1, which has 92,672 validation rows.",
+    "The diagnostic disadvantage is relative to the portfolio and may not be repairable by simple importance weighting."
+  ]
+}

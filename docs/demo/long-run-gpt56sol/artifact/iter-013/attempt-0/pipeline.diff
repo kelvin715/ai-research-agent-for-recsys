@@ -1,0 +1,108 @@
+--- incumbent/pipeline.py
++++ candidate/pipeline.py
+@@ -32,7 +32,104 @@
+ 
+ # <<<BLOCK:features>>>
+ def build_features(splits, train_idx):
+-    return SO.build_features(splits, train_idx, OP_CONFIG)
++    base_Xs, base_dim = SO.build_features(splits, train_idx, OP_CONFIG)
++    train_idx = np.asarray(train_idx, dtype=np.int64)
++
++    def pair_exposure_feature(entity_name):
++        features = {
++            name: np.zeros(rowset.n, dtype=np.float32)
++            for name, rowset in splits.items()
++        }
++        if train_idx.size == 0:
++            return features
++
++        train = splits['train']
++        users = np.asarray(train.user_id)[train_idx]
++        entities = np.asarray(getattr(train, entity_name))[train_idx]
++        dates = np.asarray(train.date)[train_idx]
++
++        order = np.lexsort((dates, entities, users))
++        sorted_users = users[order]
++        sorted_entities = entities[order]
++        sorted_dates = dates[order]
++        n = order.size
++        positions = np.arange(n, dtype=np.int64)
++
++        pair_start = np.empty(n, dtype=bool)
++        pair_start[0] = True
++        pair_start[1:] = ((sorted_users[1:] != sorted_users[:-1]) |
++                          (sorted_entities[1:] != sorted_entities[:-1]))
++
++        date_start = np.empty(n, dtype=bool)
++        date_start[0] = True
++        date_start[1:] = (pair_start[1:] |
++                          (sorted_dates[1:] != sorted_dates[:-1]))
++
++        pair_origins = np.maximum.accumulate(
++            np.where(pair_start, positions, 0)
++        )
++        date_origins = np.maximum.accumulate(
++            np.where(date_start, positions, 0)
++        )
++        prior_sorted = date_origins - pair_origins
++        prior = np.empty(n, dtype=np.float32)
++        prior[order] = np.log1p(prior_sorted).astype(np.float32)
++        features['train'][train_idx] = prior
++
++        key_dtype = np.dtype([
++            ('user', sorted_users.dtype),
++            ('entity', sorted_entities.dtype),
++        ])
++        sorted_keys = np.empty(n, dtype=key_dtype)
++        sorted_keys['user'] = sorted_users
++        sorted_keys['entity'] = sorted_entities
++
++        starts = np.flatnonzero(pair_start)
++        ends = np.empty_like(starts)
++        ends[:-1] = starts[1:]
++        ends[-1] = n
++        unique_keys = sorted_keys[starts]
++        totals = (ends - starts).astype(np.float32)
++
++        for split_name, rowset in splits.items():
++            if split_name == 'train':
++                continue
++            query_users = np.asarray(rowset.user_id)
++            query_entities = np.asarray(getattr(rowset, entity_name))
++            query_keys = np.empty(rowset.n, dtype=key_dtype)
++            query_keys['user'] = query_users
++            query_keys['entity'] = query_entities
++
++            locations = np.searchsorted(unique_keys, query_keys)
++            valid = locations < unique_keys.size
++            matched = np.zeros(rowset.n, dtype=bool)
++            valid_rows = np.flatnonzero(valid)
++            if valid_rows.size:
++                matched[valid_rows] = (
++                    unique_keys[locations[valid_rows]] == query_keys[valid_rows]
++                )
++            values = np.zeros(rowset.n, dtype=np.float32)
++            matched_rows = np.flatnonzero(matched)
++            if matched_rows.size:
++                values[matched_rows] = totals[locations[matched_rows]]
++            features[split_name] = np.log1p(values).astype(np.float32)
++
++        return features
++
++    video_affinity = pair_exposure_feature('video_id')
++    author_affinity = pair_exposure_feature('author_id')
++
++    Xs = {}
++    for split_name, base in base_Xs.items():
++        extra = np.column_stack((
++            video_affinity[split_name],
++            author_affinity[split_name],
++        )).astype(np.float32, copy=False)
++        Xs[split_name] = np.concatenate(
++            (np.asarray(base, dtype=np.float32), extra), axis=1
++        )
++
++    return Xs, base_dim + 2
+ # <<<END:features>>>
+ 
+ 

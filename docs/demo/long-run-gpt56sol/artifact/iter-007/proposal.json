@@ -1,0 +1,75 @@
+{
+  "basis_type": "diagnostic",
+  "estimated_cost_s": 220,
+  "evidence": [
+    {
+      "ref": "portfolio_diagnostics.members[w003].slice_specialization.member_disadvantages: tab=0 delta_primary=-0.01749022029153391 and tab=2 delta_primary=-0.009346696620826433",
+      "type": "diagnostic"
+    },
+    {
+      "ref": "feature_api returns 25 columns and declares only column 5 (tab) categorical",
+      "type": "current_code"
+    },
+    {
+      "ref": "Categorical vocabularies are train-only and personalization must depend on a (user, candidate-item) pair",
+      "type": "task_spec"
+    }
+  ],
+  "evidence_adaptation": null,
+  "execution_mode": "custom_patch",
+  "expected_observation": "If true, trusted validation will show positive overall and portfolio-primary deltas, with the largest directional gains in tab=0 or tab=2 and no broad regression across user-history quartiles.",
+  "experiment_contract": {
+    "claim": "The sole tested mechanism is adding strictly-prior-date user-by-tab affinity rate and support features to the unchanged item/context LambdaRank learner.",
+    "expected_observable": "feature_dim must increase from 25 to 27, and training metadata or assertions must show that the earliest date has zero pair support while later dates can have positive prior counts.",
+    "falsification_condition": "The hypothesis is refuted if trusted primary or marginal portfolio primary is nonpositive, or if gains do not survive outside the highlighted tab slices; the run is invalid if any training feature includes its own or a later label.",
+    "forbidden_shortcuts": [
+      "full-train target encoding for training rows",
+      "row-wise leave-one-out target encoding",
+      "same-date label updates before feature emission",
+      "reading validation or test targets",
+      "changing LambdaRank parameters or prediction blending"
+    ],
+    "portfolio_role": "member_refinement",
+    "required_components": [
+      "statistics fitted only from train_idx labels",
+      "date-batched emission before update for training rows",
+      "frozen full-train statistics for validation and test",
+      "fixed smoothing strength of 10",
+      "UNK behavior via global prior and zero count",
+      "two appended float32 columns consumed by SO.train"
+    ]
+  },
+  "fallback": "Rollback the two appended columns and preserve the original 25-column SO feature representation.",
+  "hypothesis": "Adding a causal user-by-tab preference interaction will improve w003's within-user ordering, especially in tab slices where a global tab feature cannot express heterogeneous user preferences, and thereby increase its marginal portfolio contribution.",
+  "implementation_plan": "Extend build_features after SO.build_features with exactly two columns derived from train_idx: a smoothed user-by-tab long_view rate and log1p prior count. For each training date, emit values from cumulative statistics containing only earlier dates, then update statistics after all rows of that date so no row or same-date label enters its own feature. Use the global strictly-prior rate as the smoothing prior with fixed strength 10. For validation and test, freeze user-by-tab and global statistics after all training dates; unseen pairs receive prior rate and zero count. Append float32 columns in identical order for every split while preserving tab at column 5 for the delegated categorical declaration.",
+  "justification": "A global categorical split for tab cannot directly encode that two users prefer different tabs. A strictly historical user-by-tab rate creates the required pair-dependent context signal without exposing evaluation feedback or mechanically removing the current row's label.",
+  "mechanism": "strictly-prior-date user-by-tab affinity features",
+  "mechanism_tags": [
+    "user_context_interaction",
+    "target_encoding",
+    "temporal_causality",
+    "personalization",
+    "lambdarank"
+  ],
+  "observation": "The task states that useful personalization must depend on a user-candidate pair. In portfolio_diagnostics.members for w003, slice_specialization reports disadvantages of -0.01749022029153391 on tab=0 and -0.009346696620826433 on tab=2, while the current feature contract exposes tab only as a single categorical column and otherwise delegates a fixed 25-column representation.",
+  "operator_id": null,
+  "parent_operator_stack": [
+    "item_lambdarank"
+  ],
+  "parent_references": [
+    "w003"
+  ],
+  "patch_scope": [
+    "features"
+  ],
+  "persona": "architecture",
+  "primary_block": "features",
+  "research_evidence": [],
+  "research_nonuse_reason": "The supplied research records address same-user BPR, use of the already-deployed tree branch, and an inapplicable rejected auxiliary-weight transition. The exact user-by-tab causal interaction is instead motivated directly by w003's tab-slice diagnostics and the current feature contract.",
+  "risk": [
+    "User-by-tab histories may be too sparse over thirteen training dates.",
+    "Temporal preference drift could make full-train frozen rates stale on hidden test.",
+    "Target-derived rates can overfit despite strict temporal construction.",
+    "The two columns may be redundant with opaque existing group statistics."
+  ]
+}

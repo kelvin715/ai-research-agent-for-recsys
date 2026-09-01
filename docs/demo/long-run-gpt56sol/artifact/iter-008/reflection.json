@@ -1,0 +1,5 @@
+{
+  "analysis": "The experiment never reached training or trusted evaluation. Smoke testing failed because DV.assert_trainable was applied to the raw watch-ratio array, which contains NaN/Inf values, plausibly on invalid duration-zero rows. Thus the valid-mask handling was ordered incorrectly: the run establishes only that the raw ratio cannot be asserted as fully finite before masking, not whether soft-label shaping improves ranking.",
+  "next_lesson": "Validate the mask first, assert finiteness only on valid ratios, and replace invalid ratio values safely before constructing the masked target.",
+  "result": "failed"
+}

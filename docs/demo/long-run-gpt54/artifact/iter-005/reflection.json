@@ -1,0 +1,5 @@
+{
+  "analysis": "The experiment did not support the hypothesis that a tab=6-only inference-time blend with a train-only item long_view prior would improve standalone or portfolio performance. Measured standalone delta_primary was slightly negative (-0.0002467) with a 95% paired CI that crossed zero, so there is no reliable positive effect. Portfolio comparison was also negative (-0.0002527) and the challenger was not promoted. Most importantly for the mechanism claim, diagnostic slice feedback showed no detectable improvement on tab=6 (delta_primary=0.0), so the targeted weakness was not measurably helped. This establishes that, in this implementation, the tab-gated popularity prior did not deliver the intended error diversification benefit.",
+  "next_lesson": "A tab-specific correction must change within-user ordering on the weak slice more effectively than a coarse item-popularity prior; otherwise it adds little or no useful diversity.",
+  "result": "not_supported"
+}

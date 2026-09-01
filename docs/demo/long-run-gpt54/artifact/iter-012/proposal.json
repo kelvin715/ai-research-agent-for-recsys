@@ -1,0 +1,74 @@
+{
+  "basis_type": "diagnostic",
+  "estimated_cost_s": 60,
+  "evidence": [
+    {
+      "ref": "Deterministic train-only diagnostics: train_target_phi_with_long_view is_click=0.7604858188163154, is_like=0.09916137501207341, long_view=1.0000000000000002",
+      "type": "diagnostic"
+    },
+    {
+      "ref": "Trusted runtime-backend contract target_api supports objective values pointwise, bpr, bpr_censored_watch for this family",
+      "type": "task_spec"
+    },
+    {
+      "ref": "Trusted runtime-backend contract exact_parent_config objective='bpr_censored_watch'",
+      "type": "task_spec"
+    },
+    {
+      "ref": "build_target delegates to SO.build_target(splits, train_idx, OP_CONFIG) and train passes config directly to SO.train",
+      "type": "current_code"
+    }
+  ],
+  "evidence_adaptation": null,
+  "execution_mode": "custom_patch",
+  "expected_observation": "If true, standalone validation may be flat to slightly down, but prediction correlation with the parent should drop enough to improve ensemble or marginal portfolio performance.",
+  "experiment_contract": {
+    "claim": "Switching the connected backend objective from bpr_censored_watch to pointwise while keeping the official long_view label yields a genuinely different FM scorer that may diversify the portfolio.",
+    "expected_observable": "Training metadata and predictions differ from the parent across all seeds due to objective-family change.",
+    "falsification_condition": "If predictions are identical to parent, or measured marginal portfolio and standalone validation are both clearly negative, the claim is refuted.",
+    "forbidden_shortcuts": [
+      "changing the target to click/like/auxiliary labels",
+      "adding unsupported loss hyperparameters with no consumer",
+      "mixing in post-exposure features at inference"
+    ],
+    "portfolio_role": "error_diversifier",
+    "required_components": [
+      "target returns official long_view labels",
+      "train sets config objective to pointwise before calling SO.train",
+      "no feature or predict changes confounding attribution"
+    ]
+  },
+  "fallback": "If negative, retain pairwise family and explore alternative legal auxiliary formulations without changing the official target.",
+  "hypothesis": "A pointwise objective on the official binary target will underperform or match standalone BPR but may add portfolio value by producing less correlated within-user orderings than the current pairwise censored-watch stack.",
+  "implementation_plan": "Edit target and train blocks only. In target, return the plain binary long_view label from train rows and DV.assert_trainable(y, 'target'). In train, override config['objective']='pointwise' while keeping the same connected stable_ops train path and existing supported hp keys. Do not alter features or predict. This tests a loss-family change from pairwise censored-watch BPR to pointwise long_view optimization using the same FM architecture.",
+  "justification": "Because the active search reward is marginal portfolio primary, an intentionally different loss family is a plausible error-diversifier. This is a connected, supported backend path with clear attribution, unlike unsupported optimizer keys. It does not repeat the exact failed aux_weight change in E003 or the failed target replacement in m010, because the official target remains long_view while only the objective family changes.",
+  "mechanism": "pointwise long_view target for probability-style error diversification",
+  "mechanism_tags": [
+    "target-design",
+    "pointwise-objective",
+    "loss-family-switch",
+    "error-diversifier"
+  ],
+  "observation": "The runtime contract target_api lists supported objectives for this family as [\"pointwise\",\"bpr\",\"bpr_censored_watch\"]. Current exact_parent_config objective is \"bpr_censored_watch\". Deterministic train diagnostics show train_target_phi_with_long_view for is_click=0.7604858188163154 and is_like=0.09916137501207341, meaning auxiliary engagement labels are correlated but not the official target itself; memory m010 only rejects replacing the target with a different target, with delta=-0.12730439758399714.",
+  "operator_id": null,
+  "parent_operator_stack": [
+    "legal_rank_stack_v1"
+  ],
+  "parent_references": [
+    "w001",
+    "w003"
+  ],
+  "patch_scope": [
+    "target",
+    "train"
+  ],
+  "persona": "reward",
+  "primary_block": "train",
+  "research_evidence": [],
+  "research_nonuse_reason": "No supplied research record directly covers a supported objective-family switch on this exact FM parent. The strongest basis is the visible stable_ops contract plus portfolio directive favoring structural error-diverse ideas over scalar tuning.",
+  "risk": [
+    "Pointwise may sacrifice top-of-list quality relative to pairwise ranking",
+    "Using only binary long_view may reduce useful censored-watch signal",
+    "Could be too correlated with other probability-like members to help portfolio"
+  ]
+}

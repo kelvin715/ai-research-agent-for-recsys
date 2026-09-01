@@ -1,0 +1,1263 @@
+{
+ "edges": [
+  {
+   "label": "built from",
+   "source": "w002",
+   "target": "n002",
+   "type": "execution"
+  },
+  {
+   "label": "built from",
+   "source": "w001",
+   "target": "n003",
+   "type": "execution"
+  },
+  {
+   "label": "built from",
+   "source": "w003",
+   "target": "n004",
+   "type": "execution"
+  },
+  {
+   "label": "built from",
+   "source": "w002",
+   "target": "n005",
+   "type": "execution"
+  },
+  {
+   "label": "built from",
+   "source": "w001",
+   "target": "n006",
+   "type": "execution"
+  },
+  {
+   "label": "built from",
+   "source": "w003",
+   "target": "n007",
+   "type": "execution"
+  },
+  {
+   "label": "built from",
+   "source": "w002",
+   "target": "n008",
+   "type": "execution"
+  },
+  {
+   "label": "built from",
+   "source": "w001",
+   "target": "n009",
+   "type": "execution"
+  },
+  {
+   "label": "built from",
+   "source": "w003",
+   "target": "n010",
+   "type": "execution"
+  },
+  {
+   "label": "built from",
+   "source": "w002",
+   "target": "n011",
+   "type": "execution"
+  },
+  {
+   "label": "built from",
+   "source": "w001",
+   "target": "n012",
+   "type": "execution"
+  },
+  {
+   "label": "built from",
+   "source": "w003",
+   "target": "n013",
+   "type": "execution"
+  },
+  {
+   "label": "built from",
+   "source": "w002",
+   "target": "n014",
+   "type": "execution"
+  },
+  {
+   "label": "built from",
+   "source": "w001",
+   "target": "n015",
+   "type": "execution"
+  },
+  {
+   "label": "built from",
+   "source": "n000",
+   "target": "w001",
+   "type": "execution"
+  },
+  {
+   "label": "built from",
+   "source": "n000",
+   "target": "w002",
+   "type": "execution"
+  },
+  {
+   "label": "built from",
+   "source": "n000",
+   "target": "w003",
+   "type": "execution"
+  },
+  {
+   "label": "member",
+   "source": "w001",
+   "target": "portfolio-best",
+   "type": "portfolio",
+   "weight": 0.4
+  },
+  {
+   "label": "member",
+   "source": "w002",
+   "target": "portfolio-best",
+   "type": "portfolio",
+   "weight": 0.4
+  },
+  {
+   "label": "member",
+   "source": "w003",
+   "target": "portfolio-best",
+   "type": "portfolio",
+   "weight": 0.2
+  }
+ ],
+ "generated_at": "2026-09-01T04:09:32.516911+00:00",
+ "nodes": [
+  {
+   "artifacts": {
+    "metrics": "baseline/metrics.json",
+    "pipeline": "incumbents/iter-000.py"
+   },
+   "candidate_entered_combination": null,
+   "combination_ci95": null,
+   "combination_delta": null,
+   "decision": "BASELINE",
+   "execution_mode": "baseline",
+   "expected": null,
+   "hypothesis": null,
+   "id": "n000",
+   "is_best_standalone": false,
+   "is_portfolio_member": false,
+   "iteration": 0,
+   "kind": "baseline",
+   "label": "official FM baseline",
+   "lesson": null,
+   "mechanism": "official FM baseline",
+   "operator_id": null,
+   "parent_id": null,
+   "parent_references": [],
+   "patch_scope": null,
+   "portfolio_weight": null,
+   "result": null,
+   "score": 0.6018779688793552,
+   "score_ci95": null,
+   "score_delta": null,
+   "status": "COMPLETE",
+   "status_key": "baseline",
+   "status_label": "Baseline",
+   "times_selected_as_parent": 0,
+   "why": null
+  },
+  {
+   "artifacts": {
+    "code change": "iter-002/attempt-0/pipeline.diff",
+    "combination": "iter-002/ensemble-selection.json",
+    "implementation check": "iter-002/attempt-0/implementation-audit.json",
+    "metrics": "iter-002/metrics.json",
+    "pipeline": "iter-002/attempt-0/pipeline.py",
+    "proposal": "iter-002/proposal.json",
+    "reflection": "iter-002/reflection.json",
+    "selection": "iter-002/selection-trace.json"
+   },
+   "candidate_entered_combination": true,
+   "combination_ci95": [
+    -0.0011832933222168441,
+    0.0007566694622673477
+   ],
+   "combination_delta": -0.0002527445864699551,
+   "decision": "UNCERTAIN",
+   "execution_mode": "operator",
+   "expected": "Feature field count and embedding-table dimension should increase, predictions should differ from w002, and trusted validation should show improved standalone or marginal portfolio primary if temporal state is informative.",
+   "hypothesis": "Adding legal hour and recency fields will improve candidate-dependent ranking because DeepFM interactions let temporal state modulate each user's preference for the candidate item rather than adding only a per-user constant.",
+   "id": "n002",
+   "is_best_standalone": true,
+   "is_portfolio_member": false,
+   "iteration": 2,
+   "kind": "experiment",
+   "label": "hour and strictly-prior user-gap interaction fields",
+   "lesson": "Treat the combined temporal fields as unproven; only revisit with a prespecified context-targeted mechanism motivated by the heterogeneous slice effects.",
+   "mechanism": "hour and strictly-prior user-gap interaction fields",
+   "operator_id": "legal_temporal_context",
+   "parent_id": "w002",
+   "parent_references": [
+    "w002"
+   ],
+   "patch_scope": [
+    "features"
+   ],
+   "portfolio_weight": null,
+   "result": "The temporal-context variant produced distinct predictions and a small positive standalone mean delta (+0.000528), but its paired 95% CI crossed zero (-0.000830 to +0.001934), so the claimed improvement is not statistically established. It also failed the portfolio acceptance gate: replacing w003 with the refined w002 variant reduced portfolio primary by 0.000253, again with a CI crossing zero, and was not promoted. Diagnostic slices were heterogeneous, with gains on tab 0 and some history/popularity groups but losses on tabs 2, 4, and 6 and on more-popular items; these exploratory results cannot support a general benefit. Thus the experiment suggests possible context-specific signal but does not demonstrate that the combined hour and strictly-prior gap operator reliably improves either standalone ranking or portfolio value.",
+   "score": 0.6052800193085559,
+   "score_ci95": [
+    -0.0008303693600360373,
+    0.00193394072380294
+   ],
+   "score_delta": 0.0005282638342124502,
+   "status": "COMPLETE",
+   "status_key": "uncertain",
+   "status_label": "Promising, not proven",
+   "times_selected_as_parent": 0,
+   "why": "Temporal consumption state can alter which videos are likely to receive a long view. The fields enter the FM and deep interaction paths, so their effect can vary by candidate item and can change both within-user metrics."
+  },
+  {
+   "artifacts": {
+    "code change": "iter-003/attempt-0/pipeline.diff",
+    "combination": "iter-003/ensemble-selection.json",
+    "implementation check": "iter-003/attempt-0/implementation-audit.json",
+    "metrics": "iter-003/metrics.json",
+    "pipeline": "iter-003/attempt-0/pipeline.py",
+    "proposal": "iter-003/proposal.json",
+    "reflection": "iter-003/reflection.json",
+    "selection": "iter-003/selection-trace.json"
+   },
+   "candidate_entered_combination": false,
+   "combination_ci95": null,
+   "combination_delta": null,
+   "decision": "ROLLBACK",
+   "execution_mode": "operator",
+   "expected": "feature_dim will increase and predictions will differ from w001 for every seed; if the hypothesis is true, trusted validation will show a positive paired primary delta and positive marginal contribution when substituted for w001 in the active portfolio.",
+   "hypothesis": "Adding the seven selected static user-profile fields to w001 will improve official validation primary and its marginal portfolio contribution because their FM crosses create candidate-dependent personalization that is absent from the current hour+user-gap feature configuration.",
+   "id": "n003",
+   "is_best_standalone": false,
+   "is_portfolio_member": false,
+   "iteration": 3,
+   "kind": "experiment",
+   "label": "selected static user-profile FM interactions",
+   "lesson": "Do not add all seven profile fields globally; test one predeclared targeted profile-interaction mechanism motivated by the observed low-history-user heterogeneity.",
+   "mechanism": "selected static user-profile FM interactions",
+   "operator_id": "selected_user_profile",
+   "parent_id": "w001",
+   "parent_references": [
+    "w001"
+   ],
+   "patch_scope": [
+    "features"
+   ],
+   "portfolio_weight": null,
+   "result": "The implementation appears valid because feature dimension changed and all prediction hashes differ, so the rollback reflects a substantive model result rather than a no-op. The hypothesis is not supported on the fixed official validation protocol: the candidate's ensemble primary was 0.6041756 versus the search parent at 0.6049134, a delta of -0.0007378, with paired 95% CI [-0.0014162, -0.0000372] excluding zero. It also failed to improve the active portfolio: delta -0.0002527, with CI crossing zero, so there is no promotion evidence. Seed-level comparison was less decisive, but its mean direction was still negative. Diagnostic slices suggest heterogeneous effects\u2014positive for the lowest-history users and more popular items, but negative for most history strata and every tab slice\u2014so they motivate future targeted hypotheses but do not override the official aggregate result or justify selective deployment from this experiment alone. The prior curated evidence therefore did not transfer to this parent/configuration and split.",
+   "score": 0.604175571136877,
+   "score_ci95": [
+    -0.0014161918261403532,
+    -3.7182088574294706e-05
+   ],
+   "score_delta": -0.0007378004158260509,
+   "status": "COMPLETE",
+   "status_key": "rollback",
+   "status_label": "Rolled back",
+   "times_selected_as_parent": 0,
+   "why": "The proposed fields are legal at inference and can alter ordering within a user through interactions with candidate-item fields. The evidence studies the same incremental placement\u2014on top of hour, exposure gap, and the watch-time auxiliary mechanism\u2014making it more directly applicable than broad profile expansion or a new architecture family."
+  },
+  {
+   "artifacts": {
+    "code change": "iter-004/attempt-0/pipeline.diff",
+    "combination": "iter-004/ensemble-selection.json",
+    "implementation check": "iter-004/attempt-0/implementation-audit.json",
+    "metrics": "iter-004/metrics.json",
+    "pipeline": "iter-004/attempt-0/pipeline.py",
+    "proposal": "iter-004/proposal.json",
+    "reflection": "iter-004/reflection.json",
+    "selection": "iter-004/selection-trace.json"
+   },
+   "candidate_entered_combination": false,
+   "combination_ci95": null,
+   "combination_delta": null,
+   "decision": "ROLLBACK",
+   "execution_mode": "custom_patch",
+   "expected": "If click supplies useful within-label ordering, the graded model will improve trusted portfolio primary over 0.6061277485758569, with gains reflected in changed within-user order rather than any inference-time click dependency.",
+   "hypothesis": "Using train-only click as an ordinal tie-breaker around native long_view will provide denser ranking supervision and improve the LambdaRank branch's marginal portfolio primary without replacing the official relevance label.",
+   "id": "n004",
+   "is_best_standalone": false,
+   "is_portfolio_member": false,
+   "iteration": 4,
+   "kind": "experiment",
+   "label": "click-tiebroken ordinal LambdaRank relevance",
+   "lesson": "Do not use raw click as a four-grade LambdaRank tie-breaker; its exposure bias and default graded gains can distort the official long_view ordering objective.",
+   "mechanism": "click-tiebroken ordinal LambdaRank relevance",
+   "operator_id": null,
+   "parent_id": "w003",
+   "parent_references": [
+    "w003"
+   ],
+   "patch_scope": [
+    "target",
+    "train"
+   ],
+   "portfolio_weight": null,
+   "result": "The click-tiebroken ordinal LambdaRank target did not improve performance. Standalone primary declined by 0.0015719 versus the incumbent, with a paired 95% CI of [-0.0028354, -0.0001966] excluding zero; the per-seed comparison was likewise significantly negative. Portfolio primary also decreased by 0.0002527, although its paired CI crossed zero, so there is no evidence of marginal portfolio benefit and the candidate was not promoted. Diagnostic slices show losses across most user-history and item-popularity groups, especially tabs 0 and 6, while gains for the least-popular item quartile and tab 4 are exploratory and insufficient to offset the aggregate decline. This refutes the tested formulation\u2014grade=2*long_view+is_click under unchanged LambdaRank settings\u2014not the broader possibility that click could help through a differently controlled training-only auxiliary objective.",
+   "score": 0.5994856848549472,
+   "score_ci95": [
+    -0.0028354492409322337,
+    -0.00019663888871635518
+   ],
+   "score_delta": -0.0015718989164643649,
+   "status": "COMPLETE",
+   "status_key": "rollback",
+   "status_label": "Rolled back",
+   "times_selected_as_parent": 0,
+   "why": "The grade preserves long_view as the dominant ordering because every long_view-positive has grade at least 2 while every long_view-negative has grade at most 1. Click only resolves ties within each native-label class, potentially supplying a denser preference signal while producing a reward mechanism complementary to the portfolio's pointwise and existing ranking branches."
+  },
+  {
+   "artifacts": {
+    "code change": "iter-005/attempt-2/pipeline.diff",
+    "combination": "iter-005/ensemble-selection.json",
+    "implementation check": "iter-005/attempt-2/implementation-audit.json",
+    "metrics": "iter-005/metrics.json",
+    "pipeline": "iter-005/attempt-2/pipeline.py",
+    "proposal": "iter-005/proposal.json",
+    "reflection": "iter-005/reflection.json",
+    "selection": "iter-005/selection-trace.json"
+   },
+   "candidate_entered_combination": false,
+   "combination_ci95": null,
+   "combination_delta": null,
+   "decision": "ROLLBACK",
+   "execution_mode": "custom_patch",
+   "expected": "If the hypothesis is true, the candidate will provide a positive marginal portfolio-primary delta and alter within-user ranks most for candidates with different durations or completion patterns, without requiring any watch feedback during prediction.",
+   "hypothesis": "A leakage-safe censored watch-time auxiliary will teach duration-sensitive item-quality interactions not fully captured by the four sparse engagement heads, yielding complementary within-user ordering and positive marginal contribution to the heterogeneous portfolio.",
+   "id": "n005",
+   "is_best_standalone": false,
+   "is_portfolio_member": false,
+   "iteration": 5,
+   "kind": "experiment",
+   "label": "censored watch-time auxiliary head",
+   "lesson": "Do not reuse this fixed-weight watch auxiliary on w002; if revisited, isolate a much smaller auxiliary weight while retaining explicit masking and censoring audits.",
+   "mechanism": "censored watch-time auxiliary head",
+   "operator_id": null,
+   "parent_id": "w002",
+   "parent_references": [
+    "w002"
+   ],
+   "patch_scope": [
+    "target",
+    "model",
+    "train"
+   ],
+   "portfolio_weight": null,
+   "result": "The hypothesis is refuted under the tested configuration. The censored watch-time auxiliary produced a trusted primary delta of -0.001229 versus the incumbent, with a paired 95% CI of [-0.002228, -0.000172], excluding zero. Per-seed comparison was also consistently negative (-0.002207; CI [-0.003003, -0.001305]). Diagnostic slices show no clear compensating segment: all user-history quartiles, all item-popularity quartiles, and every reported tab declined, with especially large degradation for the least-popular item quartile (-0.004046) and tabs 0, 2, and 6. The intended portfolio diversification benefit was not demonstrated either: replacing a portfolio member yielded -0.000253, with a CI crossing zero, so the candidate was not promoted. These results establish that adding this watch head at fixed weight 0.2 to the reproduced pointwise DeepFM harms standalone ranking and provides no trusted marginal portfolio gain. They do not establish that censored watch-time supervision is universally ineffective, because the result is specific to this parent reproduction, objective, auxiliary weight, and implementation; the supplied outcome also does not report the target-audit counters needed to independently verify masking and censoring correctness.",
+   "score": 0.6035228392532407,
+   "score_ci95": [
+    -0.002227540371070008,
+    -0.00017211852709163872
+   ],
+   "score_delta": -0.0012289162211027715,
+   "status": "COMPLETE",
+   "status_key": "rollback",
+   "status_label": "Rolled back",
+   "times_selected_as_parent": 0,
+   "why": "Watch time supplies a denser training signal than rare engagement actions, while censoring avoids penalizing completed plays whose latent desired watch time may exceed the video duration. Shared embeddings can transfer this signal to the long_view ranker without exposing post-exposure feedback at inference."
+  },
+  {
+   "artifacts": {
+    "code change": "iter-006/attempt-1/pipeline.diff",
+    "combination": "iter-006/ensemble-selection.json",
+    "implementation check": "iter-006/attempt-1/implementation-audit.json",
+    "metrics": "iter-006/metrics.json",
+    "pipeline": "iter-006/attempt-1/pipeline.py",
+    "proposal": "iter-006/proposal.json",
+    "reflection": "iter-006/reflection.json",
+    "selection": "iter-006/selection-trace.json"
+   },
+   "candidate_entered_combination": false,
+   "combination_ci95": null,
+   "combination_delta": null,
+   "decision": "ROLLBACK",
+   "execution_mode": "custom_patch",
+   "expected": "Predictions must differ from w001 on tab-6 rows for every seed and remain exactly equal outside tab 6; if the hypothesis is correct, tab-6 directional delta and marginal portfolio primary will be positive.",
+   "hypothesis": "A globally trained FM blended with an explicitly tab-6-upweighted specialist will improve within-user ordering on tab 6 without materially changing other rows, yielding positive marginal portfolio primary relative to w001.",
+   "id": "n006",
+   "is_best_standalone": false,
+   "is_portfolio_member": false,
+   "iteration": 6,
+   "kind": "experiment",
+   "label": "tab-6 oversampled mixture-of-experts FM",
+   "lesson": "Do not retry this fixed oversampling/blend recipe; first verify exact routing invariants, then test any future tab-6 intervention at much lower strength as a single isolated change.",
+   "mechanism": "tab-6 oversampled mixture-of-experts FM",
+   "operator_id": null,
+   "parent_id": "w001",
+   "parent_references": [
+    "w001"
+   ],
+   "patch_scope": [
+    "train",
+    "predict"
+   ],
+   "portfolio_weight": null,
+   "result": "The implementation was behaviorally active rather than inert: seed-level prediction hashes changed, and the final directional effects were concentrated on tab 6 with some spillover reported on tab 0/1. However, the central hypothesis was falsified. Tab-6 performance worsened from the already negative parent diagnostic, reaching a candidate-vs-incumbent delta of -0.0113547. The official paired ensemble delta was also negative (-3.41e-05), with a 95% paired interval entirely below zero, so rollback is justified. Portfolio value likewise declined by -0.0002527, although that portfolio interval crossed zero. The outcome supports the narrower conclusion that this specific three-extra-copy oversampling plus fixed 50/50 tab-6 blend did not create a useful specialist; it does not establish that all executable group weighting or tab specialization is ineffective. The nonzero changes outside tab 6 conflict with the proposal's exact-equality expectation and should be investigated as either comparison noise, implementation mismatch, or an overly broad prediction path.",
+   "score": 0.6048792975351228,
+   "score_ci95": [
+    -6.638976027238119e-05,
+    -8.224623783831344e-07
+   ],
+   "score_delta": -3.4074017580265625e-05,
+   "status": "COMPLETE",
+   "status_key": "rollback",
+   "status_label": "Rolled back",
+   "times_selected_as_parent": 0,
+   "why": "Tab 6 is the parent\u2019s clearest fixed-slice deficit and is also a shared weakness in the portfolio diagnostics. Deterministic index duplication is visibly consumed by SO.train through train_idx, so this tests actual gradient exposure rather than repeating the inert configuration-only proposal rejected by E001."
+  },
+  {
+   "artifacts": {
+    "code change": "iter-007/attempt-2/pipeline.diff",
+    "combination": "iter-007/ensemble-selection.json",
+    "implementation check": "iter-007/attempt-2/implementation-audit.json",
+    "pipeline": "iter-007/attempt-2/pipeline.py",
+    "proposal": "iter-007/proposal.json",
+    "reflection": "iter-007/reflection.json",
+    "selection": "iter-007/selection-trace.json"
+   },
+   "candidate_entered_combination": null,
+   "combination_ci95": null,
+   "combination_delta": null,
+   "decision": "REJECT",
+   "execution_mode": "custom_patch",
+   "expected": "If true, trusted validation will show positive overall and portfolio-primary deltas, with the largest directional gains in tab=0 or tab=2 and no broad regression across user-history quartiles.",
+   "hypothesis": "Adding a causal user-by-tab preference interaction will improve w003's within-user ordering, especially in tab slices where a global tab feature cannot express heterogeneous user preferences, and thereby increase its marginal portfolio contribution.",
+   "id": "n007",
+   "is_best_standalone": false,
+   "is_portfolio_member": false,
+   "iteration": 7,
+   "kind": "experiment",
+   "label": "strictly-prior-date user-by-tab affinity features",
+   "lesson": "Construct all label-derived historical statistics inside the target block and expose only policy-compliant derived artifacts to features, with both blocks declared in patch_scope.",
+   "mechanism": "strictly-prior-date user-by-tab affinity features",
+   "operator_id": null,
+   "parent_id": "w003",
+   "parent_references": [
+    "w003"
+   ],
+   "patch_scope": [
+    "features"
+   ],
+   "portfolio_weight": null,
+   "result": "The experiment was rejected by static policy gate G2 because the features block accessed train.label; under the block policy, only the target block may read labels. Therefore the candidate was not validly evaluated, and the reported validation value cannot establish whether strictly-prior user-by-tab affinity improves ranking or portfolio contribution. The architectural hypothesis remains untested rather than refuted.",
+   "score": null,
+   "score_ci95": null,
+   "score_delta": null,
+   "status": "FAILED",
+   "status_key": "failed",
+   "status_label": "Implementation failed",
+   "times_selected_as_parent": 0,
+   "why": "A global categorical split for tab cannot directly encode that two users prefer different tabs. A strictly historical user-by-tab rate creates the required pair-dependent context signal without exposing evaluation feedback or mechanically removing the current row's label."
+  },
+  {
+   "artifacts": {
+    "code change": "iter-008/attempt-2/pipeline.diff",
+    "combination": "iter-008/ensemble-selection.json",
+    "implementation check": "iter-008/attempt-2/implementation-audit.json",
+    "pipeline": "iter-008/attempt-2/pipeline.py",
+    "proposal": "iter-008/proposal.json",
+    "reflection": "iter-008/reflection.json",
+    "selection": "iter-008/selection-trace.json"
+   },
+   "candidate_entered_combination": null,
+   "combination_ci95": null,
+   "combination_delta": null,
+   "decision": "REJECT",
+   "execution_mode": "custom_patch",
+   "expected": "If the shaped reward carries useful ordinal information, the trusted primary and marginal portfolio score will increase, especially nDCG@5, while predictions remain label-free at inference and differ within users rather than by a user constant.",
+   "hypothesis": "A small continuous watch-ratio component in the main training reward will break ties among binary long_view outcomes and improve top-of-list within-user ordering without sacrificing the parent\u2019s engagement auxiliary signal.",
+   "id": "n008",
+   "is_best_standalone": false,
+   "is_portfolio_member": false,
+   "iteration": 8,
+   "kind": "experiment",
+   "label": "valid-watch-ratio soft-label shaping",
+   "lesson": "Validate the mask first, assert finiteness only on valid ratios, and replace invalid ratio values safely before constructing the masked target.",
+   "mechanism": "valid-watch-ratio soft-label shaping",
+   "operator_id": null,
+   "parent_id": "w002",
+   "parent_references": [
+    "w002"
+   ],
+   "patch_scope": [
+    "target"
+   ],
+   "portfolio_weight": null,
+   "result": "The experiment never reached training or trusted evaluation. Smoke testing failed because DV.assert_trainable was applied to the raw watch-ratio array, which contains NaN/Inf values, plausibly on invalid duration-zero rows. Thus the valid-mask handling was ordered incorrectly: the run establishes only that the raw ratio cannot be asserted as fully finite before masking, not whether soft-label shaping improves ranking.",
+   "score": null,
+   "score_ci95": null,
+   "score_delta": null,
+   "status": "FAILED",
+   "status_key": "failed",
+   "status_label": "Implementation failed",
+   "times_selected_as_parent": 0,
+   "why": "Binary long_view discards intensity information among impressions with the same class. A bounded 15% continuous component supplies finer supervision related to viewing quality, while masking invalid rows and retaining 85% of the official label limits objective drift. This is a target-formulation change consumed directly by the existing trainer, not an inert auxiliary-weight setting."
+  },
+  {
+   "artifacts": {
+    "code change": "iter-009/attempt-1/pipeline.diff",
+    "combination": "iter-009/ensemble-selection.json",
+    "implementation check": "iter-009/attempt-1/implementation-audit.json",
+    "metrics": "iter-009/metrics.json",
+    "pipeline": "iter-009/attempt-1/pipeline.py",
+    "proposal": "iter-009/proposal.json",
+    "reflection": "iter-009/reflection.json",
+    "selection": "iter-009/selection-trace.json"
+   },
+   "candidate_entered_combination": false,
+   "combination_ci95": null,
+   "combination_delta": null,
+   "decision": "ROLLBACK",
+   "execution_mode": "custom_patch",
+   "expected": "Predictions should differ most on users with tab-6 candidates; trusted fixed-slice feedback should improve on tab=6, and the portfolio gate should show positive marginal primary if that specialist gain outweighs any degradation elsewhere.",
+   "hypothesis": "Doubling the training mass of tab-6 impressions will produce a tab-6-specialized ordering that improves the selected parent's largest diagnosed residual slice and yields positive marginal contribution to the heterogeneous portfolio without materially degrading dominant tab=1 traffic.",
+   "id": "n009",
+   "is_best_standalone": false,
+   "is_portfolio_member": false,
+   "iteration": 9,
+   "kind": "experiment",
+   "label": "tab-6 importance-weighted BPR training",
+   "lesson": "Do not retry uniform tab-6 replication: increased training mass did not translate into better tab-6 ordering and introduced broader slice degradation.",
+   "mechanism": "tab-6 importance-weighted BPR training",
+   "operator_id": null,
+   "parent_id": "w001",
+   "parent_references": [
+    "w001"
+   ],
+   "patch_scope": [
+    "train"
+   ],
+   "portfolio_weight": null,
+   "result": "The intervention changed predictions, but it failed both declared success criteria. Tab=6 performance worsened versus the incumbent by -0.005413 rather than improving, so the targeted residual was not repaired. Standalone primary declined by -0.000286, and portfolio primary declined by -0.000253; neither paired interval excluded zero, so the aggregate effects are statistically inconclusive in magnitude but provide no promotion evidence. The largest observed slice damage was instead on tab=0 (-0.007411), while dominant tab=1 was nearly unchanged. Thus twofold tab-6 row replication did not create a useful tab-6 specialist or positive portfolio complement. The reported outcome does not verify the exact expanded-index count, but there is no indication of execution failure and prediction hashes confirm a behavioral change.",
+   "score": 0.6046269947114137,
+   "score_ci95": [
+    -0.0012597048219486456,
+    0.0005542395203893406
+   ],
+   "score_delta": -0.0002863768412894041,
+   "status": "COMPLETE",
+   "status_key": "rollback",
+   "status_label": "Rolled back",
+   "times_selected_as_parent": 0,
+   "why": "The large, repeated tab-6 deficit identifies a concrete residual segment rather than motivating an undirected scalar tune. Deterministically replicating only train tab-6 rows connects that diagnostic to the existing executable BPR/auxiliary training consumer and should shift learned item/context interactions toward this segment. Because the portfolio already contains strong but correlated generalists, a bounded specialist can succeed through complementary ordering even if its standalone average gain is modest."
+  },
+  {
+   "artifacts": {
+    "code change": "iter-010/attempt-2/pipeline.diff",
+    "combination": "iter-010/ensemble-selection.json",
+    "implementation check": "iter-010/attempt-2/implementation-audit.json",
+    "metrics": "iter-010/metrics.json",
+    "pipeline": "iter-010/attempt-2/pipeline.py",
+    "proposal": "iter-010/proposal.json",
+    "reflection": "iter-010/reflection.json",
+    "selection": "iter-010/selection-trace.json"
+   },
+   "candidate_entered_combination": true,
+   "combination_ci95": [
+    -0.000518007725670827,
+    0.0006551356237167792
+   ],
+   "combination_delta": 4.615662777462948e-05,
+   "decision": "UNCERTAIN",
+   "execution_mode": "custom_patch",
+   "expected": "If the representation is useful, the trusted evaluation will show a positive marginal portfolio-primary delta, with the largest plausible gains among users having enough history for nonzero pair statistics rather than the history-count <=16 slice.",
+   "hypothesis": "Adding strictly-prior user-candidate exposure-affinity columns to w003 will improve marginal portfolio primary because the current item/context tree can then split on genuine user-author and user-video interactions rather than only marginal context statistics.",
+   "id": "n010",
+   "is_best_standalone": false,
+   "is_portfolio_member": false,
+   "iteration": 10,
+   "kind": "experiment",
+   "label": "strictly_prior_exposure_affinity_features",
+   "lesson": "Treat the mechanism as weakly promising but unproven; next isolate the strictly-prior user-author affinity representation alone rather than adding all three features together.",
+   "mechanism": "strictly_prior_exposure_affinity_features",
+   "operator_id": null,
+   "parent_id": "w003",
+   "parent_references": [
+    "w003"
+   ],
+   "patch_scope": [
+    "features"
+   ],
+   "portfolio_weight": null,
+   "result": "The experiment produced a small positive standalone delta (+0.000256 primary), but the paired 95% CI crossed zero (-0.000661 to +0.001224), so it does not establish that the strictly-prior affinity features reliably improve the incumbent. Portfolio benefit was even smaller (+0.000046) with a zero-crossing CI, and the challenger was not promoted. Directional slices are diagnostic only: gains appeared strongest for users with history >=65 and on tabs 4/6, but intermediate-history cohorts were negative, contradicting the expectation that benefit would broadly concentrate outside the <=16 slice. The positive effect in the <=16 slice also suggests the three bundled features may act through more than repeated-history personalization. Because author count, video count, and author share were added together, this result cannot identify which component helped or whether repeated-impression frequency and fatigue effects offset one another.",
+   "score": 0.6013137305403489,
+   "score_ci95": [
+    -0.0006612861138982435,
+    0.0012240003137336444
+   ],
+   "score_delta": 0.00025614676893725985,
+   "status": "COMPLETE",
+   "status_key": "uncertain",
+   "status_label": "Promising, not proven",
+   "times_selected_as_parent": 0,
+   "why": "Prior pair counts vary across candidates for the same user and therefore can change both GAUC and nDCG@5. They use no labels or feedback, remain available at inference, and give LightGBM low-cost interaction summaries that trees would otherwise need raw high-cardinality identifiers to reconstruct."
+  },
+  {
+   "artifacts": {
+    "code change": "iter-011/attempt-2/pipeline.diff",
+    "combination": "iter-011/ensemble-selection.json",
+    "implementation check": "iter-011/attempt-2/implementation-audit.json",
+    "pipeline": "iter-011/attempt-2/pipeline.py",
+    "proposal": "iter-011/proposal.json",
+    "reflection": "iter-011/reflection.json",
+    "selection": "iter-011/selection-trace.json"
+   },
+   "candidate_entered_combination": null,
+   "combination_ci95": null,
+   "combination_delta": null,
+   "decision": "REJECT",
+   "execution_mode": "custom_patch",
+   "expected": "If the weak hate task causes negative transfer, the replacement will improve trusted primary while leaving inference inputs and feature dimensions unchanged; training metadata should show the same four-head shape but a changed auxiliary-target checksum.",
+   "hypothesis": "Replacing the extremely sparse, essentially uncorrelated hate auxiliary with the denser profile-enter signal will reduce negative transfer and improve w002's long_view ranking and marginal portfolio contribution.",
+   "id": "n011",
+   "is_best_standalone": false,
+   "is_portfolio_member": false,
+   "iteration": 11,
+   "kind": "experiment",
+   "label": "replace weak hate auxiliary head with profile-enter supervision",
+   "lesson": "Require exactly one direct equality match to the train-only is_hate array and reject complement-only or ambiguous matches before rerunning.",
+   "mechanism": "replace weak hate auxiliary head with profile-enter supervision",
+   "operator_id": null,
+   "parent_id": "w002",
+   "parent_references": [
+    "w002"
+   ],
+   "patch_scope": [
+    "target"
+   ],
+   "portfolio_weight": null,
+   "result": "The candidate reached a higher validation primary than the search parent (0.6052800193 vs. 0.6047517555), but the experiment did not satisfy its contract. The matcher accepted either a thresholded direct match to is_hate or its complement, so it did not fail closed unless exactly one auxiliary column equaled is_hate. Consequently, the observed score cannot be treated as evidence for the stated hypothesis that replacing the hate auxiliary with profile-enter improves the model; the actual replaced target could violate that intervention definition.",
+   "score": null,
+   "score_ci95": null,
+   "score_delta": null,
+   "status": "FAILED",
+   "status_key": "failed",
+   "status_label": "Implementation failed",
+   "times_selected_as_parent": 0,
+   "why": "At the fixed auxiliary weight of 0.2, an almost label-orthogonal event can inject noisy or conflicting shared-representation gradients. A denser auxiliary with a weak but positive relationship to long_view should provide more stable supervision while changing only one head's target, making the measured delta attributable to auxiliary-task selection rather than scalar tuning."
+  },
+  {
+   "artifacts": {
+    "code change": "iter-012/attempt-1/pipeline.diff",
+    "combination": "iter-012/ensemble-selection.json",
+    "implementation check": "iter-012/attempt-1/implementation-audit.json",
+    "pipeline": "iter-012/attempt-1/pipeline.py",
+    "proposal": "iter-012/proposal.json",
+    "reflection": "iter-012/reflection.json",
+    "selection": "iter-012/selection-trace.json"
+   },
+   "candidate_entered_combination": null,
+   "combination_ci95": null,
+   "combination_delta": null,
+   "decision": "ORCHESTRATOR_ERROR",
+   "execution_mode": "custom_patch",
+   "expected": "Relative to w001, mean valid primary should increase, with nonnegative directional deltas in the 17-35 and 36-64 history slices and a positive marginal change when admitted as a portfolio refinement.",
+   "hypothesis": "Giving every eligible training user equal expected pairwise loss mass will improve within-user validation ranking, especially for short and medium histories, and will add marginal portfolio value by reducing the incumbent's exposure-frequency bias.",
+   "id": "n012",
+   "is_best_standalone": false,
+   "is_portfolio_member": false,
+   "iteration": 12,
+   "kind": "experiment",
+   "label": "user-uniform pairwise FM training",
+   "lesson": "Validate that the custom patch emits schema-compliant, nonempty JSON before rerunning the unchanged hypothesis.",
+   "mechanism": "user-uniform pairwise FM training",
+   "operator_id": null,
+   "parent_id": "w001",
+   "parent_references": [
+    "w001"
+   ],
+   "patch_scope": [
+    "target",
+    "train",
+    "predict"
+   ],
+   "portfolio_weight": null,
+   "result": "The experiment produced no valid implementation or trusted metric outcome because orchestration failed after three JSON decoding errors. Therefore, there is no evidence about whether user-uniform pairwise FM training improves within-user ranking, medium-history slices, or portfolio value; the hypothesis remains untested rather than falsified.",
+   "score": null,
+   "score_ci95": null,
+   "score_delta": null,
+   "status": "ORCHESTRATOR_ERROR",
+   "status_key": "failed",
+   "status_label": "Implementation failed",
+   "times_selected_as_parent": 0,
+   "why": "The current delegated sampler is optimized over exposure pairs, so prolific users can dominate gradient mass even though evaluation aggregates ranking quality by user. Uniform user sampling directly aligns optimization mass with the evaluation unit and targets the two history slices where the latest ordering regressed."
+  },
+  {
+   "artifacts": {
+    "code change": "iter-013/attempt-0/pipeline.diff",
+    "combination": "iter-013/ensemble-selection.json",
+    "implementation check": "iter-013/attempt-0/implementation-audit.json",
+    "metrics": "iter-013/metrics.json",
+    "pipeline": "iter-013/attempt-0/pipeline.py",
+    "proposal": "iter-013/proposal.json",
+    "reflection": "iter-013/reflection.json",
+    "selection": "iter-013/selection-trace.json"
+   },
+   "candidate_entered_combination": true,
+   "combination_ci95": [
+    -0.0005906049023085862,
+    0.0005586866086578462
+   ],
+   "combination_delta": -2.2510864804203834e-05,
+   "decision": "UNCERTAIN",
+   "execution_mode": "custom_patch",
+   "expected": "If the hypothesis is true, trusted primary and the long-history slice will improve, and LightGBM feature usage will show at least one split on a newly appended affinity column.",
+   "hypothesis": "Explicit label-free user-video and user-author repeat-exposure affinities will improve the current LambdaRank leaf because they add candidate-dependent personalization absent from item-only popularity and context aggregates.",
+   "id": "n013",
+   "is_best_standalone": false,
+   "is_portfolio_member": false,
+   "iteration": 13,
+   "kind": "experiment",
+   "label": "label-free repeat-exposure affinity features",
+   "lesson": "Raw repeat-exposure affinity is segment-dependent; retain the personalization idea only if a follow-up isolates it to the history/popularity regimes where the diagnostic was positive.",
+   "mechanism": "label-free repeat-exposure affinity features",
+   "operator_id": null,
+   "parent_id": "w003",
+   "parent_references": [
+    "w003"
+   ],
+   "patch_scope": [
+    "features"
+   ],
+   "portfolio_weight": null,
+   "result": "The added repeat-exposure pair features produced a positive standalone delta of 0.00063, but the paired 95% CI crossed zero (-0.00036 to 0.00158), so the evidence does not establish a reliable improvement. Directional effects were heterogeneous: gains appeared for medium/long-history users and less-popular items, while the shortest-history slice and the two most-popular item quartiles degraded. The portfolio comparison was effectively flat but slightly negative (-0.000023), also with a CI crossing zero, and the candidate was not promoted. Thus the result is consistent with useful affinity signal in some segments, but not with a robust overall or portfolio-level benefit.",
+   "score": 0.6016871257980373,
+   "score_ci95": [
+    -0.00036400984213527665,
+    0.0015758602616091936
+   ],
+   "score_delta": 0.0006295420266256846,
+   "status": "COMPLETE",
+   "status_key": "uncertain",
+   "status_label": "Promising, not proven",
+   "times_selected_as_parent": 0,
+   "why": "A repeat-exposure count is a direct user-candidate interaction, not a per-user constant. It uses only exposure identities available before inference and can let the tree distinguish familiar videos or authors from otherwise similar candidates. The positive diagnostic in the longest-history slice suggests that richer history-dependent ordering is plausible, while this implementation avoids all feedback-derived inference columns."
+  },
+  {
+   "artifacts": {
+    "code change": "iter-014/attempt-2/pipeline.diff",
+    "combination": "iter-014/ensemble-selection.json",
+    "implementation check": "iter-014/attempt-2/implementation-audit.json",
+    "pipeline": "iter-014/attempt-2/pipeline.py",
+    "proposal": "iter-014/proposal.json",
+    "reflection": "iter-014/reflection.json",
+    "selection": "iter-014/selection-trace.json"
+   },
+   "candidate_entered_combination": null,
+   "combination_ci95": null,
+   "combination_delta": null,
+   "decision": "REJECT",
+   "execution_mode": "custom_patch",
+   "expected": "The unchanged DeepFM should show a positive trusted validation-primary and marginal portfolio-primary delta, with the largest plausible benefit on rows where viewing-depth information distinguishes candidates beyond click.",
+   "hypothesis": "Replacing the parent's auxiliary reward bundle with three explicit engagement outcomes plus a dense soft watch-completion head will improve the main long_view ranking learned by the unchanged DeepFM.",
+   "id": "n014",
+   "is_best_standalone": false,
+   "is_portfolio_member": false,
+   "iteration": 14,
+   "kind": "experiment",
+   "label": "watch-aligned multi-task auxiliary targets",
+   "lesson": "Use DV.train_targets(names) according to its batch return contract, verify column and row shapes before assembly, and then align the resulting matrix to train_idx.",
+   "mechanism": "watch-aligned multi-task auxiliary targets",
+   "operator_id": null,
+   "parent_id": "w002",
+   "parent_references": [
+    "w002"
+   ],
+   "patch_scope": [
+    "target"
+   ],
+   "portfolio_weight": null,
+   "result": "The experiment did not reach training or trusted evaluation. Smoke testing failed in build_target because load_target_column('is_click') produced a scalar-shaped value, while the implementation asserted a full-length vector of 1,141,112 rows. Therefore, the watch-aligned auxiliary-target hypothesis was not tested, and the reported validation value cannot establish its effect.",
+   "score": null,
+   "score_ci95": null,
+   "score_delta": null,
+   "status": "FAILED",
+   "status_key": "failed",
+   "status_label": "Implementation failed",
+   "times_selected_as_parent": 0,
+   "why": "Click supplies a strongly aligned binary auxiliary signal, while clipped watch ratio supplies a denser graded signal tied to viewing depth. Explicit neutral handling of invalid ratios avoids treating zero-duration rows as certain non-completions. This changes target semantics rather than repeating the rejected scalar aux_weight transition from 0.1 to 0.2."
+  },
+  {
+   "artifacts": {
+    "code change": "iter-015/attempt-0/pipeline.diff",
+    "combination": "iter-015/ensemble-selection.json",
+    "implementation check": "iter-015/attempt-0/implementation-audit.json",
+    "metrics": "iter-015/metrics.json",
+    "pipeline": "iter-015/attempt-0/pipeline.py",
+    "proposal": "iter-015/proposal.json",
+    "reflection": "iter-015/reflection.json",
+    "selection": "iter-015/selection-trace.json"
+   },
+   "candidate_entered_combination": false,
+   "combination_ci95": null,
+   "combination_delta": null,
+   "decision": "ROLLBACK",
+   "execution_mode": "custom_patch",
+   "expected": "If the hypothesis is correct, the candidate will improve the short-history slice and produce a positive marginal portfolio-primary delta, with each eligible training user contributing exactly eight sampled pairs per epoch.",
+   "hypothesis": "Equalizing pairwise training mass across eligible users will improve the macro-style GAUC and nDCG@5 objective, especially for short-history users, and yield a complementary ranking branch relative to the exposure-weighted parent.",
+   "id": "n015",
+   "is_best_standalone": false,
+   "is_portfolio_member": false,
+   "iteration": 15,
+   "kind": "experiment",
+   "label": "macro-user-balanced pairwise FM training",
+   "lesson": "Do not replace exposure-weighted FM training with a hard eight-pair-per-user cap; if revisiting macro alignment, preserve substantially more within-user information and isolate weighting from trainer changes.",
+   "mechanism": "macro-user-balanced pairwise FM training",
+   "operator_id": null,
+   "parent_id": "w001",
+   "parent_references": [
+    "w001"
+   ],
+   "patch_scope": [
+    "target",
+    "train",
+    "predict"
+   ],
+   "portfolio_weight": null,
+   "result": "The experiment cleanly contradicts the stated hypothesis. The candidate reduced standalone primary by 0.00904 versus the incumbent, with a paired 95% CI of [-0.01138, -0.00721], excluding zero. Both component metrics were low enough to produce a primary mean of 0.59494, and the result was stable across three seeds (seed SD 0.00023). The predicted short-history benefit also did not occur: the lowest-history quartile declined by 0.00627, while every history quartile, item-popularity quartile, and tab slice was negative. Losses were somewhat smaller for the shortest-history users than for longer-history users, but this is only a relative pattern within an overall degradation and does not support the claim. The branch also failed as an error diversifier: adding it to the portfolio changed primary by -0.000253, with a CI crossing zero, so there is no evidence of complementary value. Assuming the contract diagnostics confirmed uniform same-user sampling, these results reject fixed eight-pair macro-user balancing in this three-epoch custom FM configuration; they do not establish that all forms of user-balanced weighting are harmful, because the intervention also sharply capped information use and changed the trainer implementation relative to the parent.",
+   "score": 0.5958773271682127,
+   "score_ci95": [
+    -0.011381182430353265,
+    -0.007208877095650196
+   ],
+   "score_delta": -0.00903604438449035,
+   "status": "COMPLETE",
+   "status_key": "rollback",
+   "status_label": "Rolled back",
+   "times_selected_as_parent": 0,
+   "why": "The evaluation aggregates user-level ranking behavior, but the current training recipe is organized around sampled positives rather than a fixed contribution per user. Capping each eligible user's pair count directly changes the reward weighting toward the evaluation unit and structurally targets underrepresented users without exposing evaluation labels."
+  },
+  {
+   "artifacts": {
+    "metrics": "warmstart/members/member-001/metrics.json",
+    "pipeline": "warmstart/members/member-001/attempt-0/pipeline.py"
+   },
+   "candidate_entered_combination": null,
+   "combination_ci95": null,
+   "combination_delta": null,
+   "decision": "ACCEPT",
+   "execution_mode": "operator",
+   "expected": null,
+   "hypothesis": "Verify legal_rank_stack_v1 as member 1 of empirical portfolio validated_rank_router_v2.",
+   "id": "w001",
+   "is_best_standalone": false,
+   "is_portfolio_member": true,
+   "iteration": null,
+   "kind": "warmstart",
+   "label": "Validated legal ranking stack",
+   "lesson": "Retain this exact operator only through the verified portfolio contract.",
+   "mechanism": "Validated legal ranking stack",
+   "operator_id": "legal_rank_stack_v1",
+   "parent_id": "n000",
+   "parent_references": [],
+   "patch_scope": [
+    "features",
+    "target",
+    "model",
+    "loss",
+    "train"
+   ],
+   "portfolio_weight": 0.4,
+   "result": "Locked reproduction completed with selection_primary 0.604913372; standalone status does not override its designated heterogeneous-portfolio role.",
+   "score": 0.6049133715527031,
+   "score_ci95": [
+    0.0013411214604212463,
+    0.004889614316386501
+   ],
+   "score_delta": 0.003035402673347898,
+   "status": "COMPLETE",
+   "status_key": "accepted",
+   "status_label": "Kept",
+   "times_selected_as_parent": 5,
+   "why": "A fresh locked three-seed reproduction is required before the prior can initialize formal search."
+  },
+  {
+   "artifacts": {
+    "metrics": "warmstart/members/member-002/metrics.json",
+    "pipeline": "warmstart/members/member-002/attempt-0/pipeline.py"
+   },
+   "candidate_entered_combination": null,
+   "combination_ci95": null,
+   "combination_delta": null,
+   "decision": "ACCEPT",
+   "execution_mode": "operator",
+   "expected": null,
+   "hypothesis": "Verify deepfm_engagement_mtl_v1 as member 2 of empirical portfolio validated_rank_router_v2.",
+   "id": "w002",
+   "is_best_standalone": false,
+   "is_portfolio_member": true,
+   "iteration": null,
+   "kind": "warmstart",
+   "label": "CPU DeepFM + four engagement heads",
+   "lesson": "Retain this exact operator only through the verified portfolio contract.",
+   "mechanism": "CPU DeepFM + four engagement heads",
+   "operator_id": "deepfm_engagement_mtl_v1",
+   "parent_id": "n000",
+   "parent_references": [],
+   "patch_scope": [
+    "target",
+    "model",
+    "loss",
+    "train"
+   ],
+   "portfolio_weight": 0.4,
+   "result": "Locked reproduction completed with selection_primary 0.604751755; standalone status does not override its designated heterogeneous-portfolio role.",
+   "score": 0.6047517554743435,
+   "score_ci95": [
+    0.0013664469124173545,
+    0.004268526767862965
+   ],
+   "score_delta": 0.00287378659498827,
+   "status": "COMPLETE",
+   "status_key": "accepted",
+   "status_label": "Kept",
+   "times_selected_as_parent": 5,
+   "why": "A fresh locked three-seed reproduction is required before the prior can initialize formal search."
+  },
+  {
+   "artifacts": {
+    "metrics": "warmstart/members/member-003/metrics.json",
+    "pipeline": "warmstart/members/member-003/attempt-0/pipeline.py"
+   },
+   "candidate_entered_combination": null,
+   "combination_ci95": null,
+   "combination_delta": null,
+   "decision": "ROLLBACK",
+   "execution_mode": "operator",
+   "expected": null,
+   "hypothesis": "Verify item_lambdarank as member 3 of empirical portfolio validated_rank_router_v2.",
+   "id": "w003",
+   "is_best_standalone": false,
+   "is_portfolio_member": true,
+   "iteration": null,
+   "kind": "warmstart",
+   "label": "Item/context LambdaRank",
+   "lesson": "Retain this exact operator only through the verified portfolio contract.",
+   "mechanism": "Item/context LambdaRank",
+   "operator_id": "item_lambdarank",
+   "parent_id": "n000",
+   "parent_references": [],
+   "patch_scope": [
+    "features",
+    "target",
+    "model",
+    "train"
+   ],
+   "portfolio_weight": 0.2,
+   "result": "Locked reproduction completed with selection_primary 0.601057584; standalone status does not override its designated heterogeneous-portfolio role.",
+   "score": 0.6010575837714116,
+   "score_ci95": [
+    -0.0030028916984608856,
+    0.0014032335319028113
+   ],
+   "score_delta": -0.0008203851079435776,
+   "status": "COMPLETE",
+   "status_key": "rollback",
+   "status_label": "Rolled back",
+   "times_selected_as_parent": 4,
+   "why": "A fresh locked three-seed reproduction is required before the prior can initialize formal search."
+  },
+  {
+   "artifacts": {
+    "combination": "ensemble/selection.json"
+   },
+   "candidate_entered_combination": null,
+   "combination_ci95": null,
+   "combination_delta": null,
+   "decision": "INCUMBENT_RETAINED",
+   "execution_mode": "combination",
+   "expected": null,
+   "hypothesis": "Combine models that make different ranking errors.",
+   "id": "portfolio-best",
+   "is_best_standalone": false,
+   "is_portfolio_member": false,
+   "iteration": null,
+   "kind": "portfolio",
+   "label": "Best model combination",
+   "lesson": null,
+   "mechanism": "exhaustive best-subset within-user rank average over node seed ensembles with bounded 0.1-step global weights with pre-registered label-free tab routing",
+   "operator_id": null,
+   "parent_id": null,
+   "parent_references": [],
+   "patch_scope": [],
+   "portfolio_weight": null,
+   "result": "INCUMBENT_RETAINED",
+   "score": 0.6061277485758569,
+   "score_ci95": null,
+   "score_delta": 0.000914708117099261,
+   "status": "INCUMBENT_RETAINED",
+   "status_key": "portfolio",
+   "status_label": "Best combination",
+   "times_selected_as_parent": 0,
+   "why": "The combination is kept only when its validation evidence is stronger than the alternatives."
+  }
+ ],
+ "run": {
+  "current_iteration": null,
+  "directory": "/home/zhihan/techjam/track2-agent/runs/pilot-15round-gpt56sol-20260831-001",
+  "heartbeat_age_s": 46199.5,
+  "id": "pilot-15round-gpt56sol-20260831-001",
+  "last_completed_iteration": 15,
+  "last_update_age_s": 46199.5,
+  "model": "gpt-5.6-sol",
+  "phase": "Experiment finished",
+  "role": "pilot",
+  "status": "complete",
+  "status_label": "Complete",
+  "stop_reason": "iteration_cap"
+ },
+ "schema_version": "experiment-graph-view-1.0",
+ "selection": {
+  "artifact": "ensemble/selection.json",
+  "context_router": {
+   "fallback": "global member weights",
+   "feature": "tab",
+   "min_rows": 1000,
+   "routes": [
+    {
+     "member_weights": {
+      "w001": 0.1,
+      "w002": 0.6,
+      "w003": 0.3
+     },
+     "rows": 13726,
+     "value": 0
+    },
+    {
+     "member_weights": {
+      "w001": 0.3,
+      "w002": 0.4,
+      "w003": 0.3
+     },
+     "rows": 92672,
+     "value": 1
+    },
+    {
+     "member_weights": {
+      "w001": 0.9,
+      "w002": 0.0,
+      "w003": 0.1
+     },
+     "rows": 3834,
+     "value": 2
+    },
+    {
+     "member_weights": {
+      "w001": 0.5,
+      "w002": 0.4,
+      "w003": 0.1
+     },
+     "rows": 7877,
+     "value": 4
+    },
+    {
+     "member_weights": {
+      "w001": 0.0,
+      "w002": 0.3,
+      "w003": 0.7
+     },
+     "rows": 5170,
+     "value": 6
+    }
+   ],
+   "source": "pre_registered_empirical_prior",
+   "test_label_free": true,
+   "weight_grid_step": 0.1
+  },
+  "members": [
+   {
+    "mechanism": "Validated legal ranking stack",
+    "node_id": "w001",
+    "operator_stack": [
+     "legal_rank_stack_v1"
+    ],
+    "pipeline_path": "warmstart/members/member-001/attempt-0/pipeline.py",
+    "pipeline_sha256": "960c2c3af18107d8def79c6e969d2be9870d70f29465e1ed68f033f23aad4f8d",
+    "standalone_primary": 0.6049133715527031,
+    "weight": 0.4
+   },
+   {
+    "mechanism": "CPU DeepFM + four engagement heads",
+    "node_id": "w002",
+    "operator_stack": [
+     "deepfm_engagement_mtl_v1"
+    ],
+    "pipeline_path": "warmstart/members/member-002/attempt-0/pipeline.py",
+    "pipeline_sha256": "2b3ae1494c2fe98e6dc6de77f09d3488d094f2f40c27837031b5a7e5ecedc447",
+    "standalone_primary": 0.6047517554743435,
+    "weight": 0.4
+   },
+   {
+    "mechanism": "Item/context LambdaRank",
+    "node_id": "w003",
+    "operator_stack": [
+     "item_lambdarank"
+    ],
+    "pipeline_path": "warmstart/members/member-003/attempt-0/pipeline.py",
+    "pipeline_sha256": "5a61d820798d697c7c097c674315d9ac31aeb101a97c152ec46cfa9ff58e54c0",
+    "standalone_primary": 0.6010575837714116,
+    "weight": 0.2
+   }
+  ],
+  "node_id": "portfolio-best",
+  "score": 0.6061277485758569,
+  "status": "INCUMBENT_RETAINED"
+ },
+ "stats": {
+  "accepted": 0,
+  "best_combination": 0.6061277485758569,
+  "best_standalone": 0.6052800193085559,
+  "best_standalone_node": "n002",
+  "completed_rounds": 15,
+  "failed": 5,
+  "graph_nodes": 18,
+  "measured_models": 12,
+  "new_experiments": 14,
+  "planning_stops": 0,
+  "rolled_back": 6,
+  "total_tokens": 883495,
+  "uncertain": 3,
+  "wall_s": 6323.782999999999
+ },
+ "timeline": [
+  {
+   "decision": "WARMSTART_VERIFIED",
+   "iteration": 1,
+   "label": "Reproduce the locked validation-only portfolio before LLM search.",
+   "score": 0.6061277485758569,
+   "status": "COMPLETE",
+   "tokens": 0,
+   "wall_s": 204.405
+  },
+  {
+   "decision": "UNCERTAIN",
+   "iteration": 2,
+   "label": "hour and strictly-prior user-gap interaction fields",
+   "score": 0.6052800193085559,
+   "status": "COMPLETE",
+   "tokens": 43993,
+   "wall_s": 392.955
+  },
+  {
+   "decision": "ROLLBACK",
+   "iteration": 3,
+   "label": "selected static user-profile FM interactions",
+   "score": 0.604175571136877,
+   "status": "COMPLETE",
+   "tokens": 30749,
+   "wall_s": 307.005
+  },
+  {
+   "decision": "ROLLBACK",
+   "iteration": 4,
+   "label": "click-tiebroken ordinal LambdaRank relevance",
+   "score": 0.5994856848549472,
+   "status": "COMPLETE",
+   "tokens": 43742,
+   "wall_s": 448.134
+  },
+  {
+   "decision": "ROLLBACK",
+   "iteration": 5,
+   "label": "censored watch-time auxiliary head",
+   "score": 0.6035228392532407,
+   "status": "COMPLETE",
+   "tokens": 109741,
+   "wall_s": 729.662
+  },
+  {
+   "decision": "ROLLBACK",
+   "iteration": 6,
+   "label": "tab-6 oversampled mixture-of-experts FM",
+   "score": 0.6048792975351228,
+   "status": "COMPLETE",
+   "tokens": 55502,
+   "wall_s": 382.178
+  },
+  {
+   "decision": "REJECT",
+   "iteration": 7,
+   "label": "strictly-prior-date user-by-tab affinity features",
+   "score": null,
+   "status": "FAILED",
+   "tokens": 74638,
+   "wall_s": 383.555
+  },
+  {
+   "decision": "REJECT",
+   "iteration": 8,
+   "label": "valid-watch-ratio soft-label shaping",
+   "score": null,
+   "status": "FAILED",
+   "tokens": 62830,
+   "wall_s": 293.161
+  },
+  {
+   "decision": "ROLLBACK",
+   "iteration": 9,
+   "label": "tab-6 importance-weighted BPR training",
+   "score": 0.6046269947114137,
+   "status": "COMPLETE",
+   "tokens": 52418,
+   "wall_s": 329.792
+  },
+  {
+   "decision": "UNCERTAIN",
+   "iteration": 10,
+   "label": "strictly_prior_exposure_affinity_features",
+   "score": 0.6013137305403489,
+   "status": "COMPLETE",
+   "tokens": 80578,
+   "wall_s": 663.908
+  },
+  {
+   "decision": "REJECT",
+   "iteration": 11,
+   "label": "replace weak hate auxiliary head with profile-enter supervision",
+   "score": null,
+   "status": "FAILED",
+   "tokens": 70291,
+   "wall_s": 441.235
+  },
+  {
+   "decision": "ORCHESTRATOR_ERROR",
+   "iteration": 12,
+   "label": "user-uniform pairwise FM training",
+   "score": null,
+   "status": "ORCHESTRATOR_ERROR",
+   "tokens": 66726,
+   "wall_s": 654.845
+  },
+  {
+   "decision": "UNCERTAIN",
+   "iteration": 13,
+   "label": "label-free repeat-exposure affinity features",
+   "score": 0.6016871257980373,
+   "status": "COMPLETE",
+   "tokens": 44863,
+   "wall_s": 332.735
+  },
+  {
+   "decision": "REJECT",
+   "iteration": 14,
+   "label": "watch-aligned multi-task auxiliary targets",
+   "score": null,
+   "status": "FAILED",
+   "tokens": 98493,
+   "wall_s": 441.05
+  },
+  {
+   "decision": "ROLLBACK",
+   "iteration": 15,
+   "label": "macro-user-balanced pairwise FM training",
+   "score": 0.5958773271682127,
+   "status": "COMPLETE",
+   "tokens": 48931,
+   "wall_s": 319.163
+  }
+ ],
+ "warnings": []
+}

@@ -1,0 +1,74 @@
+{
+  "basis_type": "task_spec",
+  "estimated_cost_s": 1100,
+  "evidence": [
+    {
+      "ref": "Trusted metrics rank rows independently within each user.",
+      "type": "task_spec"
+    },
+    {
+      "ref": "Fixed aggregate directional feedback: train_user_history_quartile cutpoints=[16,35,64], q2 delta_primary=-0.0003552387347491859, q3 delta_primary=-0.00038142376887939644.",
+      "type": "diagnostic"
+    },
+    {
+      "ref": "SO.train currently consumes Xs[train][train_idx] under bpr_censored_watch, so user-balanced sampling requires an explicit replacement training consumer rather than an unused config key.",
+      "type": "current_code"
+    }
+  ],
+  "evidence_adaptation": null,
+  "execution_mode": "custom_patch",
+  "expected_observation": "Relative to w001, mean valid primary should increase, with nonnegative directional deltas in the 17-35 and 36-64 history slices and a positive marginal change when admitted as a portfolio refinement.",
+  "experiment_contract": {
+    "claim": "Equal-user rather than equal-exposure pair sampling improves within-user ranking.",
+    "expected_observable": "Compared with an otherwise identical row-weighted implementation, sampled pair counts become approximately uniform across eligible users while predictions remain nonconstant within user.",
+    "falsification_condition": "Reject if mean valid primary does not improve, marginal portfolio primary is nonpositive, or the two targeted medium-history slices remain jointly worse without an offsetting trusted primary gain.",
+    "forbidden_shortcuts": [
+      "Sampling rows uniformly and merely labeling it user-balanced",
+      "Using validation or test labels for sampling, weighting, checkpoints, or feature construction",
+      "Adding a per-user constant to predictions",
+      "Changing embedding width, learning rate, feature columns, or auxiliary targets in the scored comparison"
+    ],
+    "portfolio_role": "member_refinement",
+    "required_components": [
+      "Train-only long_view labels validated with DV.assert_trainable",
+      "Per-user positive and negative row pools",
+      "Uniform sampling over users that contain both classes",
+      "Correct BPR gradient sign that increases z_pos-z_neg in a one-step check",
+      "Prediction from the same learned FM parameters on unchanged inference features"
+    ]
+  },
+  "fallback": "Rollback to the delegated w001 trainer; retain only offline smoke-test findings about pair counts and gradient parity, without deploying predictions.",
+  "hypothesis": "Giving every eligible training user equal expected pairwise loss mass will improve within-user validation ranking, especially for short and medium histories, and will add marginal portfolio value by reducing the incumbent's exposure-frequency bias.",
+  "implementation_plan": "Retain the parent's globally offset categorical feature matrix, but replace the delegated training loop with a self-contained FM BPR loop that samples an eligible user uniformly, then samples one long_view-positive and one long_view-negative exposure for that user. Each sampled user therefore contributes equal expected pair mass regardless of history length. The target block will return train-only long_view labels plus the corresponding train user IDs after DV.assert_trainable. The train block will construct positive/negative row lists per user, optimize the FM score difference with softplus(-(z_pos-z_neg)), and use the current k=32, lr=0.0005, l2=1e-6 and three-epoch budget. The predict block will score the unchanged Xs[split] matrix from the learned linear and embedding parameters. Include a deterministic one-step sign check and a uniform-row-weight parity fixture before the scored user-balanced run.",
+  "justification": "The current delegated sampler is optimized over exposure pairs, so prolific users can dominate gradient mass even though evaluation aggregates ranking quality by user. Uniform user sampling directly aligns optimization mass with the evaluation unit and targets the two history slices where the latest ordering regressed.",
+  "mechanism": "user-uniform pairwise FM training",
+  "mechanism_tags": [
+    "pairwise-ranking",
+    "user-balanced-loss",
+    "metric-alignment",
+    "sampling",
+    "fm"
+  ],
+  "observation": "Both trusted metrics rank within user, while train histories are highly unequal; the supplied cutpoints for \"train_user_history_quartile\" are [16,35,64], and the last candidate had negative slice deltas of -0.0003552387347491859 for histories 17-35 and -0.00038142376887939644 for histories 36-64.",
+  "operator_id": null,
+  "parent_operator_stack": [
+    "legal_rank_stack_v1"
+  ],
+  "parent_references": [
+    "w001"
+  ],
+  "patch_scope": [
+    "target",
+    "train",
+    "predict"
+  ],
+  "persona": "optimizer",
+  "primary_block": "train",
+  "research_evidence": [],
+  "research_nonuse_reason": "The supplied BPR evidence concerns ordinary same-user negative sampling, whereas this experiment specifically tests equal expected gradient mass per user; the metric definition and history-slice diagnostics are the more direct basis.",
+  "risk": [
+    "A custom FM loop may not reproduce the optimized stable backend exactly.",
+    "Uniform user weighting may discard useful signal from high-history users or raise gradient variance.",
+    "CPU runtime may increase if pair construction is not vectorized."
+  ]
+}

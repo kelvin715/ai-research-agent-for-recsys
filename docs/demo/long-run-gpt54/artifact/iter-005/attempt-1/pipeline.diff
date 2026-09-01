@@ -1,0 +1,44 @@
+--- incumbent/pipeline.py
++++ candidate/pipeline.py
+@@ -66,7 +66,40 @@
+ 
+ # <<<BLOCK:predict>>>
+ def predict(model, Xs, split):
+-    return SO.predict(model, Xs, split)
++    pred = np.asarray(SO.predict(model, Xs, split), dtype=np.float64)
++
++    train = DV.load('train')
++    target = DV.load(split)
++
++    y = np.asarray(DV.train_targets(['long_view'])['long_view'], dtype=np.float64)
++    DV.assert_trainable(y, 'predict_train_only_item_prior')
++    video_id_train = np.asarray(train.video_id)
++
++    uniq_vid, inv = np.unique(video_id_train, return_inverse=True)
++    cnt = np.bincount(inv)
++    pos = np.bincount(inv, weights=y)
++    global_prior = float(y.mean()) if y.size else 0.0
++    item_prior = pos / np.maximum(cnt, 1)
++
++    order = np.argsort(uniq_vid)
++    uniq_vid = uniq_vid[order]
++    item_prior = item_prior[order]
++
++    video_id_target = np.asarray(target.video_id)
++    tab_target = np.asarray(target.tab)
++
++    prior_target = np.full(target.n, global_prior, dtype=np.float64)
++    loc = np.searchsorted(uniq_vid, video_id_target)
++    found = (loc < uniq_vid.size) & (uniq_vid[loc] == video_id_target)
++    prior_target[found] = item_prior[loc[found]]
++
++    mask = (tab_target == 6)
++    if np.any(mask):
++        alpha = 0.6
++        pred = pred.copy()
++        pred[mask] = alpha * pred[mask] + (1.0 - alpha) * prior_target[mask]
++
++    return pred
+ # <<<END:predict>>>
+ 
+ 

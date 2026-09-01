@@ -1,0 +1,56 @@
+--- incumbent/pipeline.py
++++ candidate/pipeline.py
+@@ -60,13 +60,51 @@
+ def train(splits, train_idx, Xs, dim, y, seed, verbose=False):
+     config = dict(OP_CONFIG)
+     config['hp'] = dict(HP)
+-    return SO.train(splits, train_idx, Xs, dim, y, seed, config, verbose)
++
++    train_idx = np.asarray(train_idx, dtype=np.int64)
++    global_model, global_info = SO.train(
++        splits, train_idx, Xs, dim, y, seed, config, verbose
++    )
++
++    train_tab = np.asarray(splits['train'].tab)
++    tab6_idx = train_idx[train_tab[train_idx] == 6]
++    specialist_idx = np.concatenate(
++        [train_idx, tab6_idx, tab6_idx, tab6_idx]
++    )
++
++    # Targets returned for the global index have one entry per global training
++    # occurrence. Rebuild them for the duplicated row stream so the backend's
++    # users, features, and targets all have identical occurrence-level length.
++    specialist_y = SO.build_target(splits, specialist_idx, config)
++    specialist_model, specialist_info = SO.train(
++        splits, specialist_idx, Xs, dim, specialist_y, seed, config, verbose
++    )
++
++    info = dict(global_info)
++    info['global_train_rows'] = int(train_idx.size)
++    info['tab6_base_rows'] = int(tab6_idx.size)
++    info['specialist_train_rows'] = int(specialist_idx.size)
++    info['specialist_info'] = specialist_info
++    model = {
++        'global': global_model,
++        'specialist': specialist_model,
++    }
++    return model, info
+ # <<<END:train>>>
+ 
+ 
+ # <<<BLOCK:predict>>>
+ def predict(model, Xs, split):
+-    return SO.predict(model, Xs, split)
++    global_pred = np.asarray(SO.predict(model['global'], Xs, split))
++    specialist_pred = np.asarray(SO.predict(model['specialist'], Xs, split))
++    tab6_mask = np.asarray(DV.load(split).tab) == 6
++
++    pred = global_pred.copy()
++    pred[tab6_mask] = (
++        0.5 * global_pred[tab6_mask] +
++        0.5 * specialist_pred[tab6_mask]
++    )
++    return pred
+ # <<<END:predict>>>
+ 
+ 

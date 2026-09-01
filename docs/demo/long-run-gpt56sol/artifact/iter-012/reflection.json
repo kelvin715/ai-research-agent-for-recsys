@@ -1,0 +1,5 @@
+{
+  "analysis": "The experiment produced no valid implementation or trusted metric outcome because orchestration failed after three JSON decoding errors. Therefore, there is no evidence about whether user-uniform pairwise FM training improves within-user ranking, medium-history slices, or portfolio value; the hypothesis remains untested rather than falsified.",
+  "next_lesson": "Validate that the custom patch emits schema-compliant, nonempty JSON before rerunning the unchanged hypothesis.",
+  "result": "failed"
+}

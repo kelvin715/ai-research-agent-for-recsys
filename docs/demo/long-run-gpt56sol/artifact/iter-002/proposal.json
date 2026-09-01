@@ -1,0 +1,71 @@
+{
+  "basis_type": "task_spec",
+  "estimated_cost_s": 950,
+  "evidence": [
+    {
+      "ref": "Trusted operator catalog entry legal_temporal_context: adds hour and strictly-earlier exposure-gap buckets; search_priority='first_round_exploit'.",
+      "type": "task_spec"
+    },
+    {
+      "ref": "Trusted feature_api states that 'hour' appends hourmin//100 and 'user_gap' appends a strictly-earlier exposure-gap bucket with edges fit on selected train rows only.",
+      "type": "task_spec"
+    },
+    {
+      "ref": "Current OP_CONFIG has an empty features list, so neither supported temporal field is present.",
+      "type": "current_code"
+    }
+  ],
+  "evidence_adaptation": null,
+  "execution_mode": "operator",
+  "expected_observation": "Feature field count and embedding-table dimension should increase, predictions should differ from w002, and trusted validation should show improved standalone or marginal portfolio primary if temporal state is informative.",
+  "experiment_contract": {
+    "claim": "The catalogued combination of hour and strictly-prior user exposure-gap fields improves the w002 representation.",
+    "expected_observable": "Xs gains two categorical fields, feature_dim changes, and predictions are not identical to the parent.",
+    "falsification_condition": "Reject the hypothesis if the fields are not present in Xs, leakage checks fail, predictions remain identical, or trusted marginal portfolio primary does not improve.",
+    "forbidden_shortcuts": [
+      "Use future exposures when calculating a row's gap.",
+      "Fit quantile boundaries on validation or test rows.",
+      "Add a per-user-only score after prediction instead of candidate interactions.",
+      "Split the compound catalog operator into separate experiments."
+    ],
+    "portfolio_role": "member_refinement",
+    "required_components": [
+      "Append hourmin//100 as a categorical field.",
+      "Append a strictly-earlier per-user exposure-gap bucket.",
+      "Fit gap bucket boundaries on selected training rows only.",
+      "Feed both fields through the existing DeepFM embedding and interaction paths."
+    ]
+  },
+  "fallback": "Keep the original w002 representation if the operator fails the trusted portfolio acceptance gate.",
+  "hypothesis": "Adding legal hour and recency fields will improve candidate-dependent ranking because DeepFM interactions let temporal state modulate each user's preference for the candidate item rather than adding only a per-user constant.",
+  "implementation_plan": "Apply the registry-owned legal_temporal_context operator exactly as catalogued. In the features block, append hourmin//100 and the strictly-earlier per-user exposure-gap bucket to the globally offset categorical feature matrix. Fit gap quantile edges using selected training rows only and map all splits with those train-fitted edges. The unchanged DeepFM then embeds these fields and crosses them with user, candidate video, author, tab, duration, and profile fields.",
+  "justification": "Temporal consumption state can alter which videos are likely to receive a long view. The fields enter the FM and deep interaction paths, so their effect can vary by candidate item and can change both within-user metrics.",
+  "mechanism": "hour and strictly-prior user-gap interaction fields",
+  "mechanism_tags": [
+    "temporal-context",
+    "user-gap",
+    "hour",
+    "categorical-interactions",
+    "deepfm"
+  ],
+  "observation": "The current parent has OP_CONFIG['features']=[], while the catalog marks legal_temporal_context as an applicable first_round_exploit for this DeepFM parent.",
+  "operator_id": "legal_temporal_context",
+  "parent_operator_stack": [
+    "deepfm_engagement_mtl_v1"
+  ],
+  "parent_references": [
+    "w002"
+  ],
+  "patch_scope": [
+    "features"
+  ],
+  "persona": "architecture",
+  "primary_block": "features",
+  "research_evidence": [],
+  "research_nonuse_reason": "The deterministic catalogued operator and its visible feature-consumption contract are more direct than the supplied research records, none of which studies this exact temporal-context refinement.",
+  "risk": [
+    "Temporal distributions may drift between train and evaluation dates.",
+    "Gap buckets may be sparse for users with little history.",
+    "The refined member may become more correlated with the legal ranking-stack member."
+  ]
+}

@@ -1,0 +1,5 @@
+{
+  "analysis": "The predict-only tab-aware affine remap was definitely active because prediction hashes changed on every seed, but it did not improve the trusted objective. Validation primary versus the search parent moved slightly downward (-0.0001529), the ensemble paired CI crossed zero, and portfolio delta was also negative (-0.0002527), so there is no promotion evidence. The targeted tab slices did not behave as expected from the prior diagnostic: tabs 2 and 4 improved slightly and tab 6 was neutral, but tab 0 flipped negative and the net effect remained worse overall. This means the earlier tab-level directional feedback was not a reliable basis for a fixed hard-coded inference calibration in this parent branch.",
+  "next_lesson": "Do not hand-code tab-specific predict-time score remaps from prior slice feedback; prefer learned train-time interactions or richer context features.",
+  "result": "not_supported"
+}

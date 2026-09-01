@@ -1,0 +1,25 @@
+{
+  "analysis": "trusted operator materialization; no LLM patch fidelity gap",
+  "changed_runtime_path": true,
+  "component_evidence": [
+    {
+      "code_evidence": "trusted registry operator selected_user_profile with locked source and unit-tested materialization",
+      "component": "Registry-owned addition of all seven selected pre-impression user-profile fields"
+    },
+    {
+      "code_evidence": "trusted registry operator selected_user_profile with locked source and unit-tested materialization",
+      "component": "Train-only vocabulary fitting with one UNK slot for unseen values"
+    },
+    {
+      "code_evidence": "trusted registry operator selected_user_profile with locked source and unit-tested materialization",
+      "component": "Globally offset categorical IDs appended to Xs for every split"
+    },
+    {
+      "code_evidence": "trusted registry operator selected_user_profile with locked source and unit-tested materialization",
+      "component": "Reuse of the existing FM and bpr_censored_watch training path"
+    }
+  ],
+  "forbidden_shortcuts_found": [],
+  "missing_components": [],
+  "status": "PASS"
+}

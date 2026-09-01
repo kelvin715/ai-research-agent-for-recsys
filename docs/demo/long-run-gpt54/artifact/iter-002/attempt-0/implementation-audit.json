@@ -1,0 +1,21 @@
+{
+  "analysis": "trusted operator materialization; no LLM patch fidelity gap",
+  "changed_runtime_path": true,
+  "component_evidence": [
+    {
+      "code_evidence": "trusted registry operator legal_temporal_context with locked source and unit-tested materialization",
+      "component": "SO.build_features must receive config enabling hour and user_gap"
+    },
+    {
+      "code_evidence": "trusted registry operator legal_temporal_context with locked source and unit-tested materialization",
+      "component": "DeepFM field_count must increase because Xs[split].shape[1] changes"
+    },
+    {
+      "code_evidence": "trusted registry operator legal_temporal_context with locked source and unit-tested materialization",
+      "component": "training and prediction must consume the augmented X matrices"
+    }
+  ],
+  "forbidden_shortcuts_found": [],
+  "missing_components": [],
+  "status": "PASS"
+}

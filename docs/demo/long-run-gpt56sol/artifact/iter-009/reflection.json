@@ -1,0 +1,5 @@
+{
+  "analysis": "The intervention changed predictions, but it failed both declared success criteria. Tab=6 performance worsened versus the incumbent by -0.005413 rather than improving, so the targeted residual was not repaired. Standalone primary declined by -0.000286, and portfolio primary declined by -0.000253; neither paired interval excluded zero, so the aggregate effects are statistically inconclusive in magnitude but provide no promotion evidence. The largest observed slice damage was instead on tab=0 (-0.007411), while dominant tab=1 was nearly unchanged. Thus twofold tab-6 row replication did not create a useful tab-6 specialist or positive portfolio complement. The reported outcome does not verify the exact expanded-index count, but there is no indication of execution failure and prediction hashes confirm a behavioral change.",
+  "next_lesson": "Do not retry uniform tab-6 replication: increased training mass did not translate into better tab-6 ordering and introduced broader slice degradation.",
+  "result": "not_supported"
+}

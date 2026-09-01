@@ -1,0 +1,31 @@
+{
+  "analysis": "The equal-user sampler, pair pools, BPR sign fixture, and FM prediction dataflow are concrete and executable. However, replacing the fixed bpr_censored_watch training objective with unauxiliated long_view BPR is an undeclared and explicitly forbidden change, so the implementation is not faithful to the accepted comparison contract.",
+  "changed_runtime_path": true,
+  "component_evidence": [
+    {
+      "code_evidence": "build_target reads splits['train'].label at train_idx, converts it to a one-dimensional binary array, and calls DV.assert_trainable(labels, 'build_target.long_view').",
+      "component": "Train-only long_view labels validated with DV.assert_trainable"
+    },
+    {
+      "code_evidence": "train maps user_ids to user_inverse, then _build_pair_pools constructs positive_counts, negative_counts, sorted positive_rows/negative_rows, and per-user starts.",
+      "component": "Per-user positive and negative row pools"
+    },
+    {
+      "code_evidence": "_build_pair_pools defines eligible_users where both class counts are positive; _sample_pair_indices(..., mode='uniform_user') samples indices uniformly from eligible_users before sampling one positive and one negative row within each selected user.",
+      "component": "Uniform sampling over users that contain both classes"
+    },
+    {
+      "code_evidence": "_bpr_loss computes softplus(-(z_pos-z_neg)); _run_training_fixtures backpropagates from equal scores and asserts g_pos < 0, g_neg > 0, and a positive hypothetical gradient-step margin change.",
+      "component": "Correct BPR gradient sign that increases z_pos-z_neg in a one-step check"
+    },
+    {
+      "code_evidence": "train optimizes the linear and factors embeddings of _UniformUserFM using Xs['train'][train_idx]; predict applies that same model directly to unchanged Xs[split] batches.",
+      "component": "Prediction from the same learned FM parameters on unchanged inference features"
+    }
+  ],
+  "forbidden_shortcuts_found": [
+    "The parent contract fixes objective='bpr_censored_watch' with aux_weight=0.1 and forbids changing auxiliary targets. The candidate target returns only long_view and user_id, while the custom loss is pure BPR and never consumes HP['aux_weight'] or any censored-watch auxiliary target. Thus the scored comparison silently removes the parent's auxiliary objective despite retaining the unused configuration value."
+  ],
+  "missing_components": [],
+  "status": "REVISE"
+}

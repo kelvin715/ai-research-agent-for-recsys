@@ -1,0 +1,17 @@
+{
+  "analysis": "trusted operator materialization; no LLM patch fidelity gap",
+  "changed_runtime_path": true,
+  "component_evidence": [
+    {
+      "code_evidence": "trusted registry operator selected_user_profile with locked source and unit-tested materialization",
+      "component": "features block expanded by operator"
+    },
+    {
+      "code_evidence": "trusted registry operator selected_user_profile with locked source and unit-tested materialization",
+      "component": "training and prediction both consume the enlarged feature matrix"
+    }
+  ],
+  "forbidden_shortcuts_found": [],
+  "missing_components": [],
+  "status": "PASS"
+}

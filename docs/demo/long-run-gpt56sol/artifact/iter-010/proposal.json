@@ -1,0 +1,71 @@
+{
+  "basis_type": "task_spec",
+  "estimated_cost_s": 150,
+  "evidence": [
+    {
+      "ref": "Personalization must depend on a (user, candidate-item) pair because per-user constants cannot change either metric.",
+      "type": "task_spec"
+    },
+    {
+      "ref": "features currently delegates unchanged to SO.build_features(splits, train_idx, OP_CONFIG), returning the fixed 25-column representation.",
+      "type": "current_code"
+    },
+    {
+      "ref": "splits.train has 1,141,112 rows, 26,210 users, 7,538 videos, and author_id has 6,482 distinct training values, providing repeated exposure structure from which bounded pair counts can be computed.",
+      "type": "diagnostic"
+    }
+  ],
+  "evidence_adaptation": null,
+  "execution_mode": "custom_patch",
+  "expected_observation": "If the representation is useful, the trusted evaluation will show a positive marginal portfolio-primary delta, with the largest plausible gains among users having enough history for nonzero pair statistics rather than the history-count <=16 slice.",
+  "experiment_contract": {
+    "claim": "The sole tested mechanism is adding label-free, strictly-prior user-author and user-video exposure-affinity features to the existing w003 LambdaRank model.",
+    "expected_observable": "feature_dim must increase by exactly three, and an audit sample must show nonzero candidate-dependent affinity values without any evaluation-map updates.",
+    "falsification_condition": "Reject if leakage or candidate invariance is detected, or if trusted marginal portfolio primary is non-positive.",
+    "forbidden_shortcuts": [
+      "Computing pair counts from validation or test exposures",
+      "Using long_view, click, watch ratio, or any other feedback in the appended features",
+      "Appending only a user-history count that is constant within user",
+      "Changing LambdaRank parameters or target grading in the same experiment"
+    ],
+    "portfolio_role": "member_refinement",
+    "required_components": [
+      "Training-row statistics exclude the current row and every later time_ms row",
+      "Validation and test use frozen maps built from training rows only",
+      "At least one appended value varies across candidates for users with heterogeneous author or video histories",
+      "The three appended columns are float32 and are consumed by unchanged SO.train"
+    ]
+  },
+  "fallback": "Roll back the feature block to the fixed SO representation; use audit sparsity only to decide whether a later author-only representation is justified.",
+  "hypothesis": "Adding strictly-prior user-candidate exposure-affinity columns to w003 will improve marginal portfolio primary because the current item/context tree can then split on genuine user-author and user-video interactions rather than only marginal context statistics.",
+  "implementation_plan": "Wrap SO.build_features and append a bounded interaction representation derived only from exposure identities: log1p prior count for (user,author), log1p prior count for (user,video), and smoothed prior-author share within the user's exposure history. For each training row, compute counts using only rows with smaller time_ms, with stable row order breaking ties; do not include the current exposure. For validation and test rows, freeze the maps after all selected training rows and perform lookups without updating them. Unseen users, authors, videos, and pairs receive zero counts. Concatenate the three float32 columns to every Xs matrix and increment feature_count; leave the existing LambdaRank training and prediction consumers unchanged.",
+  "justification": "Prior pair counts vary across candidates for the same user and therefore can change both GAUC and nDCG@5. They use no labels or feedback, remain available at inference, and give LightGBM low-cost interaction summaries that trees would otherwise need raw high-cardinality identifiers to reconstruct.",
+  "mechanism": "strictly_prior_exposure_affinity_features",
+  "mechanism_tags": [
+    "exposure_history",
+    "user_author_interaction",
+    "user_video_interaction",
+    "causal_features",
+    "member_refinement"
+  ],
+  "observation": "The task specification states that per-user constants cannot change either metric and personalization must depend on a (user,candidate-item) pair, while the runtime contract describes the current 25 columns as legal context and group-statistic features rather than explicit user-author or user-video exposure affinities.",
+  "operator_id": null,
+  "parent_operator_stack": [
+    "item_lambdarank"
+  ],
+  "parent_references": [
+    "w003"
+  ],
+  "patch_scope": [
+    "features"
+  ],
+  "persona": "architecture",
+  "primary_block": "features",
+  "research_evidence": [],
+  "research_nonuse_reason": "The supplied research records concern BPR optimization or the already-measured tree/FM ensemble role; the direct basis here is the task requirement for pair-dependent personalization and the visible absence of explicit exposure-affinity columns in the current feature adapter.",
+  "risk": [
+    "Most user-video pairs may be unique, making the video-pair column sparse.",
+    "Prior exposure frequency can encode stale preference or repeated-impression fatigue with the wrong sign.",
+    "Python dictionary construction over 1.14 million rows may add runtime and memory overhead."
+  ]
+}

@@ -1,0 +1,5 @@
+{
+  "analysis": "The feature augmentation was connected and active: prediction hashes changed across seeds, so the added hour/user-gap context affected inference. Measured standalone validation moved up slightly versus the search parent (+0.00053 primary), and the run even exceeded the prior validation-best point estimate, but the paired 95% CI crossed zero both per-seed and on the ensemble, so the gain is not statistically reliable. Slice diagnostics suggest heterogeneous effects rather than broad uplift, with some gains in tab 0 / medium-popularity items and losses in tabs 2 and 6 and for more popular items. Portfolio evidence was slightly negative and not promotable. Overall, this experiment supports that temporal-context features can change ranking behavior, but does not support a robust improvement claim for this parent model.",
+  "next_lesson": "Legal temporal context is active but weak and slice-dependent here, so treat it as a non-robust variant unless a future single-change follow-up can target the favorable slices without hurting the rest.",
+  "result": "inconclusive"
+}

@@ -1,0 +1,33 @@
+{
+  "analysis": "The sole edited target block faithfully implements valid-row watch-ratio soft-label shaping. Ratio-derived data flows only into the train-only main target, while inference features and prediction remain unchanged. Invalid rows retain the original target, auxiliaries and aux_weight=0.2 are unchanged, and all model/training hyperparameters match the parent contract.",
+  "changed_runtime_path": true,
+  "component_evidence": [
+    {
+      "code_evidence": "build_target calls `ratio, valid = DV.watch_ratio()`; no watch-ratio access appears in features, model, loss, train, or predict.",
+      "component": "DV.watch_ratio called only during target construction"
+    },
+    {
+      "code_evidence": "`DV.assert_trainable(ratio, 'build_target.watch_ratio')` and `DV.assert_trainable(valid_raw, 'build_target.watch_ratio_valid')` are executed immediately after converting both returned arrays with `np.asarray`.",
+      "component": "DV.assert_trainable applied to ratio and validity arrays"
+    },
+    {
+      "code_evidence": "For valid rows, `safe_ratio[valid] = np.clip(ratio[valid], 0.0, 1.0)` bounds every ratio value that enters the shaped target.",
+      "component": "ratio clipped to [0,1]"
+    },
+    {
+      "code_evidence": "`shaped_main` is copied from `target['main']`, and only `shaped_main[valid]` is assigned `0.85 * shaped_main[valid] + 0.15 * safe_ratio[valid]`; the result is installed as `result['main']` and consumed by unchanged `SO.train`.",
+      "component": "main target set to 0.85*long_view+0.15*ratio only where valid"
+    },
+    {
+      "code_evidence": "`shaped_main = original_main.astype(np.float32, copy=True)` initializes all rows from the original main target, while the subsequent assignment indexes only `valid`; therefore rows where `valid` is false remain unchanged apart from dtype.",
+      "component": "original binary main target retained where invalid"
+    },
+    {
+      "code_evidence": "`result = dict(target)` preserves every target entry from `SO.build_target`, and the candidate replaces only `result['main']`; no engagement auxiliary entry is modified.",
+      "component": "unchanged engagement auxiliary targets"
+    }
+  ],
+  "forbidden_shortcuts_found": [],
+  "missing_components": [],
+  "status": "PASS"
+}

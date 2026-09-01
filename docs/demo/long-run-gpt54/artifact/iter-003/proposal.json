@@ -1,0 +1,72 @@
+{
+  "basis_type": "diagnostic",
+  "estimated_cost_s": 60,
+  "evidence": [
+    {
+      "ref": "Fixed aggregate directional feedback from the last measured candidate: key \"tab\" with deltas tab0=0.004239939703112372, tab2=-0.003424136993893434, tab4=-0.0013052045260611989, tab6=-0.003447251697769549",
+      "type": "diagnostic"
+    },
+    {
+      "ref": "Both metrics rank rows independently within each user; personalization must depend on a (user, candidate-item) pair",
+      "type": "task_spec"
+    },
+    {
+      "ref": "predict block currently returns SO.predict(model, Xs, split) unchanged",
+      "type": "current_code"
+    },
+    {
+      "ref": "Trusted runtime-backend contract: prediction_api legal_context_access allows custom predict to call DV.load(split) and read tab",
+      "type": "current_code"
+    }
+  ],
+  "evidence_adaptation": null,
+  "execution_mode": "custom_patch",
+  "expected_observation": "If connected and beneficial, validation primary should rise mainly through improved portfolio contribution and the fixed-slice feedback should become less negative on tabs 2/4/6.",
+  "experiment_contract": {
+    "claim": "A deterministic per-tab affine remap in predict changes within-user ordering enough to improve weak tab slices.",
+    "expected_observable": "Prediction hashes differ from parent for all seeds and score distributions differ by tab.",
+    "falsification_condition": "No measurable improvement in trusted validation primary or prediction hashes remain identical to the parent.",
+    "forbidden_shortcuts": [
+      "adding unused HP/config keys with no consumer",
+      "using any validation/test labels or post-exposure feedback as features",
+      "applying a global constant shift that cannot affect ranking"
+    ],
+    "portfolio_role": "error_diversifier",
+    "required_components": [
+      "predict block calls SO.predict",
+      "predict block reads DV.load(split).tab",
+      "predict block applies explicit tab-indexed scale/bias arrays to scores"
+    ]
+  },
+  "fallback": "If this is neutral or negative, revert and prioritize a train-time context feature/operator rather than further hand calibration.",
+  "hypothesis": "A small tab-specific monotone calibration will improve portfolio marginal gain by correcting weak-slice ordering errors on tabs 2/4/6 without changing train-time behavior.",
+  "implementation_plan": "Edit only the predict block. Call SO.predict(model, Xs, split) to get base scores, then read the inference-time tab array via DV.load(split).tab. Apply a fixed monotone affine remap per tab id using a small hard-coded table chosen to downweight tabs with repeated negative directional feedback for the current parent branch (tabs 2,4,6) and mildly upweight tab 0. Example implementation: pred = base.copy(); pred *= scale[tab]; pred += bias[tab], with defaults 1 and 0 for unseen tab ids. Keep the mapping independent of labels and constant across seeds.",
+  "justification": "Since ranking is within user and tab varies within user request contexts, a tab-conditioned remap can alter within-user order when users have candidates from different tabs. The current code exposes no tab-specific consumer except predict, so this is a connected, falsifiable slice-specialist change aimed at known weak tabs and potential portfolio diversity rather than scalar retraining.",
+  "mechanism": "tab-aware score calibration at prediction",
+  "mechanism_tags": [
+    "prediction_calibration",
+    "slice_specialist",
+    "tab_context",
+    "error_diversifier"
+  ],
+  "observation": "The fixed aggregate directional feedback shows negative deltas for the last measured candidate on \"tab\": {\"tab\":2,\"delta_primary\":-0.003424136993893434}, {\"tab\":4,\"delta_primary\":-0.0013052045260611989}, {\"tab\":6,\"delta_primary\":-0.003447251697769549}, while tab 0 is positive at 0.004239939703112372. The runtime contract states predict may legally call DV.load(split) to access tab.",
+  "operator_id": null,
+  "parent_operator_stack": [
+    "legal_rank_stack_v1"
+  ],
+  "parent_references": [
+    "w001"
+  ],
+  "patch_scope": [
+    "predict"
+  ],
+  "persona": "optimizer",
+  "primary_block": "predict",
+  "research_evidence": [],
+  "research_nonuse_reason": "No supplied research record describes tab-conditioned inference calibration for this exact FM parent. The more direct basis is the measured slice diagnostic plus the explicit predict-time legal access contract.",
+  "risk": [
+    "Many users may see a single tab so effect could be small",
+    "Wrong sign or magnitude could hurt strong tab 1 performance",
+    "Affine remap may be too coarse if score issues are not tab-specific"
+  ]
+}

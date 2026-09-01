@@ -1,0 +1,105 @@
+--- incumbent/pipeline.py
++++ candidate/pipeline.py
+@@ -32,7 +32,28 @@
+ 
+ # <<<BLOCK:features>>>
+ def build_features(splits, train_idx):
+-    return SO.build_features(splits, train_idx, OP_CONFIG)
++    Xs, dim = SO.build_features(splits, train_idx, OP_CONFIG)
++
++    major_tabs = np.array([0, 1, 2, 4, 6], dtype=np.int64)
++    out = {}
++    add_dim = 1 + len(major_tabs) + len(major_tabs)
++
++    for split, X in Xs.items():
++        rs = splits[split]
++        tab = np.asarray(rs.tab)
++        dur = np.asarray(rs.duration_ms, dtype=np.float32)
++        log_dur = np.log1p(np.clip(dur, 0.0, None)).astype(np.float32)
++
++        extra = np.zeros((rs.n, add_dim), dtype=np.float32)
++        extra[:, 0] = log_dur
++        for j, t in enumerate(major_tabs):
++            flag = (tab == t).astype(np.float32)
++            extra[:, 1 + j] = flag
++            extra[:, 1 + len(major_tabs) + j] = flag * log_dur
++
++        out[split] = np.concatenate([X, extra], axis=1).astype(np.float32, copy=False)
++
++    return out, dim + add_dim
+ # <<<END:features>>>
+ 
+ 
+@@ -60,13 +81,70 @@
+ def train(splits, train_idx, Xs, dim, y, seed, verbose=False):
+     config = dict(OP_CONFIG)
+     config['hp'] = dict(HP)
+-    return SO.train(splits, train_idx, Xs, dim, y, seed, config, verbose)
++    base_model, info = SO.train(splits, train_idx, Xs, dim, y, seed, config, verbose)
++
++    from sklearn.linear_model import LogisticRegression
++
++    n_extra = 11
++    base_dim = dim - n_extra
++
++    y_arr = np.asarray(y)
++    if y_arr.shape[0] == len(train_idx):
++        y_train = np.asarray(y_arr, dtype=np.float32)
++    else:
++        y_train = np.asarray(y_arr[train_idx], dtype=np.float32)
++    DV.assert_trainable(y_train, 'residual_head')
++
++    X_train_extra = np.asarray(Xs['train'][train_idx, base_dim:base_dim + n_extra], dtype=np.float32)
++
++    mean = X_train_extra.mean(axis=0).astype(np.float32)
++    scale = np.maximum(X_train_extra.std(axis=0), 1e-6).astype(np.float32)
++
++    residual = {
++        'mean': mean,
++        'scale': scale,
++        'coef': np.zeros(n_extra, dtype=np.float32),
++        'intercept': 0.0,
++        'weight': 0.15,
++    }
++
++    if X_train_extra.shape[0] > 0 and np.unique(y_train).size >= 2:
++        Xz = (X_train_extra - mean) / scale
++        clf = LogisticRegression(
++            penalty='l2',
++            C=1.0,
++            solver='liblinear',
++            max_iter=200,
++            random_state=seed,
++        )
++        clf.fit(Xz, y_train.astype(np.int32))
++        residual['coef'] = clf.coef_.reshape(-1).astype(np.float32)
++        residual['intercept'] = float(clf.intercept_[0])
++        head_status = 'logreg'
++    else:
++        head_status = 'degenerate_zero'
++
++    info = dict(info)
++    info['residual_head'] = head_status
++    info['residual_weight'] = residual['weight']
++    info['residual_extra_dim'] = n_extra
++    return {'base_model': base_model, 'residual': residual, 'base_dim': base_dim}, info
+ # <<<END:train>>>
+ 
+ 
+ # <<<BLOCK:predict>>>
+ def predict(model, Xs, split):
+-    return SO.predict(model, Xs, split)
++    if not isinstance(model, dict) or 'base_model' not in model:
++        return SO.predict(model, Xs, split)
++
++    base_pred = SO.predict(model['base_model'], Xs, split)
++    residual = model['residual']
++    n_extra = residual['coef'].shape[0]
++    start = int(model['base_dim'])
++    X_extra = np.asarray(Xs[split][:, start:start + n_extra], dtype=np.float32)
++    Xz = (X_extra - residual['mean']) / residual['scale']
++    logits = Xz @ residual['coef'] + residual['intercept']
++    return np.asarray(base_pred, dtype=np.float32) + residual['weight'] * logits.astype(np.float32)
+ # <<<END:predict>>>
+ 
+ 

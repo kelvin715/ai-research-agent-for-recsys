@@ -1,0 +1,25 @@
+{
+  "analysis": "The sole substantive runtime change is deterministic replication of train tab-6 observations before the existing trainer. The source-position mapping duplicates aligned target entries where needed, preserving labels while allowing the expanded index path to affect both pairwise and auxiliary training. No evaluation labels, prediction-time tab constants, post-exposure inference features, HP retuning, or unsupported delegated configuration are introduced.",
+  "changed_runtime_path": true,
+  "component_evidence": [
+    {
+      "code_evidence": "`train_idx = np.asarray(train_idx, dtype=np.int64)` followed by `tab6_mask = np.asarray(splits['train'].tab)[train_idx] == 6` restricts selection to indices already present in the provided training subset and uses only the legal train `tab` array.",
+      "component": "Selection of tab-6 indices only from the provided training index set"
+    },
+    {
+      "code_evidence": "`raw_idx = np.concatenate([train_idx, train_idx[tab6_mask]])` retains every original index and appends exactly one copy of every selected tab-6 index.",
+      "component": "Exactly one additional copy of each selected tab-6 training index"
+    },
+    {
+      "code_evidence": "`order = np.argsort(raw_idx, kind='stable')` and `expanded_train_idx = raw_idx[order]` produce sorted expanded indices, which are passed directly as the second argument of `SO.train(splits, expanded_train_idx, Xs, dim, expanded_y, seed, config, verbose)`.",
+      "component": "Sorted expanded indices passed to the existing SO.train call"
+    },
+    {
+      "code_evidence": "Feature and target construction remain delegated unchanged through `SO.build_features(..., OP_CONFIG)` and `SO.build_target(..., OP_CONFIG)`. `config['hp'] = dict(HP)` preserves the parent HP values, including `aux_weight=0.1`; no checkpoint logic is replaced. Prediction remains exactly `SO.predict(model, Xs, split)`. `replicate_target` only aligns train-index-relative target arrays with duplicated observations and does not alter target values or objective semantics.",
+      "component": "Unchanged target, features, hp dictionary, checkpoint policy, and prediction function"
+    }
+  ],
+  "forbidden_shortcuts_found": [],
+  "missing_components": [],
+  "status": "PASS"
+}

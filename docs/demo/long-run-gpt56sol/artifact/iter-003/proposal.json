@@ -1,0 +1,93 @@
+{
+  "basis_type": "curated_research",
+  "estimated_cost_s": 300,
+  "evidence": [
+    {
+      "ref": "E002 (Kind: curated_research): selected low-cardinality user profile domains added on top of hour, train-derived user exposure-gap buckets, and censored watch-time auxiliary training",
+      "type": "curated_research"
+    },
+    {
+      "ref": "Trusted runtime-backend contract: exact_parent_config.features=[\"hour\",\"user_gap\"] and feature_api supports user_core as seven static pre-impression user profile fields",
+      "type": "current_code"
+    },
+    {
+      "ref": "Categorical vocabularies must be fitted on train only and unseen evaluation values map to UNK",
+      "type": "task_spec"
+    }
+  ],
+  "evidence_adaptation": {
+    "evidence_id": "E002",
+    "implementation_mapping": "Primary block features: the selected_user_profile registry operator adds seven user-profile categorical arrays to each Xs[split], converts them to train-fitted globally offset categorical IDs, updates dimension, and leaves SO.train to consume Xs[train][train_idx] through the existing FM.",
+    "protocol_caveat": "The cited measurements are treated only as evidence for the incremental representation mechanism; improvement must be established on the fixed official split and trusted primary metric, and no reported score is assumed to transfer.",
+    "source_mechanism": "Add selected low-cardinality static user profile domains after hour and strictly-earlier user exposure-gap fields so FM embeddings cross those user attributes with candidate item and context fields."
+  },
+  "execution_mode": "operator",
+  "expected_observation": "feature_dim will increase and predictions will differ from w001 for every seed; if the hypothesis is true, trusted validation will show a positive paired primary delta and positive marginal contribution when substituted for w001 in the active portfolio.",
+  "experiment_contract": {
+    "claim": "The experiment tests whether seven selected legal static user-profile fields improve ranking through FM interactions with each candidate and context.",
+    "expected_observable": "The feature dimension and prediction hashes must change relative to w001, with row-varying effects induced by user-profile and candidate-field interactions.",
+    "falsification_condition": "The claim is falsified if the connected operator yields no positive trusted validation-primary or marginal-portfolio delta across the fixed seeds; byte-identical predictions or unchanged feature_dim instead invalidate the implementation.",
+    "forbidden_shortcuts": [
+      "Using any post-exposure feedback as a profile feature",
+      "Adding a per-user constant that cannot change within-user ranking",
+      "Replacing the catalog operator with an ad hoc custom implementation",
+      "Changing optimizer or auxiliary-loss hyperparameters in the same experiment"
+    ],
+    "portfolio_role": "member_refinement",
+    "required_components": [
+      "Registry-owned addition of all seven selected pre-impression user-profile fields",
+      "Train-only vocabulary fitting with one UNK slot for unseen values",
+      "Globally offset categorical IDs appended to Xs for every split",
+      "Reuse of the existing FM and bpr_censored_watch training path"
+    ]
+  },
+  "fallback": "Rollback the operator and retain the exact w001 feature representation.",
+  "hypothesis": "Adding the seven selected static user-profile fields to w001 will improve official validation primary and its marginal portfolio contribution because their FM crosses create candidate-dependent personalization that is absent from the current hour+user-gap feature configuration.",
+  "implementation_plan": "Apply the registry-owned selected_user_profile operator. In the features block, extend the current hour and strictly-earlier user-gap representation with the seven low-cardinality static pre-impression user profile fields. The trusted operator maps train-fitted categorical vocabularies to globally offset FM IDs and uses UNK for unseen evaluation values; the resulting fields interact with candidate video, author, duration bucket, hour, and user-gap fields through the existing FM.",
+  "justification": "The proposed fields are legal at inference and can alter ordering within a user through interactions with candidate-item fields. The evidence studies the same incremental placement—on top of hour, exposure gap, and the watch-time auxiliary mechanism—making it more directly applicable than broad profile expansion or a new architecture family.",
+  "mechanism": "selected static user-profile FM interactions",
+  "mechanism_tags": [
+    "factorization_machine",
+    "user_profile",
+    "categorical_features",
+    "user_item_interactions",
+    "member_refinement"
+  ],
+  "observation": "The exact parent configuration contains only features [\"hour\",\"user_gap\"] beyond its base representation, while the applicable catalog operator explicitly adds seven static pre-impression user fields. E002 reports that selected user-profile domains produced an incremental effect when added after hour, user-gap, and censored-watch auxiliary training.",
+  "operator_id": "selected_user_profile",
+  "parent_operator_stack": [
+    "legal_rank_stack_v1"
+  ],
+  "parent_references": [
+    "w001"
+  ],
+  "patch_scope": [
+    "features"
+  ],
+  "persona": "architecture",
+  "primary_block": "features",
+  "research_evidence": [
+    {
+      "evidence_id": "E002",
+      "kind": "curated_research",
+      "knowledge_id": "K0003",
+      "knowledge_origin": "cached",
+      "persona": "architecture",
+      "query": "Which legal context and side-information fields complement the FM?",
+      "reason": "Broad side-feature additions can add noise; legal temporal context needs an explicit availability rule.",
+      "record_type": "mechanism",
+      "requires_success_mechanisms": [],
+      "source_ids": [
+        "S002",
+        "S003"
+      ],
+      "summary": "Prioritize low-cardinality hour and train-derived user exposure-gap buckets before broad profile expansion. Compute all quantile edges from train only. The hour+user_gap BPR configuration reached five-seed official-validation primary 0.604430330 ± 0.000459158; adding the censored watch-time auxiliary target reached 0.604607224 ± 0.000168363. Adding selected user profile domains on top reached 0.604821956 ± 0.000355822, a smaller incremental effect. The legal hour+gap+aux configuration also led the inspected random-exposure set at unbiased primary 0.378085981 ± 0.003012055. Any history feature must use train feedback or exposure-only information available at prediction time; evaluation-period long_view/play-time feedback is forbidden."
+    }
+  ],
+  "research_nonuse_reason": null,
+  "risk": [
+    "Sparse profile-item crosses may overfit users or categories that drift after the train period.",
+    "The new member may be highly rank-correlated with w001 and therefore add little portfolio value.",
+    "UNK-heavy evaluation fields could reduce the effective representation gain."
+  ]
+}

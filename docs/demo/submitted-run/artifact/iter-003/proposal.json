@@ -1,0 +1,68 @@
+{
+  "basis_type": "diagnostic",
+  "estimated_cost_s": 15,
+  "evidence": [
+    {
+      "ref": "Fixed aggregate directional feedback from the last measured candidate, key `tab`, negative deltas for tabs 2/4/6",
+      "type": "diagnostic"
+    },
+    {
+      "ref": "predict block currently returns `SO.predict(model, Xs, split)`",
+      "type": "current_code"
+    },
+    {
+      "ref": "predict block may call DV.load(split); metrics rank within user and require (user, candidate-item) dependence",
+      "type": "task_spec"
+    }
+  ],
+  "evidence_adaptation": null,
+  "execution_mode": "custom_patch",
+  "expected_observation": "If connected, predictions will differ from the parent on rows with tabs 2/4/6, with possible small standalone change but improved portfolio marginal contribution through rank diversity on those slices.",
+  "experiment_contract": {
+    "claim": "Prediction-time tab-aware affine calibration changes within-user candidate ordering in targeted tabs and can improve weak-slice contribution.",
+    "expected_observable": "Prediction hashes differ from parent and changes are concentrated on rows whose `tab` is in the targeted set.",
+    "falsification_condition": "No measurable prediction change versus parent, or trusted evaluation shows no marginal portfolio benefit and standalone delta is neutral/negative beyond noise.",
+    "forbidden_shortcuts": [
+      "adding unused config keys to OP_CONFIG",
+      "using validation/test labels or post-exposure targets",
+      "using a per-user constant offset that cannot affect ranking"
+    ],
+    "portfolio_role": "error_diversifier",
+    "required_components": [
+      "predict block calls SO.predict(model, Xs, split)",
+      "predict block loads DV.load(split).tab",
+      "predict block applies explicit tab-indexed affine coefficients to pred"
+    ]
+  },
+  "fallback": "If this connected predict-only diversifier is not helpful, revert and prefer a train-time structural mechanism with stronger interaction capacity.",
+  "hypothesis": "A small tab-specific monotone recalibration will improve marginal portfolio contribution by shifting ordering in weak tabs 2/4/6 where the current parent underperforms, while preserving most of the parent's strong global ordering.",
+  "implementation_plan": "Edit only the predict block. After calling SO.predict(model, Xs, split), load the same split via DV.load(split), read inference-time tab, and apply a fixed monotone tab-specific affine transform pred' = a_tab * pred + b_tab with coefficients hard-coded to emphasize weak-slice tabs 2/4/6 and keep tab 1 near identity. Use only tab, not any label or post-exposure target. Keep transforms bounded so rank changes occur mostly across close scores within each tab.",
+  "justification": "Within-user metrics are unaffected by per-user constants but can change under candidate-specific transformations. Since tab is an allowed inference-time context field and diagnostics identify tab-specific weaknesses, a bounded tab-aware calibration is a directly connected way to seek error diversity without touching training.",
+  "mechanism": "tab-aware score calibration at prediction",
+  "mechanism_tags": [
+    "posthoc-calibration",
+    "slice-specialist",
+    "tab-context",
+    "error-diversifier"
+  ],
+  "observation": "Fixed aggregate directional feedback shows negative slice deltas on \"tab\": {\"tab\": 2, \"delta_primary\": -0.003424136993893434}, {\"tab\": 4, \"delta_primary\": -0.0013052045260611989}, {\"tab\": 6, \"delta_primary\": -0.003447251697769549}; current code predict path is exactly `return SO.predict(model, Xs, split)` and the runtime contract states predict may call `DV.load(split)` to read inference-time arrays such as tab.",
+  "operator_id": null,
+  "parent_operator_stack": [
+    "legal_rank_stack_v1"
+  ],
+  "parent_references": [
+    "w001"
+  ],
+  "patch_scope": [
+    "predict"
+  ],
+  "persona": "optimizer",
+  "primary_block": "predict",
+  "research_evidence": [],
+  "research_nonuse_reason": "The more direct basis is slice diagnostics plus the visible predict consumer path; supplied research records focus on feature/auxiliary-training mechanisms rather than posthoc tab calibration for this exact parent.",
+  "risk": [
+    "Affine calibration may harm strong tab=1 ordering more than it helps weak tabs",
+    "Tab-specific transforms may be too crude because tabs 2/4/6 are small slices",
+    "If transforms are near-monotone globally, diversity gain may be limited"
+  ]
+}

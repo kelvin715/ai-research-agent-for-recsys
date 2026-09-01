@@ -1,0 +1,21 @@
+{
+  "analysis": "trusted operator materialization; no LLM patch fidelity gap",
+  "changed_runtime_path": true,
+  "component_evidence": [
+    {
+      "code_evidence": "trusted registry operator legal_temporal_context with locked source and unit-tested materialization",
+      "component": "features block updated through the legal_temporal_context operator"
+    },
+    {
+      "code_evidence": "trusted registry operator legal_temporal_context with locked source and unit-tested materialization",
+      "component": "SO.build_features must append hour and strictly-earlier user-gap categorical columns"
+    },
+    {
+      "code_evidence": "trusted registry operator legal_temporal_context with locked source and unit-tested materialization",
+      "component": "unchanged SO.train/SO.predict consume the expanded X matrices"
+    }
+  ],
+  "forbidden_shortcuts_found": [],
+  "missing_components": [],
+  "status": "PASS"
+}

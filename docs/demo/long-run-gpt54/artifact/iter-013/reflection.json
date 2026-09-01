@@ -1,0 +1,5 @@
+{
+  "analysis": "The experiment gives weak standalone lift but does not support the intended mechanism. Validation primary increased only +0.000185 with a 95% paired CI of [-0.000079, 0.000452], so the improvement is not statistically reliable. More importantly, the tab-specific evidence contradicts the calibration hypothesis: every reported tab slice was flat or slightly negative versus incumbent (tab 0 -0.000057, tab 1 -0.000042, tab 2 -0.000099, tab 4 -0.000178, tab 6 0.0), so the proposed tab-conditioned monotone transform did not repair the diagnosed weak tabs. The small overall gain therefore likely came from incidental cross-slice reordering rather than successful tab miscalibration correction. Portfolio contribution was also negative (-0.000253), so it did not act as a useful error diversifier in the ensemble.",
+  "next_lesson": "Fixed hand-chosen tab-wise score transforms are too weak or mis-targeted here; if tab context matters, test a single train-time tab interaction model rather than predict-time calibration.",
+  "result": "inconclusive"
+}

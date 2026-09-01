@@ -1,0 +1,99 @@
+{
+  "basis_type": "curated_research",
+  "estimated_cost_s": 1200,
+  "evidence": [
+    {
+      "ref": "E003 (Kind: curated_research): a small censored watch-time regression head sharing FM embeddings improved exact-dataset BPR, using exact residuals for incomplete plays and a one-sided lower-bound hinge for completed plays.",
+      "type": "curated_research"
+    },
+    {
+      "ref": "Deterministic diagnostic key train_duration_zero_rows has value 24076.",
+      "type": "diagnostic"
+    },
+    {
+      "ref": "DV.watch_ratio() is train-only, and post-exposure feedback may be used as a training or auxiliary target but never as an inference feature.",
+      "type": "task_spec"
+    }
+  ],
+  "evidence_adaptation": {
+    "evidence_id": "E003",
+    "implementation_mapping": "The primary target block derives masked log watch targets and completion bounds from DV.watch_ratio() and splits['train'].duration_ms; the model block adds a shared-representation watch head; the train block consumes those arrays in the censored auxiliary loss at weight 0.2.",
+    "protocol_caveat": "E003 paired the watch head with BPR, whereas this isolated reward experiment keeps w002's pointwise long_view objective so that the measured delta is attributable to the auxiliary signal. Its reported score is not used as an expected result, and evaluation labels remain unavailable.",
+    "source_mechanism": "A small censored watch-time regression head sharing ranking-model embeddings, with exact regression for incomplete plays and a one-sided log-duration lower-bound hinge for completed plays."
+  },
+  "execution_mode": "custom_patch",
+  "expected_observation": "If the hypothesis is true, the candidate will provide a positive marginal portfolio-primary delta and alter within-user ranks most for candidates with different durations or completion patterns, without requiring any watch feedback during prediction.",
+  "experiment_contract": {
+    "claim": "The experiment tests whether censored train-only watch-time supervision improves and diversifies the existing DeepFM ranking representation.",
+    "expected_observable": "Training metadata must report positive incomplete and completed auxiliary counts, zero included rows with invalid watch ratio or zero duration, and a finite nonzero watch-head loss.",
+    "falsification_condition": "The hypothesis is refuted if trusted marginal portfolio primary is non-positive, or invalid-target auditing shows leakage or incorrect censoring; absence of consumed watch rows invalidates rather than confirms the experiment.",
+    "forbidden_shortcuts": [
+      "Using watch ratio, play time, completion, or any post-exposure feedback as an inference feature.",
+      "Treating completed plays as uncensored exact-duration targets.",
+      "Assigning zero watch time to invalid or zero-duration observations.",
+      "Replacing long_view with watch time.",
+      "Claiming mechanism fusion without a second reused frontier parent."
+    ],
+    "portfolio_role": "error_diversifier",
+    "required_components": [
+      "Call DV.watch_ratio() only while building training targets.",
+      "Mask invalid ratios and all zero-duration rows from the watch loss.",
+      "Use log1p(played_ms)/12 for incomplete exact regression.",
+      "Use a one-sided lower-bound hinge at log1p(duration_ms)/12 for completed plays.",
+      "Share the ranking representation with a scalar watch head.",
+      "Keep native long_view as the main evaluation-aligned objective."
+    ]
+  },
+  "fallback": "Reject the watch branch if its trusted marginal contribution is non-positive; retain w002 unchanged and preserve audit counters for valid, incomplete, completed, zero-duration, and excluded rows to diagnose implementation errors.",
+  "hypothesis": "A leakage-safe censored watch-time auxiliary will teach duration-sensitive item-quality interactions not fully captured by the four sparse engagement heads, yielding complementary within-user ordering and positive marginal contribution to the heterogeneous portfolio.",
+  "implementation_plan": "Add one censored watch-time regression head to a visible reproduction of the w002 DeepFM while leaving native long_view as the main pointwise label and retaining its four engagement heads. In the target block, call DV.watch_ratio() on train only, combine valid ratios with splits['train'].duration_ms to derive played_ms, and construct scaled log targets log1p(played_ms)/12 and log-duration bounds log1p(duration_ms)/12. Mark completed observations where valid and played_ms>=duration_ms; exclude invalid ratios and zero-duration rows from this auxiliary loss. In the model block, attach a scalar watch head to the same shared FM/deep representation used by the ranking and engagement heads. In the train block, use exact regression residual loss for incomplete plays and a one-sided lower-bound hinge for completed plays that becomes zero once the prediction reaches the log-duration bound. Add this auxiliary at fixed weight 0.2, with all other architecture and optimization settings held to the parent values.",
+  "justification": "Watch time supplies a denser training signal than rare engagement actions, while censoring avoids penalizing completed plays whose latent desired watch time may exceed the video duration. Shared embeddings can transfer this signal to the long_view ranker without exposing post-exposure feedback at inference.",
+  "mechanism": "censored watch-time auxiliary head",
+  "mechanism_tags": [
+    "censored-regression",
+    "watch-time",
+    "auxiliary-target",
+    "shared-embeddings",
+    "error-diversity"
+  ],
+  "observation": "The current parent has four engagement auxiliary heads but no watch-time head; train has 24076 zero-duration rows, so explicit validity masking is necessary rather than treating every watch ratio as an exact regression target.",
+  "operator_id": null,
+  "parent_operator_stack": [
+    "deepfm_engagement_mtl_v1"
+  ],
+  "parent_references": [
+    "w002"
+  ],
+  "patch_scope": [
+    "target",
+    "model",
+    "train"
+  ],
+  "persona": "reward",
+  "primary_block": "target",
+  "research_evidence": [
+    {
+      "evidence_id": "E003",
+      "kind": "curated_research",
+      "knowledge_id": "K0002",
+      "knowledge_origin": "cached",
+      "persona": "reward",
+      "query": "How should watch time complement native long_view without changing evaluation labels?",
+      "reason": "The native binary label discards engagement magnitude and completed plays are right-censored by duration.",
+      "record_type": "mechanism",
+      "requires_success_mechanisms": [],
+      "source_ids": [
+        "S001",
+        "S003"
+      ],
+      "summary": "Keep native long_view as the ranking objective and add a small censored watch-time regression head sharing FM embeddings. Transform play time and duration with log1p/12. For incomplete plays use exact regression residual; for completed plays use a one-sided lower-bound hinge that stops penalizing predictions above log-duration. Never use evaluation-period feedback as an input feature. BPR plus this auxiliary target at weight 0.2 reached five-seed official-validation primary 0.604023290 ± 0.000282947 versus 0.603517127 ± 0.000631158 for BPR alone; on three random-exposure seeds, unbiased primary was 0.376328528 ± 0.003245064 versus 0.373291085 ± 0.002151737. This is an implementation prior, not permission to replace the fixed relevance label."
+    }
+  ],
+  "research_nonuse_reason": null,
+  "risk": [
+    "The custom visible DeepFM reproduction may differ from the registry-owned parent in initialization details.",
+    "Watch behavior can encode exposure-policy bias and reduce robustness despite being dense.",
+    "The fixed auxiliary weight may overemphasize duration relative to top-five relevance.",
+    "Incorrect completion or validity masking would turn censoring into label noise."
+  ]
+}

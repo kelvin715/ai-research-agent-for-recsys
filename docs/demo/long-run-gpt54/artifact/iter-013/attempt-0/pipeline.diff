@@ -1,0 +1,50 @@
+--- incumbent/pipeline.py
++++ candidate/pipeline.py
+@@ -66,7 +66,46 @@
+ 
+ # <<<BLOCK:predict>>>
+ def predict(model, Xs, split):
+-    return SO.predict(model, Xs, split)
++    raw = np.asarray(SO.predict(model, Xs, split), dtype=np.float32)
++    rows = DV.load(split)
++    tabs = np.asarray(rows.tab)
++    assert raw.shape[0] == tabs.shape[0], 'tab/score length mismatch'
++
++    pred = raw.copy()
++    k1, k2 = -1.0, 1.0
++
++    def apply_pwl(x, slope_lo, slope_mid, slope_hi, bias):
++        y = np.empty_like(x, dtype=np.float32)
++        lo = x < k1
++        hi = x > k2
++        mid = ~(lo | hi)
++        y[mid] = slope_mid * x[mid] + bias
++        y[lo] = slope_mid * k1 + bias + slope_lo * (x[lo] - k1)
++        y[hi] = slope_mid * k2 + bias + slope_hi * (x[hi] - k2)
++        return y
++
++    # Fixed tab-conditional monotone calibrations, kept close to identity.
++    # Buckets follow the accepted coarse grouping: {0,1,2,4,6,other}.
++    params = {
++        0: (0.96, 1.05, 1.12, 0.055),
++        1: (0.98, 1.02, 1.06, 0.020),
++        2: (0.95, 1.06, 1.14, 0.070),
++        4: (1.00, 0.99, 0.97, -0.015),
++        6: (0.97, 1.03, 1.08, 0.035),
++    }
++
++    seen = np.zeros(tabs.shape[0], dtype=bool)
++    for tab_value, p in params.items():
++        m = tabs == tab_value
++        if np.any(m):
++            pred[m] = apply_pwl(raw[m], *p)
++            seen |= m
++
++    other = ~seen
++    if np.any(other):
++        pred[other] = apply_pwl(raw[other], 1.0, 1.0, 1.0, 0.0)
++
++    return pred
+ # <<<END:predict>>>
+ 
+ 

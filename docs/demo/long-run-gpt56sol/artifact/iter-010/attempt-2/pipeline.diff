@@ -1,0 +1,153 @@
+--- incumbent/pipeline.py
++++ candidate/pipeline.py
+@@ -31,8 +31,149 @@
+ 
+ 
+ # <<<BLOCK:features>>>
++_PAIR_DTYPE = np.dtype([('u', np.int64), ('i', np.int64)])
++
++
++def _pair_history(users, items, times, stable_order):
++    users = np.asarray(users, dtype=np.int64)
++    items = np.asarray(items, dtype=np.int64)
++    times = np.asarray(times, dtype=np.int64)
++    stable_order = np.asarray(stable_order, dtype=np.int64)
++    n = users.size
++
++    if n == 0:
++        return (np.zeros(0, dtype=np.int64),
++                np.empty(0, dtype=_PAIR_DTYPE),
++                np.zeros(0, dtype=np.int64))
++
++    order = np.lexsort((stable_order, times, items, users))
++    su = users[order]
++    si = items[order]
++    boundary = np.empty(n, dtype=bool)
++    boundary[0] = True
++    boundary[1:] = (su[1:] != su[:-1]) | (si[1:] != si[:-1])
++    starts = np.flatnonzero(boundary)
++    lengths = np.diff(np.append(starts, n)).astype(np.int64, copy=False)
++
++    prior_sorted = np.arange(n, dtype=np.int64) - np.repeat(starts, lengths)
++    prior = np.empty(n, dtype=np.int64)
++    prior[order] = prior_sorted
++
++    keys = np.empty(starts.size, dtype=_PAIR_DTYPE)
++    keys['u'] = su[starts]
++    keys['i'] = si[starts]
++    return prior, keys, lengths
++
++
++def _user_history(users, times, stable_order):
++    users = np.asarray(users, dtype=np.int64)
++    times = np.asarray(times, dtype=np.int64)
++    stable_order = np.asarray(stable_order, dtype=np.int64)
++    n = users.size
++
++    if n == 0:
++        return (np.zeros(0, dtype=np.int64), np.zeros(0, dtype=np.int64),
++                np.zeros(0, dtype=np.int64))
++
++    order = np.lexsort((stable_order, times, users))
++    su = users[order]
++    boundary = np.empty(n, dtype=bool)
++    boundary[0] = True
++    boundary[1:] = su[1:] != su[:-1]
++    starts = np.flatnonzero(boundary)
++    lengths = np.diff(np.append(starts, n)).astype(np.int64, copy=False)
++
++    prior_sorted = np.arange(n, dtype=np.int64) - np.repeat(starts, lengths)
++    prior = np.empty(n, dtype=np.int64)
++    prior[order] = prior_sorted
++    return prior, su[starts], lengths
++
++
++def _lookup_pairs(users, items, keys, counts):
++    users = np.asarray(users, dtype=np.int64)
++    items = np.asarray(items, dtype=np.int64)
++    query = np.empty(users.size, dtype=_PAIR_DTYPE)
++    query['u'] = users
++    query['i'] = items
++    out = np.zeros(users.size, dtype=np.int64)
++    if keys.size == 0:
++        return out
++
++    pos = np.searchsorted(keys, query)
++    in_range = pos < keys.size
++    safe_pos = np.minimum(pos, keys.size - 1)
++    matched = in_range & (keys[safe_pos] == query)
++    out[matched] = counts[pos[matched]]
++    return out
++
++
++def _lookup_users(users, known_users, counts):
++    users = np.asarray(users, dtype=np.int64)
++    out = np.zeros(users.size, dtype=np.int64)
++    if known_users.size == 0:
++        return out
++
++    pos = np.searchsorted(known_users, users)
++    in_range = pos < known_users.size
++    safe_pos = np.minimum(pos, known_users.size - 1)
++    matched = in_range & (known_users[safe_pos] == users)
++    out[matched] = counts[pos[matched]]
++    return out
++
++
+ def build_features(splits, train_idx):
+-    return SO.build_features(splits, train_idx, OP_CONFIG)
++    Xs, feature_count = SO.build_features(splits, train_idx, OP_CONFIG)
++
++    tr = splits['train']
++    idx = np.asarray(train_idx, dtype=np.int64)
++    if Xs['train'].shape[0] != tr.n:
++        raise AssertionError('SO training features must retain full train row indexing')
++
++    users = np.asarray(tr.user_id, dtype=np.int64)[idx]
++    authors = np.asarray(tr.author_id, dtype=np.int64)[idx]
++    videos = np.asarray(tr.video_id, dtype=np.int64)[idx]
++    times = np.asarray(tr.time_ms, dtype=np.int64)[idx]
++
++    ua_prior, ua_keys, ua_final = _pair_history(users, authors, times, idx)
++    uv_prior, uv_keys, uv_final = _pair_history(users, videos, times, idx)
++    user_prior, known_users, user_final = _user_history(users, times, idx)
++
++    extras = {}
++    train_extra = np.zeros((tr.n, 3), dtype=np.float32)
++    selected_extra = np.empty((idx.size, 3), dtype=np.float32)
++    selected_extra[:, 0] = np.log1p(ua_prior).astype(np.float32)
++    selected_extra[:, 1] = np.log1p(uv_prior).astype(np.float32)
++    selected_extra[:, 2] = (ua_prior.astype(np.float32) /
++                            (user_prior.astype(np.float32) + np.float32(1.0)))
++    train_extra[idx] = selected_extra
++    extras['train'] = train_extra
++
++    for split in Xs:
++        if split == 'train':
++            continue
++        rows = splits[split]
++        split_users = np.asarray(rows.user_id, dtype=np.int64)
++        author_counts = _lookup_pairs(
++            split_users, rows.author_id, ua_keys, ua_final)
++        video_counts = _lookup_pairs(
++            split_users, rows.video_id, uv_keys, uv_final)
++        total_counts = _lookup_users(split_users, known_users, user_final)
++
++        extra = np.empty((rows.n, 3), dtype=np.float32)
++        extra[:, 0] = np.log1p(author_counts).astype(np.float32)
++        extra[:, 1] = np.log1p(video_counts).astype(np.float32)
++        extra[:, 2] = (author_counts.astype(np.float32) /
++                       (total_counts.astype(np.float32) + np.float32(1.0)))
++        extras[split] = extra
++
++    for split in Xs:
++        if Xs[split].shape[0] != extras[split].shape[0]:
++            raise AssertionError('base and affinity feature row counts differ')
++        Xs[split] = np.ascontiguousarray(
++            np.concatenate((Xs[split], extras[split]), axis=1),
++            dtype=np.float32)
++
++    return Xs, feature_count + 3
+ # <<<END:features>>>
+ 
+ 

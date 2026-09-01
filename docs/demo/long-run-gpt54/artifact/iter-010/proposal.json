@@ -1,0 +1,72 @@
+{
+  "basis_type": "current_code",
+  "estimated_cost_s": 180,
+  "evidence": [
+    {
+      "ref": "Both metrics rank rows independently within each user. A per-user constant cannot change either metric, so personalization must depend on a (user, candidate-item) pair.",
+      "type": "task_spec"
+    },
+    {
+      "ref": "feature_api returns 25 fixed context/group-statistic columns; current build_features delegates unchanged to SO.build_features",
+      "type": "current_code"
+    },
+    {
+      "ref": "fixed aggregate directional feedback train_item_popularity_quartile q1 delta_primary=-0.10655939890604793",
+      "type": "diagnostic"
+    },
+    {
+      "ref": "fixed aggregate directional feedback train_item_popularity_quartile q2 delta_primary=-0.10224896437049613",
+      "type": "diagnostic"
+    }
+  ],
+  "evidence_adaptation": null,
+  "execution_mode": "custom_patch",
+  "expected_observation": "If true, validation should improve most on lower-popularity items and possibly lower-history users, with prediction hashes changed and stronger complementarity to the legal and DeepFM members.",
+  "experiment_contract": {
+    "claim": "Test whether explicit train-only user-item/author affinity count features improve personalized ranking beyond the fixed SO feature set.",
+    "expected_observable": "Feature dimension increases above the delegated baseline 25 and predictions differ from parent on every seed.",
+    "falsification_condition": "No feature-dimension increase, or no measurable improvement/complementarity on validation.",
+    "forbidden_shortcuts": [
+      "using validation/test labels or post-exposure targets as features",
+      "adding per-user constants only",
+      "editing train to silently alter LightGBM fixed parameters"
+    ],
+    "portfolio_role": "error_diversifier",
+    "required_components": [
+      "features block must append new columns derived from train-only user-author/user-video/user-tab counts",
+      "only inference-time IDs user_id/video_id/author_id/tab may index those aggregates",
+      "all splits must receive the same appended feature schema"
+    ]
+  },
+  "fallback": "If sparse pair counts are too zero-heavy, next step would back off to user-author and user-tab only rather than abandoning pair-personalization entirely.",
+  "hypothesis": "Adding explicit train-only pair affinity features for (user,author), (user,video), and (user,tab) will improve within-user ranking and diversify errors relative to the current item/context ranker, which lacks direct pair-personalization features in its fixed 25-column representation.",
+  "implementation_plan": "Edit features as primary and predict as support. In build_features, after calling SO.build_features(splits, train_idx, OP_CONFIG), load DV.load('train') and compute train-only count dictionaries for user-author, user-video, and user-tab interactions over the training rows referenced by train_idx. For each split, append dense float32 columns: log1p(user_author_count), log1p(user_video_count), log1p(user_tab_count), and normalized user_author_share = user_author_count / max(1,user_total_count). Counts use only train data; unseen pairs map to zero. In predict, keep SO.predict unchanged because the model consumes the expanded matrices directly.",
+  "justification": "Counts over observed user-author and user-video histories are legal inference-time features because they are train-only aggregates over IDs available at inference. They directly target the pair-personalization requirement and can help cold-to-mid popularity slices where generic item/context scores underfit user-specific preferences.",
+  "mechanism": "train-only user-author affinity count features",
+  "mechanism_tags": [
+    "feature_cross",
+    "personalization",
+    "count_stats",
+    "error_diversifier"
+  ],
+  "observation": "The task explicitly states that \"personalization must depend on a (user, candidate-item) pair,\" while the trusted runtime says SO.build_features returns \"25 fixed context/group-statistic columns\" and the parent is named \"Item/context LambdaRank,\" suggesting limited direct user-item interaction representation. Also the last directional feedback showed broad losses across all \"train_item_popularity_quartile\" slices, especially q1 delta -0.10655939890604793, consistent with weak memorization for rarer items.",
+  "operator_id": null,
+  "parent_operator_stack": [
+    "item_lambdarank"
+  ],
+  "parent_references": [
+    "w003"
+  ],
+  "patch_scope": [
+    "features"
+  ],
+  "persona": "architecture",
+  "primary_block": "features",
+  "research_evidence": [],
+  "research_nonuse_reason": "The supplied research records do not directly cover adding train-only user-author/video affinity counts to the delegated LightGBM ranker; task constraints and current-code gaps are the more direct basis.",
+  "risk": [
+    "User-video counts may overfit seen train items and map many eval pairs to zero",
+    "Dense feature augmentation may add little if delegated baseline already encodes similar stats",
+    "Python dictionary feature building could be moderately slow"
+  ]
+}

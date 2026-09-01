@@ -1,0 +1,78 @@
+{
+  "basis_type": "diagnostic",
+  "estimated_cost_s": 45,
+  "evidence": [
+    {
+      "ref": "portfolio_diagnostics.members[w001].slice_specialization.member_disadvantages includes tab=6 delta_primary=-0.036711203406393667",
+      "type": "diagnostic"
+    },
+    {
+      "ref": "portfolio_diagnostics.members[w002].slice_specialization.member_disadvantages includes tab=6 delta_primary=-0.035760181511351796",
+      "type": "diagnostic"
+    },
+    {
+      "ref": "fixed aggregate directional feedback from the last measured candidate tab=6 delta_primary=0.0",
+      "type": "diagnostic"
+    },
+    {
+      "ref": "prediction_api legal_context_access permits DV.load(split) for inference-time arrays such as tab",
+      "type": "task_spec"
+    },
+    {
+      "ref": "predict block currently returns SO.predict(model, Xs, split) with no slice correction",
+      "type": "current_code"
+    }
+  ],
+  "evidence_adaptation": null,
+  "execution_mode": "custom_patch",
+  "expected_observation": "Predictions change only on tab=6 rows; if the slice weakness is real and item priors are stabilizing, marginal portfolio contribution should improve even with near-flat standalone score.",
+  "experiment_contract": {
+    "claim": "The code must test a tab=6-specific inference-time blend of parent score with a train-only item long_view prior to target portfolio slice weakness.",
+    "expected_observable": "Prediction hashes differ from parent only because tab=6 rows are adjusted; non-tab=6 rows remain identical.",
+    "falsification_condition": "No portfolio gain, or degradation indicating tab=6 weakness is not helped by conservative priors.",
+    "forbidden_shortcuts": [
+      "using validation/test labels or post-exposure targets in prediction",
+      "applying a per-user constant shift that cannot affect within-user ranking",
+      "changing training or features under the guise of a predict-only slice mix"
+    ],
+    "portfolio_role": "mechanism_fusion",
+    "required_components": [
+      "predict computes parent score via SO.predict",
+      "predict loads train split to estimate per-video long_view prior",
+      "predict loads target split to access tab and video_id",
+      "blend is applied only when tab==6"
+    ]
+  },
+  "fallback": "If tab-gated mixture is negative, abandon predict-only correction and pursue a stronger error-diverse branch such as a separate tree ranker or a train-time tab-conditioned model.",
+  "hypothesis": "Because both current portfolio leaders are strongly disadvantaged on tab=6, injecting a conservative train-only item prior only on tab=6 will create useful error diversity and improve marginal portfolio contribution even if standalone gain is small.",
+  "implementation_plan": "Edit only the predict block. Keep the trained parent model score from SO.predict(model, Xs, split), then load DV.load('train') and DV.load(split) inside predict to compute a train-only item long_view rate prior per video_id and a global fallback for unseen items. Construct a deterministic tab-gated convex mixture only for inference: for rows with tab==6, use alpha*model_score + (1-alpha)*item_prior with fixed alpha around 0.6; for all other tabs, return the original model score unchanged. No labels from valid/test are read, and the prior is constant across users only through the candidate item, so it can change within-user rankings across items.",
+  "justification": "A slice-targeted, train-only mixture is a structural residual-targeted change aimed at portfolio diversity, satisfying the stagnation directive. Using tab and train-derived item prior changes (user,candidate-item) ordering on the problematic slice without touching forbidden feedback features.",
+  "mechanism": "tab-specific prediction mixture between parent model and item-popularity prior",
+  "mechanism_tags": [
+    "error_diversifier",
+    "residual_targeted",
+    "mixture",
+    "tab_specialization"
+  ],
+  "observation": "Portfolio diagnostics show for w001 member_disadvantages on tab=6 delta_primary=-0.036711203406393667 and for w002 tab=6 delta_primary=-0.035760181511351796, while the overall fixed aggregate directional feedback from the last measured candidate had tab=6 delta_primary=0.0, indicating unresolved weakness on that slice. The prediction API explicitly permits custom predict code to call DV.load(split) for legal context such as tab.",
+  "operator_id": null,
+  "parent_operator_stack": [
+    "deepfm_engagement_mtl_v1"
+  ],
+  "parent_references": [
+    "w001",
+    "w002"
+  ],
+  "patch_scope": [
+    "predict"
+  ],
+  "persona": "reward",
+  "primary_block": "predict",
+  "research_evidence": [],
+  "research_nonuse_reason": "This proposal is driven directly by portfolio slice diagnostics and the legal predict-time API, not by a supplied research mechanism. The goal is error diversity on a known weak slice rather than reproducing an external method.",
+  "risk": [
+    "Item prior may be too coarse and hurt personalization within tab=6.",
+    "If tab=6 rows often contain repeated videos per user, the prior may add little ordering power.",
+    "A fixed alpha may be miscalibrated."
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "basis_type": "diagnostic",
+  "estimated_cost_s": 360,
+  "evidence": [
+    {
+      "ref": "Deterministic feedback key \"train_user_history_quartile\": cutpoints [16, 35, 64], with row counts 19132, 24731, 31956, and 49090.",
+      "type": "diagnostic"
+    },
+    {
+      "ref": "GAUC and nDCG@5 rank independently within each user, making user-level balance more aligned than raw row-frequency balance.",
+      "type": "task_spec"
+    },
+    {
+      "ref": "Sampling a fixed number of pairwise comparisons per eligible group is an executable importance-weighting method for approximating a macro-average group objective.",
+      "type": "prior_knowledge"
+    }
+  ],
+  "evidence_adaptation": null,
+  "execution_mode": "custom_patch",
+  "expected_observation": "If the hypothesis is correct, the candidate will improve the short-history slice and produce a positive marginal portfolio-primary delta, with each eligible training user contributing exactly eight sampled pairs per epoch.",
+  "experiment_contract": {
+    "claim": "Macro-user-balanced pair sampling, rather than exposure-proportional pair sampling, improves alignment with within-user evaluation.",
+    "expected_observable": "Training diagnostics must report the eligible-user count, exactly eight pairs per eligible user per epoch, zero cross-user pairs, and a prediction hash different from w001.",
+    "falsification_condition": "The claim is refuted if trusted marginal portfolio primary is non-positive or if the short-history directional slice does not improve; it is invalidated if pair counts are not uniform by eligible user or any pair crosses users.",
+    "forbidden_shortcuts": [
+      "Weighting users by validation performance or validation history.",
+      "Sampling cross-user negative pairs.",
+      "Allowing high-history users to contribute more than the fixed pair cap.",
+      "Changing the feature representation or adding post-exposure inference features.",
+      "Using a user-only prediction offset as the claimed personalization mechanism."
+    ],
+    "portfolio_role": "error_diversifier",
+    "required_components": [
+      "Only train long_view labels are used to construct positive and negative pools.",
+      "Only users containing both classes are eligible.",
+      "Each eligible user contributes exactly eight sampled pairs per epoch.",
+      "Every pair's positive and negative row belongs to the same user.",
+      "The model remains a second-order FM over the existing globally offset categorical fields.",
+      "Prediction returns raw FM logits and uses no feedback columns."
+    ]
+  },
+  "fallback": "If rejected, restore the trusted SO target, trainer, and predictor together; do not retain a partially connected custom target or prediction path.",
+  "hypothesis": "Equalizing pairwise training mass across eligible users will improve the macro-style GAUC and nDCG@5 objective, especially for short-history users, and yield a complementary ranking branch relative to the exposure-weighted parent.",
+  "implementation_plan": "In target, return the train-only binary long_view array for train_idx after DV.assert_trainable. In train, implement the same second-order categorical FM scoring equation with Torch embeddings, but form each epoch by drawing a fixed cap of eight positive-negative pairs per eligible user, sampling with replacement where necessary. Thus every eligible user contributes equal total pair weight rather than weight proportional to its exposure or positive count. Optimize mean softplus(-(z_pos-z_neg)) for three fixed epochs with batches of 8192 and a train-only fixed checkpoint. In predict, batch the unchanged Xs[split] categorical matrix through the trained FM and return logits.",
+  "justification": "The evaluation aggregates user-level ranking behavior, but the current training recipe is organized around sampled positives rather than a fixed contribution per user. Capping each eligible user's pair count directly changes the reward weighting toward the evaluation unit and structurally targets underrepresented users without exposing evaluation labels.",
+  "mechanism": "macro-user-balanced pairwise FM training",
+  "mechanism_tags": [
+    "user-balanced-loss",
+    "pairwise-ranking",
+    "macro-objective",
+    "fm",
+    "residual-targeting"
+  ],
+  "observation": "The diagnostic key \"train_user_history_quartile\" uses cutpoints [16, 35, 64] and validation row counts [19132, 24731, 31956, 49090], showing substantial variation in user history volume. Both trusted metrics rank within user, while ordinary per-positive BPR gives users with more training events more aggregate gradient mass.",
+  "operator_id": null,
+  "parent_operator_stack": [
+    "legal_rank_stack_v1"
+  ],
+  "parent_references": [
+    "w001"
+  ],
+  "patch_scope": [
+    "target",
+    "train",
+    "predict"
+  ],
+  "persona": "reward",
+  "primary_block": "train",
+  "research_evidence": [],
+  "research_nonuse_reason": "This is a diagnostic-driven objective-alignment hypothesis. E001 specifies per-positive BPR sampling rather than equal per-user weighting, E002 concerns a tree ensemble leaf, and E003 only rejects one auxiliary-weight transition.",
+  "risk": [
+    "Uniform user weighting may overemphasize users with very few noisy observations.",
+    "A custom Torch FM may differ numerically from SO.FM despite preserving the same scoring equation.",
+    "Eight pairs per user may underuse reliable information from long-history users."
+  ]
+}

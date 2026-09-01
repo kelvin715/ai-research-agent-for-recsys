@@ -1,0 +1,5 @@
+{
+  "analysis": "The added repeat-exposure pair features produced a positive standalone delta of 0.00063, but the paired 95% CI crossed zero (-0.00036 to 0.00158), so the evidence does not establish a reliable improvement. Directional effects were heterogeneous: gains appeared for medium/long-history users and less-popular items, while the shortest-history slice and the two most-popular item quartiles degraded. The portfolio comparison was effectively flat but slightly negative (-0.000023), also with a CI crossing zero, and the candidate was not promoted. Thus the result is consistent with useful affinity signal in some segments, but not with a robust overall or portfolio-level benefit.",
+  "next_lesson": "Raw repeat-exposure affinity is segment-dependent; retain the personalization idea only if a follow-up isolates it to the history/popularity regimes where the diagnostic was positive.",
+  "result": "inconclusive"
+}

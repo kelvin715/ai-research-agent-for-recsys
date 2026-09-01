@@ -1,0 +1,77 @@
+{
+  "basis_type": "diagnostic",
+  "estimated_cost_s": 610,
+  "evidence": [
+    {
+      "ref": "train_target_phi_with_long_view.is_click=0.7604858188163154",
+      "type": "diagnostic"
+    },
+    {
+      "ref": "train_target_rates.is_click=0.46344705865857166 and train_target_rates.long_view=0.33661989357749283",
+      "type": "diagnostic"
+    },
+    {
+      "ref": "Post-exposure feedback may be a training or auxiliary target, never an inference feature.",
+      "type": "task_spec"
+    },
+    {
+      "ref": "The delegated LightGBM learner already consumes integer relevance labels under LambdaRank, so the custom target is connected through the train block rather than an ignored OP_CONFIG key.",
+      "type": "current_code"
+    }
+  ],
+  "evidence_adaptation": null,
+  "execution_mode": "custom_patch",
+  "expected_observation": "If click supplies useful within-label ordering, the graded model will improve trusted portfolio primary over 0.6061277485758569, with gains reflected in changed within-user order rather than any inference-time click dependency.",
+  "experiment_contract": {
+    "claim": "The sole tested reward change is ordinal relevance grade=2*long_view+is_click, with native long_view retaining strict precedence over click.",
+    "expected_observable": "Training metadata reports all four grade frequencies where present, the target differs from binary long_view on clicked rows, and prediction succeeds without loading is_click for the requested split.",
+    "falsification_condition": "The hypothesis is refuted if the correctly aligned graded-target run fails to improve marginal portfolio primary or has a negative paired confidence interval; any target misalignment, illegal inference access, or missing grade consumer invalidates the run.",
+    "forbidden_shortcuts": [
+      "Using is_click as an inference feature.",
+      "Allowing clicked long_view-negatives to outrank any long_view-positive by target construction.",
+      "Changing feature columns, tree parameters, grouping, or checkpoint rounds in this experiment.",
+      "Reading validation or test feedback."
+    ],
+    "portfolio_role": "member_refinement",
+    "required_components": [
+      "Both targets are read only for train rows and aligned exactly to train_idx.",
+      "DV.assert_trainable is called for long_view and is_click.",
+      "The resulting relevance values are integers in {0,1,2,3}.",
+      "SO.train receives the graded vector while retaining the parent's fixed parameters and grouping.",
+      "Prediction consumes only the trained tree and legal Xs features."
+    ]
+  },
+  "fallback": "Rollback target and train to the native SO.build_target and SO.train path; do not weaken long_view precedence or tune grade weights in the same iteration.",
+  "hypothesis": "Using train-only click as an ordinal tie-breaker around native long_view will provide denser ranking supervision and improve the LambdaRank branch's marginal portfolio primary without replacing the official relevance label.",
+  "implementation_plan": "In target, obtain native long_view through SO.build_target and train-only is_click through DV.train_targets(['is_click']), align both to train_idx, call DV.assert_trainable on each, and create integer relevance grade=2*long_view+is_click in {0,1,2,3}. In train, call the same delegated SO.train path with this graded target and the unchanged configuration, preserving stable (user_id,date) grouping, all fixed LightGBM parameters, and num_boost_round=100. No auxiliary target is retained by the model or used during inference.",
+  "justification": "The grade preserves long_view as the dominant ordering because every long_view-positive has grade at least 2 while every long_view-negative has grade at most 1. Click only resolves ties within each native-label class, potentially supplying a denser preference signal while producing a reward mechanism complementary to the portfolio's pointwise and existing ranking branches.",
+  "mechanism": "click-tiebroken ordinal LambdaRank relevance",
+  "mechanism_tags": [
+    "graded_relevance",
+    "auxiliary_target",
+    "click_signal",
+    "lambdarank",
+    "reward_shaping"
+  ],
+  "observation": "The exact diagnostic key train_target_phi_with_long_view.is_click is 0.7604858188163154, which is strong, and train_target_rates.is_click is 0.46344705865857166 versus train_target_rates.long_view of 0.33661989357749283. The task explicitly permits post-exposure feedback as a training or auxiliary target but not as an inference feature.",
+  "operator_id": null,
+  "parent_operator_stack": [
+    "item_lambdarank"
+  ],
+  "parent_references": [
+    "w003"
+  ],
+  "patch_scope": [
+    "target",
+    "train"
+  ],
+  "persona": "reward",
+  "primary_block": "target",
+  "research_evidence": [],
+  "research_nonuse_reason": "The exact click correlation and permitted train-only target path are a more direct basis than E003, whose mechanism specifically requires a censored watch-time regression head sharing FM embeddings. Recasting E003 as a graded tree target would not faithfully implement that evidence.",
+  "risk": [
+    "Click may reflect exposure-position bias and divert capacity from the binary long_view metric.",
+    "LambdaRank's default gains may overemphasize grade 3 relative to grade 2.",
+    "DV.train_targets return shape must be normalized carefully before indexing."
+  ]
+}

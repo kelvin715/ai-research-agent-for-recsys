@@ -1,0 +1,21 @@
+{
+  "analysis": "Candidate faithfully implements the accepted fusion mechanism within the declared features/train/predict scope. The feature branch adds explicit tab, log-duration, and tab×log-duration interactions from legal inference-time arrays; train fits both the delegated LambdaRank base model and a distinct residual logistic head on only the new columns; predict fuses the two outputs with a fixed visible weight. No post-exposure inference features are used, no opaque unsupported config key is relied upon, and predictions can differ materially from the parent.",
+  "changed_runtime_path": true,
+  "component_evidence": [
+    {
+      "code_evidence": "In build_features, candidate first calls SO.build_features(splits, train_idx, OP_CONFIG) to retain base columns, then computes legal inference-time fields from splits[split]: tab = np.asarray(rs.tab), dur = np.asarray(rs.duration_ms), log_dur = np.log1p(...). It appends extra columns via extra[:, 0] = log_dur, extra[:, 1 + j] = (tab == t), and extra[:, 1 + len(major_tabs) + j] = flag * log_dur for major_tabs=[0,1,2,4,6], then concatenates with np.concatenate([X, extra], axis=1).",
+      "component": "features block appends explicit tab/duration interaction columns"
+    },
+    {
+      "code_evidence": "In train, base_model, info = SO.train(splits, train_idx, Xs, dim, y, seed, config, verbose) preserves delegated base branch. Then a separate sklearn.linear_model.LogisticRegression residual head is fit on appended columns only: n_extra=11, base_dim=dim-n_extra, X_train_extra = Xs['train'][train_idx, base_dim:base_dim+n_extra], standardized with mean/std computed on train rows only, and clf.fit(Xz, y_train). The trained residual parameters coef/intercept/mean/scale/weight are stored separately from base_model.",
+      "component": "train block fits both base SO.train model and a separate residual head on the new columns"
+    },
+    {
+      "code_evidence": "In predict, base_pred = SO.predict(model['base_model'], Xs, split). Residual features are sliced from the appended columns using start = model['base_dim']; X_extra = Xs[split][:, start:start+n_extra]; logits = Xz @ residual['coef'] + residual['intercept']; final output is base_pred + residual['weight'] * logits with residual['weight'] fixed at 0.15 in train.",
+      "component": "predict block combines the two branch outputs with a fixed predeclared weight"
+    }
+  ],
+  "forbidden_shortcuts_found": [],
+  "missing_components": [],
+  "status": "PASS"
+}

@@ -1,0 +1,22 @@
+--- incumbent/pipeline.py
++++ candidate/pipeline.py
+@@ -38,7 +38,10 @@
+ 
+ # <<<BLOCK:target>>>
+ def build_target(splits, train_idx):
+-    return SO.build_target(splits, train_idx, OP_CONFIG)
++    y = np.asarray(splits['train'].label, dtype=np.float32)
++    y = y[train_idx]
++    DV.assert_trainable(y, 'target')
++    return y
+ # <<<END:target>>>
+ 
+ 
+@@ -60,6 +63,7 @@
+ def train(splits, train_idx, Xs, dim, y, seed, verbose=False):
+     config = dict(OP_CONFIG)
+     config['hp'] = dict(HP)
++    config['objective'] = 'pointwise'
+     return SO.train(splits, train_idx, Xs, dim, y, seed, config, verbose)
+ # <<<END:train>>>
+ 
