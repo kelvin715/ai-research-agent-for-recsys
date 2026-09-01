@@ -4,9 +4,12 @@
 
 [![Open the live experiment graph](https://img.shields.io/badge/%E2%96%B6%20Open%20the%20live%20experiment%20graph-6688d9?style=for-the-badge)](https://kelvin715.github.io/ai-research-agent-for-recsys/)
 
+[![The hosted experiment graph dashboard](docs/assets/dashboard-screenshot.png)](https://kelvin715.github.io/ai-research-agent-for-recsys/demo/submitted-run/)
+
 **Click any node** to read the agent's hypothesis, its three-seed scores, the paired confidence
-interval, and the exact reason the change was kept or rejected. Nothing to install. Three real runs
-are replayed from frozen snapshots:
+interval, and the exact reason the change was kept or rejected. Above, round 2 is selected: the best
+new standalone model at `0.605280`, yet `−0.000253` on the deployed combination, so it stayed
+"promising, not proven". Nothing to install. Three real runs are replayed from frozen snapshots:
 [submitted run](https://kelvin715.github.io/ai-research-agent-for-recsys/demo/submitted-run/) ·
 [extended GPT-5.4](https://kelvin715.github.io/ai-research-agent-for-recsys/demo/long-run-gpt54/) ·
 [extended GPT-5.6-sol](https://kelvin715.github.io/ai-research-agent-for-recsys/demo/long-run-gpt56sol/)
