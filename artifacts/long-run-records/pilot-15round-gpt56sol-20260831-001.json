@@ -1,0 +1,1051 @@
+{
+ "baseline_selection_primary": 0.6018779688793552,
+ "best_new_single_model_primary": 0.6052800193085559,
+ "convergence_stop_enabled": false,
+ "deployed_portfolio_primary": 0.6061277485758569,
+ "iteration_decision_counts": {
+  "ORCHESTRATOR_ERROR": 1,
+  "REJECT": 4,
+  "ROLLBACK": 6,
+  "UNCERTAIN": 3,
+  "WARMSTART_VERIFIED": 1
+ },
+ "iterations": [
+  {
+   "basis_type": null,
+   "decision": "WARMSTART_VERIFIED",
+   "execution_mode": "empirical_prior_portfolio",
+   "implementation_attempts": 0,
+   "iteration": 1,
+   "mechanism": "Reproduce the locked validation-only portfolio before LLM search.",
+   "next_lesson": "Start novel LLM search at logical iteration 2.",
+   "node_id": null,
+   "parent_node_id": null,
+   "planning_attempts": 0,
+   "primary_block": null,
+   "reflection_result": "supported",
+   "status": "COMPLETE",
+   "usage": {
+    "calls": 0,
+    "completion_tokens": 0,
+    "llm_latency_s": 0,
+    "prompt_tokens": 0,
+    "total_tokens": 0
+   },
+   "wall_s": 204.405
+  },
+  {
+   "GAUC_mean": 0.6719898024552714,
+   "basis_type": "task_spec",
+   "candidate_entered_challenger": true,
+   "challenger_delta_vs_incumbent": -0.0002527445864699551,
+   "challenger_paired_ci95": [
+    -0.0011832933222168441,
+    0.0007566694622673477
+   ],
+   "challenger_primary": 0.605875003989387,
+   "decision": "UNCERTAIN",
+   "deployed_primary_after": 0.6061277485758569,
+   "execution_mode": "operator",
+   "implementation_attempts": 1,
+   "iteration": 2,
+   "matched_seed_deltas": [
+    -0.0001499772178518155,
+    7.719835313002577e-06,
+    -0.00044749801613985785
+   ],
+   "mean_matched_seed_delta": -0.00019658513289289026,
+   "mechanism": "hour and strictly-prior user-gap interaction fields",
+   "nDCG@5_mean": 0.5377429765691056,
+   "next_lesson": "Treat the combined temporal fields as unproven; only revisit with a prespecified context-targeted mechanism motivated by the heterogeneous slice effects.",
+   "node_id": "n002",
+   "paired_ci95_vs_parent": [
+    -0.0008303693600360373,
+    0.00193394072380294
+   ],
+   "paired_delta_vs_parent": 0.0005282638342124502,
+   "paired_excludes_zero": false,
+   "parent_node_id": "w002",
+   "planning_attempts": 1,
+   "primary_block": "features",
+   "promoted": false,
+   "promotion_gate": "positive paired CI95 lower bound OR >=2/3 matched seeds positive, mean gain >= 0.0001, worst seed >= -5e-05",
+   "reflection_result": "inconclusive",
+   "standalone_primary": 0.6052800193085559,
+   "status": "COMPLETE",
+   "usage": {
+    "calls": 5,
+    "completion_tokens": 10616,
+    "llm_latency_s": 171.805,
+    "prompt_tokens": 33377,
+    "total_tokens": 43993
+   },
+   "wall_s": 392.955
+  },
+  {
+   "GAUC_mean": 0.6709014449173276,
+   "basis_type": "curated_research",
+   "candidate_entered_challenger": false,
+   "challenger_delta_vs_incumbent": null,
+   "challenger_paired_ci95": null,
+   "challenger_primary": null,
+   "decision": "ROLLBACK",
+   "deployed_primary_after": 0.6061277485758569,
+   "execution_mode": "operator",
+   "implementation_attempts": 1,
+   "iteration": 3,
+   "matched_seed_deltas": null,
+   "mean_matched_seed_delta": null,
+   "mechanism": "selected static user-profile FM interactions",
+   "nDCG@5_mean": 0.5373669003864158,
+   "next_lesson": "Do not add all seven profile fields globally; test one predeclared targeted profile-interaction mechanism motivated by the observed low-history-user heterogeneity.",
+   "node_id": "n003",
+   "paired_ci95_vs_parent": [
+    -0.0014161918261403532,
+    -3.7182088574294706e-05
+   ],
+   "paired_delta_vs_parent": -0.0007378004158260509,
+   "paired_excludes_zero": true,
+   "parent_node_id": "w001",
+   "planning_attempts": 1,
+   "primary_block": "features",
+   "promoted": false,
+   "promotion_gate": "positive paired CI95 lower bound OR >=2/3 matched seeds positive, mean gain >= 0.0001, worst seed >= -5e-05",
+   "reflection_result": "not_supported",
+   "standalone_primary": 0.604175571136877,
+   "status": "COMPLETE",
+   "usage": {
+    "calls": 4,
+    "completion_tokens": 5769,
+    "llm_latency_s": 99.358,
+    "prompt_tokens": 24980,
+    "total_tokens": 30749
+   },
+   "wall_s": 307.005
+  },
+  {
+   "GAUC_mean": 0.6624672338304665,
+   "basis_type": "diagnostic",
+   "candidate_entered_challenger": false,
+   "challenger_delta_vs_incumbent": null,
+   "challenger_paired_ci95": null,
+   "challenger_primary": null,
+   "decision": "ROLLBACK",
+   "deployed_primary_after": 0.6061277485758569,
+   "execution_mode": "custom_patch",
+   "implementation_attempts": 1,
+   "iteration": 4,
+   "matched_seed_deltas": null,
+   "mean_matched_seed_delta": null,
+   "mechanism": "click-tiebroken ordinal LambdaRank relevance",
+   "nDCG@5_mean": 0.5347350548416102,
+   "next_lesson": "Do not use raw click as a four-grade LambdaRank tie-breaker; its exposure bias and default graded gains can distort the official long_view ordering objective.",
+   "node_id": "n004",
+   "paired_ci95_vs_parent": [
+    -0.0028354492409322337,
+    -0.00019663888871635518
+   ],
+   "paired_delta_vs_parent": -0.0015718989164643649,
+   "paired_excludes_zero": true,
+   "parent_node_id": "w003",
+   "planning_attempts": 1,
+   "primary_block": "target",
+   "promoted": false,
+   "promotion_gate": "positive paired CI95 lower bound OR >=2/3 matched seeds positive, mean gain >= 0.0001, worst seed >= -5e-05",
+   "reflection_result": "not_supported",
+   "standalone_primary": 0.5994856848549472,
+   "status": "COMPLETE",
+   "usage": {
+    "calls": 6,
+    "completion_tokens": 9205,
+    "llm_latency_s": 156.504,
+    "prompt_tokens": 34537,
+    "total_tokens": 43742
+   },
+   "wall_s": 448.134
+  },
+  {
+   "GAUC_mean": 0.6675718190425846,
+   "basis_type": "curated_research",
+   "candidate_entered_challenger": false,
+   "challenger_delta_vs_incumbent": null,
+   "challenger_paired_ci95": null,
+   "challenger_primary": null,
+   "decision": "ROLLBACK",
+   "deployed_primary_after": 0.6061277485758569,
+   "execution_mode": "custom_patch",
+   "implementation_attempts": 3,
+   "iteration": 5,
+   "matched_seed_deltas": null,
+   "mean_matched_seed_delta": null,
+   "mechanism": "censored watch-time auxiliary head",
+   "nDCG@5_mean": 0.5365526267863548,
+   "next_lesson": "Do not reuse this fixed-weight watch auxiliary on w002; if revisited, isolate a much smaller auxiliary weight while retaining explicit masking and censoring audits.",
+   "node_id": "n005",
+   "paired_ci95_vs_parent": [
+    -0.002227540371070008,
+    -0.00017211852709163872
+   ],
+   "paired_delta_vs_parent": -0.0012289162211027715,
+   "paired_excludes_zero": true,
+   "parent_node_id": "w002",
+   "planning_attempts": 1,
+   "primary_block": "target",
+   "promoted": false,
+   "promotion_gate": "positive paired CI95 lower bound OR >=2/3 matched seeds positive, mean gain >= 0.0001, worst seed >= -5e-05",
+   "reflection_result": "not_supported",
+   "standalone_primary": 0.6035228392532407,
+   "status": "COMPLETE",
+   "usage": {
+    "calls": 11,
+    "completion_tokens": 29759,
+    "llm_latency_s": 429.641,
+    "prompt_tokens": 79982,
+    "total_tokens": 109741
+   },
+   "wall_s": 729.662
+  },
+  {
+   "GAUC_mean": 0.6710111613665145,
+   "basis_type": "diagnostic",
+   "candidate_entered_challenger": false,
+   "challenger_delta_vs_incumbent": null,
+   "challenger_paired_ci95": null,
+   "challenger_primary": null,
+   "decision": "ROLLBACK",
+   "deployed_primary_after": 0.6061277485758569,
+   "execution_mode": "custom_patch",
+   "implementation_attempts": 2,
+   "iteration": 6,
+   "matched_seed_deltas": null,
+   "mean_matched_seed_delta": null,
+   "mechanism": "tab-6 oversampled mixture-of-experts FM",
+   "nDCG@5_mean": 0.5378001853141251,
+   "next_lesson": "Do not retry this fixed oversampling/blend recipe; first verify exact routing invariants, then test any future tab-6 intervention at much lower strength as a single isolated change.",
+   "node_id": "n006",
+   "paired_ci95_vs_parent": [
+    -6.638976027238119e-05,
+    -8.224623783831344e-07
+   ],
+   "paired_delta_vs_parent": -3.4074017580265625e-05,
+   "paired_excludes_zero": true,
+   "parent_node_id": "w001",
+   "planning_attempts": 1,
+   "primary_block": "train",
+   "promoted": false,
+   "promotion_gate": "positive paired CI95 lower bound OR >=2/3 matched seeds positive, mean gain >= 0.0001, worst seed >= -5e-05",
+   "reflection_result": "not_supported",
+   "standalone_primary": 0.6048792975351228,
+   "status": "COMPLETE",
+   "usage": {
+    "calls": 8,
+    "completion_tokens": 9560,
+    "llm_latency_s": 167.782,
+    "prompt_tokens": 45942,
+    "total_tokens": 55502
+   },
+   "wall_s": 382.178
+  },
+  {
+   "basis_type": "diagnostic",
+   "candidate_entered_challenger": false,
+   "challenger_delta_vs_incumbent": null,
+   "challenger_paired_ci95": null,
+   "challenger_primary": null,
+   "decision": "REJECT",
+   "deployed_primary_after": 0.6061277485758569,
+   "execution_mode": "custom_patch",
+   "failure_reason": {
+    "gate": {
+     "action": null,
+     "gate": "G2",
+     "info": {
+      "blocks": [
+       "data_view",
+       "features",
+       "loss",
+       "model",
+       "predict",
+       "target",
+       "train"
+      ]
+     },
+     "type": "POLICY_BLOCK",
+     "violations": [
+      "\u7b2c 76 \u884c block[features] \u8bbf\u95ee .label\uff1a\u53ea\u6709 target block \u53ef\u8bfb\u53d6 train.label\uff1bvalid/test \u6807\u7b7e\u5df2\u7269\u7406\u6263\u7559"
+     ]
+    },
+    "kind": "static_gate"
+   },
+   "implementation_attempts": 3,
+   "iteration": 7,
+   "matched_seed_deltas": null,
+   "mean_matched_seed_delta": null,
+   "mechanism": "strictly-prior-date user-by-tab affinity features",
+   "next_lesson": "Construct all label-derived historical statistics inside the target block and expose only policy-compliant derived artifacts to features, with both blocks declared in patch_scope.",
+   "node_id": "n007",
+   "parent_node_id": "w003",
+   "planning_attempts": 1,
+   "primary_block": "features",
+   "promoted": false,
+   "promotion_gate": "positive paired CI95 lower bound OR >=2/3 matched seeds positive, mean gain >= 0.0001, worst seed >= -5e-05",
+   "reflection_result": "failed",
+   "status": "FAILED",
+   "usage": {
+    "calls": 10,
+    "completion_tokens": 16855,
+    "llm_latency_s": 256.833,
+    "prompt_tokens": 57783,
+    "total_tokens": 74638
+   },
+   "wall_s": 383.555
+  },
+  {
+   "basis_type": "task_spec",
+   "candidate_entered_challenger": false,
+   "challenger_delta_vs_incumbent": null,
+   "challenger_paired_ci95": null,
+   "challenger_primary": null,
+   "decision": "REJECT",
+   "deployed_primary_after": 0.6061277485758569,
+   "execution_mode": "custom_patch",
+   "failure_reason": {
+    "gate": {
+     "action": null,
+     "gate": "G4",
+     "info": {
+      "error_class": "RUNTIME_ERROR"
+     },
+     "type": "POLICY_BLOCK",
+     "violations": [
+      "\u9000\u51fa\u7801 1: ValueError: build_target.watch_ratio: \u6807\u7b7e\u542b NaN/Inf"
+     ]
+    },
+    "infrastructure_retries": 0,
+    "kind": "smoke",
+    "sandbox": {
+     "cpu_s": 0.55,
+     "exit_code": 1,
+     "limits": {
+      "cpu_s": 3600,
+      "fsize_mb": 2048,
+      "mem_gb": 8,
+      "nproc": null,
+      "timeout_s": 60.0
+     },
+     "max_rss_mb": 189.1,
+     "ok": false,
+     "signal": null,
+     "stderr_path": "/home/zhihan/techjam/track2-agent/runs/pilot-15round-gpt56sol-20260831-001/iter-008/attempt-2/smoke/logs/stderr.txt",
+     "stderr_tail": "Traceback (most recent call last):\n  File \"/work/pipeline.py\", line 139, in <module>\n    main()\n  File \"/work/pipeline.py\", line 123, in main\n    y = build_target(splits, train_idx)\n  File \"/work/pipeline.py\", line 48, in build_target\n    DV.assert_trainable(ratio, 'build_target.watch_ratio')\n  File \"/task/dataview.py\", line 172, in assert_trainable\n    raise ValueError(f'{where}: \u6807\u7b7e\u542b NaN/Inf')\nValueError: build_target.watch_ratio: \u6807\u7b7e\u542b NaN/Inf\n",
+     "stdout_path": "/home/zhihan/techjam/track2-agent/runs/pilot-15round-gpt56sol-20260831-001/iter-008/attempt-2/smoke/logs/stdout.txt",
+     "stdout_tail": "",
+     "timed_out": false,
+     "wall_s": 0.6
+    }
+   },
+   "implementation_attempts": 3,
+   "iteration": 8,
+   "matched_seed_deltas": null,
+   "mean_matched_seed_delta": null,
+   "mechanism": "valid-watch-ratio soft-label shaping",
+   "next_lesson": "Validate the mask first, assert finiteness only on valid ratios, and replace invalid ratio values safely before constructing the masked target.",
+   "node_id": "n008",
+   "parent_node_id": "w002",
+   "planning_attempts": 1,
+   "primary_block": "target",
+   "promoted": false,
+   "promotion_gate": "positive paired CI95 lower bound OR >=2/3 matched seeds positive, mean gain >= 0.0001, worst seed >= -5e-05",
+   "reflection_result": "failed",
+   "status": "FAILED",
+   "usage": {
+    "calls": 10,
+    "completion_tokens": 9450,
+    "llm_latency_s": 171.239,
+    "prompt_tokens": 53380,
+    "total_tokens": 62830
+   },
+   "wall_s": 293.161
+  },
+  {
+   "GAUC_mean": 0.6707446401743202,
+   "basis_type": "diagnostic",
+   "candidate_entered_challenger": false,
+   "challenger_delta_vs_incumbent": null,
+   "challenger_paired_ci95": null,
+   "challenger_primary": null,
+   "decision": "ROLLBACK",
+   "deployed_primary_after": 0.6061277485758569,
+   "execution_mode": "custom_patch",
+   "implementation_attempts": 2,
+   "iteration": 9,
+   "matched_seed_deltas": null,
+   "mean_matched_seed_delta": null,
+   "mechanism": "tab-6 importance-weighted BPR training",
+   "nDCG@5_mean": 0.5376315289392769,
+   "next_lesson": "Do not retry uniform tab-6 replication: increased training mass did not translate into better tab-6 ordering and introduced broader slice degradation.",
+   "node_id": "n009",
+   "paired_ci95_vs_parent": [
+    -0.0012597048219486456,
+    0.0005542395203893406
+   ],
+   "paired_delta_vs_parent": -0.0002863768412894041,
+   "paired_excludes_zero": false,
+   "parent_node_id": "w001",
+   "planning_attempts": 1,
+   "primary_block": "train",
+   "promoted": false,
+   "promotion_gate": "positive paired CI95 lower bound OR >=2/3 matched seeds positive, mean gain >= 0.0001, worst seed >= -5e-05",
+   "reflection_result": "not_supported",
+   "standalone_primary": 0.6046269947114137,
+   "status": "COMPLETE",
+   "usage": {
+    "calls": 8,
+    "completion_tokens": 8158,
+    "llm_latency_s": 147.834,
+    "prompt_tokens": 44260,
+    "total_tokens": 52418
+   },
+   "wall_s": 329.792
+  },
+  {
+   "GAUC_mean": 0.6658907566783866,
+   "basis_type": "task_spec",
+   "candidate_entered_challenger": true,
+   "challenger_delta_vs_incumbent": 4.615662777462948e-05,
+   "challenger_paired_ci95": [
+    -0.000518007725670827,
+    0.0006551356237167792
+   ],
+   "challenger_primary": 0.6061739052036316,
+   "decision": "UNCERTAIN",
+   "deployed_primary_after": 0.6061277485758569,
+   "execution_mode": "custom_patch",
+   "implementation_attempts": 3,
+   "iteration": 10,
+   "matched_seed_deltas": [
+    -0.00025963821091290473,
+    0.00010151735093621994,
+    0.00010076187775653889
+   ],
+   "mean_matched_seed_delta": -1.9119660740048634e-05,
+   "mechanism": "strictly_prior_exposure_affinity_features",
+   "nDCG@5_mean": 0.535646719878886,
+   "next_lesson": "Treat the mechanism as weakly promising but unproven; next isolate the strictly-prior user-author affinity representation alone rather than adding all three features together.",
+   "node_id": "n010",
+   "paired_ci95_vs_parent": [
+    -0.0006612861138982435,
+    0.0012240003137336444
+   ],
+   "paired_delta_vs_parent": 0.00025614676893725985,
+   "paired_excludes_zero": false,
+   "parent_node_id": "w003",
+   "planning_attempts": 1,
+   "primary_block": "features",
+   "promoted": false,
+   "promotion_gate": "positive paired CI95 lower bound OR >=2/3 matched seeds positive, mean gain >= 0.0001, worst seed >= -5e-05",
+   "reflection_result": "inconclusive",
+   "standalone_primary": 0.6013137305403489,
+   "status": "COMPLETE",
+   "usage": {
+    "calls": 10,
+    "completion_tokens": 19051,
+    "llm_latency_s": 295.272,
+    "prompt_tokens": 61527,
+    "total_tokens": 80578
+   },
+   "wall_s": 663.908
+  },
+  {
+   "basis_type": "diagnostic",
+   "candidate_entered_challenger": false,
+   "challenger_delta_vs_incumbent": null,
+   "challenger_paired_ci95": null,
+   "challenger_primary": null,
+   "decision": "REJECT",
+   "deployed_primary_after": 0.6061277485758569,
+   "execution_mode": "custom_patch",
+   "failure_reason": {
+    "audit": {
+     "analysis": "The target replacement has a concrete path into SO.train and can alter predictions while preserving the parent configuration. However, the run does not fail closed when no unique auxiliary column equal to is_hate exists: a unique complemented match is accepted instead. Revise the matcher to require exactly one direct is_hate match on the applicable rows and reject complement-only or ambiguous cases.",
+     "changed_runtime_path": true,
+     "component_evidence": [
+      {
+       "code_evidence": "load_single_feedback calls DV.train_targets([name]) for both 'is_hate' and 'is_profile_enter', resolves each to a one-dimensional array, and checks its train-view length.",
+       "component": "Use DV.train_targets for train-only is_hate and is_profile_enter arrays."
+      },
+      {
+       "code_evidence": "The loop compares thresholded auxiliary columns with thresholded is_hate, but `matches = sorted(set(direct_matches + complemented_matches))` also accepts a complemented is_hate column. Thus the code does not require a unique column equal to is_hate as specified.",
+       "component": "Verify which existing engagement_aux column equals is_hate before replacement."
+      },
+      {
+       "code_evidence": "`aux_new = aux.copy()` followed by `aux_new[:, column] = ...` changes one selected column; `result = dict(target)` and changing only `result['engagement_aux']` preserves `target['main']` and other entries.",
+       "component": "Replace exactly one auxiliary column and preserve the main long_view target."
+      },
+      {
+       "code_evidence": "OP_CONFIG remains identical with aux_weight 0.2, and the features, model, loss, train, and predict blocks are unchanged from the parent.",
+       "component": "Keep hp.aux_weight=0.2 and all model, feature, training, and prediction settings unchanged."
+      },
+      {
+       "code_evidence": "After assignment, `DV.assert_trainable(aux_new[:, column], 'build_target.engagement_aux.is_profile_enter')` validates the replacement auxiliary column.",
+       "component": "Run DV.assert_trainable on the new auxiliary target."
+      }
+     ],
+     "forbidden_shortcuts_found": [
+      "The identification logic permits a column equal to the complement of is_hate and uses thresholded binary equality rather than requiring the existing auxiliary column to equal is_hate. It can therefore replace a column without finding the contract-required unique hate column."
+     ],
+     "missing_components": [
+      "Verify which existing engagement_aux column equals is_hate before replacement."
+     ],
+     "status": "REVISE"
+    },
+    "kind": "experiment_contract"
+   },
+   "implementation_attempts": 3,
+   "iteration": 11,
+   "matched_seed_deltas": null,
+   "mean_matched_seed_delta": null,
+   "mechanism": "replace weak hate auxiliary head with profile-enter supervision",
+   "next_lesson": "Require exactly one direct equality match to the train-only is_hate array and reject complement-only or ambiguous matches before rerunning.",
+   "node_id": "n011",
+   "parent_node_id": "w002",
+   "planning_attempts": 1,
+   "primary_block": "target",
+   "promoted": false,
+   "promotion_gate": "positive paired CI95 lower bound OR >=2/3 matched seeds positive, mean gain >= 0.0001, worst seed >= -5e-05",
+   "reflection_result": "failed",
+   "status": "FAILED",
+   "usage": {
+    "calls": 10,
+    "completion_tokens": 13818,
+    "llm_latency_s": 231.784,
+    "prompt_tokens": 56473,
+    "total_tokens": 70291
+   },
+   "wall_s": 441.235
+  },
+  {
+   "basis_type": "task_spec",
+   "candidate_entered_challenger": false,
+   "challenger_delta_vs_incumbent": null,
+   "challenger_paired_ci95": null,
+   "challenger_primary": null,
+   "decision": "ORCHESTRATOR_ERROR",
+   "deployed_primary_after": 0.6061277485758569,
+   "execution_mode": "custom_patch",
+   "failure_reason": "LLM debug \u8fde\u7eed 3 \u6b21\u5931\u8d25: JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
+   "implementation_attempts": 2,
+   "iteration": 12,
+   "matched_seed_deltas": null,
+   "mean_matched_seed_delta": null,
+   "mechanism": "user-uniform pairwise FM training",
+   "next_lesson": "Validate that the custom patch emits schema-compliant, nonempty JSON before rerunning the unchanged hypothesis.",
+   "node_id": "n012",
+   "parent_node_id": "w001",
+   "planning_attempts": 1,
+   "primary_block": "train",
+   "promoted": false,
+   "promotion_gate": "positive paired CI95 lower bound OR >=2/3 matched seeds positive, mean gain >= 0.0001, worst seed >= -5e-05",
+   "reflection_result": "failed",
+   "status": "ORCHESTRATOR_ERROR",
+   "usage": {
+    "calls": 8,
+    "completion_tokens": 18991,
+    "llm_latency_s": 322.728,
+    "prompt_tokens": 47735,
+    "total_tokens": 66726
+   },
+   "wall_s": 654.845
+  },
+  {
+   "GAUC_mean": 0.6664089348104527,
+   "basis_type": "diagnostic",
+   "candidate_entered_challenger": true,
+   "challenger_delta_vs_incumbent": -2.2510864804203834e-05,
+   "challenger_paired_ci95": [
+    -0.0005906049023085862,
+    0.0005586866086578462
+   ],
+   "challenger_primary": 0.6061052377110527,
+   "decision": "UNCERTAIN",
+   "deployed_primary_after": 0.6061277485758569,
+   "execution_mode": "custom_patch",
+   "implementation_attempts": 1,
+   "iteration": 13,
+   "matched_seed_deltas": [
+    -0.0003526116021475012,
+    0.00010979013335754573,
+    0.00037681582638382505
+   ],
+   "mean_matched_seed_delta": 4.466478586462319e-05,
+   "mechanism": "label-free repeat-exposure affinity features",
+   "nDCG@5_mean": 0.5360707641594056,
+   "next_lesson": "Raw repeat-exposure affinity is segment-dependent; retain the personalization idea only if a follow-up isolates it to the history/popularity regimes where the diagnostic was positive.",
+   "node_id": "n013",
+   "paired_ci95_vs_parent": [
+    -0.00036400984213527665,
+    0.0015758602616091936
+   ],
+   "paired_delta_vs_parent": 0.0006295420266256846,
+   "paired_excludes_zero": false,
+   "parent_node_id": "w003",
+   "planning_attempts": 1,
+   "primary_block": "features",
+   "promoted": false,
+   "promotion_gate": "positive paired CI95 lower bound OR >=2/3 matched seeds positive, mean gain >= 0.0001, worst seed >= -5e-05",
+   "reflection_result": "inconclusive",
+   "standalone_primary": 0.6016871257980373,
+   "status": "COMPLETE",
+   "usage": {
+    "calls": 6,
+    "completion_tokens": 10092,
+    "llm_latency_s": 173.731,
+    "prompt_tokens": 34771,
+    "total_tokens": 44863
+   },
+   "wall_s": 332.735
+  },
+  {
+   "basis_type": "diagnostic",
+   "candidate_entered_challenger": false,
+   "challenger_delta_vs_incumbent": null,
+   "challenger_paired_ci95": null,
+   "challenger_primary": null,
+   "decision": "REJECT",
+   "deployed_primary_after": 0.6061277485758569,
+   "execution_mode": "custom_patch",
+   "failure_reason": {
+    "gate": {
+     "action": null,
+     "gate": "G4",
+     "info": {
+      "error_class": "RUNTIME_ERROR"
+     },
+     "type": "POLICY_BLOCK",
+     "violations": [
+      "\u9000\u51fa\u7801 1: AssertionError: ('is_click', (), 1141112)"
+     ]
+    },
+    "infrastructure_retries": 0,
+    "kind": "smoke",
+    "sandbox": {
+     "cpu_s": 0.51,
+     "exit_code": 1,
+     "limits": {
+      "cpu_s": 3600,
+      "fsize_mb": 2048,
+      "mem_gb": 8,
+      "nproc": null,
+      "timeout_s": 60.0
+     },
+     "max_rss_mb": 187.4,
+     "ok": false,
+     "signal": null,
+     "stderr_path": "/home/zhihan/techjam/track2-agent/runs/pilot-15round-gpt56sol-20260831-001/iter-014/attempt-2/smoke/logs/stderr.txt",
+     "stderr_tail": "Traceback (most recent call last):\n  File \"/work/pipeline.py\", line 185, in <module>\n    main()\n  File \"/work/pipeline.py\", line 169, in main\n    y = build_target(splits, train_idx)\n  File \"/work/pipeline.py\", line 59, in build_target\n    click_full = load_target_column('is_click')\n  File \"/work/pipeline.py\", line 52, in load_target_column\n    assert values.size == n_full, (\nAssertionError: ('is_click', (), 1141112)\n",
+     "stdout_path": "/home/zhihan/techjam/track2-agent/runs/pilot-15round-gpt56sol-20260831-001/iter-014/attempt-2/smoke/logs/stdout.txt",
+     "stdout_tail": "",
+     "timed_out": false,
+     "wall_s": 0.55
+    }
+   },
+   "implementation_attempts": 3,
+   "iteration": 14,
+   "matched_seed_deltas": null,
+   "mean_matched_seed_delta": null,
+   "mechanism": "watch-aligned multi-task auxiliary targets",
+   "next_lesson": "Use DV.train_targets(names) according to its batch return contract, verify column and row shapes before assembly, and then align the resulting matrix to train_idx.",
+   "node_id": "n014",
+   "parent_node_id": "w002",
+   "planning_attempts": 1,
+   "primary_block": "target",
+   "promoted": false,
+   "promotion_gate": "positive paired CI95 lower bound OR >=2/3 matched seeds positive, mean gain >= 0.0001, worst seed >= -5e-05",
+   "reflection_result": "failed",
+   "status": "FAILED",
+   "usage": {
+    "calls": 12,
+    "completion_tokens": 21673,
+    "llm_latency_s": 322.834,
+    "prompt_tokens": 76820,
+    "total_tokens": 98493
+   },
+   "wall_s": 441.05
+  },
+  {
+   "GAUC_mean": 0.6583327314597214,
+   "basis_type": "diagnostic",
+   "candidate_entered_challenger": false,
+   "challenger_delta_vs_incumbent": null,
+   "challenger_paired_ci95": null,
+   "challenger_primary": null,
+   "decision": "ROLLBACK",
+   "deployed_primary_after": 0.6061277485758569,
+   "execution_mode": "custom_patch",
+   "implementation_attempts": 1,
+   "iteration": 15,
+   "matched_seed_deltas": null,
+   "mean_matched_seed_delta": null,
+   "mechanism": "macro-user-balanced pairwise FM training",
+   "nDCG@5_mean": 0.5315412725767602,
+   "next_lesson": "Do not replace exposure-weighted FM training with a hard eight-pair-per-user cap; if revisiting macro alignment, preserve substantially more within-user information and isolate weighting from trainer changes.",
+   "node_id": "n015",
+   "paired_ci95_vs_parent": [
+    -0.011381182430353265,
+    -0.007208877095650196
+   ],
+   "paired_delta_vs_parent": -0.00903604438449035,
+   "paired_excludes_zero": true,
+   "parent_node_id": "w001",
+   "planning_attempts": 1,
+   "primary_block": "train",
+   "promoted": false,
+   "promotion_gate": "positive paired CI95 lower bound OR >=2/3 matched seeds positive, mean gain >= 0.0001, worst seed >= -5e-05",
+   "reflection_result": "not_supported",
+   "standalone_primary": 0.5958773271682127,
+   "status": "COMPLETE",
+   "usage": {
+    "calls": 7,
+    "completion_tokens": 11276,
+    "llm_latency_s": 182.444,
+    "prompt_tokens": 37655,
+    "total_tokens": 48931
+   },
+   "wall_s": 319.163
+  }
+ ],
+ "iterations_cap": 15,
+ "journal_iterations": 15,
+ "label_boundary": {
+  "note": "Validation-only pilot: no submission was produced and no hidden-test label entered any selection decision.",
+  "submission_written": false,
+  "test_labels_used_anywhere": false
+ },
+ "model": "gpt-5.6-sol",
+ "nodes": [
+  {
+   "children": [
+    "w001",
+    "w002",
+    "w003"
+   ],
+   "decision": "BASELINE",
+   "execution_mode": "baseline",
+   "mechanism": "official FM baseline",
+   "node_id": "n000",
+   "operator_stack": [],
+   "parent_node_id": null,
+   "pipeline_sha256": "41f6fb3e5cdbdea6ba76a2b8925f2e1b29d3bcd1b88de29fa326f65f3b6efe2a",
+   "selection_primary": 0.6018779688793552,
+   "status": "COMPLETE",
+   "times_selected_as_parent": 0
+  },
+  {
+   "children": [],
+   "decision": "UNCERTAIN",
+   "execution_mode": "operator",
+   "mechanism": "hour and strictly-prior user-gap interaction fields",
+   "node_id": "n002",
+   "operator_stack": [
+    "deepfm_engagement_mtl_v1",
+    "legal_temporal_context"
+   ],
+   "parent_node_id": "w002",
+   "pipeline_sha256": "79abf9cca5e5397b1c6654f826bc2accf69710e1a74728f6f21314b7cbabbb5c",
+   "selection_primary": 0.6052800193085559,
+   "status": "COMPLETE",
+   "times_selected_as_parent": 0
+  },
+  {
+   "children": [],
+   "decision": "ROLLBACK",
+   "execution_mode": "operator",
+   "mechanism": "selected static user-profile FM interactions",
+   "node_id": "n003",
+   "operator_stack": [
+    "legal_rank_stack_v1",
+    "selected_user_profile"
+   ],
+   "parent_node_id": "w001",
+   "pipeline_sha256": "96119ca56f3d25beaf25f93a5516833d7aff0a4d08f9de35d685ab1e25ad540e",
+   "selection_primary": 0.604175571136877,
+   "status": "COMPLETE",
+   "times_selected_as_parent": 0
+  },
+  {
+   "children": [],
+   "decision": "ROLLBACK",
+   "execution_mode": "custom_patch",
+   "mechanism": "click-tiebroken ordinal LambdaRank relevance",
+   "node_id": "n004",
+   "operator_stack": null,
+   "parent_node_id": "w003",
+   "pipeline_sha256": "18a332646ab4d2c31335ecc5c074ce293f5f7051a6ab03652d4b66e84adceaca",
+   "selection_primary": 0.5994856848549472,
+   "status": "COMPLETE",
+   "times_selected_as_parent": 0
+  },
+  {
+   "children": [],
+   "decision": "ROLLBACK",
+   "execution_mode": "custom_patch",
+   "mechanism": "censored watch-time auxiliary head",
+   "node_id": "n005",
+   "operator_stack": null,
+   "parent_node_id": "w002",
+   "pipeline_sha256": "0cfee8cb34f6cd5eaaaa263a59e40cadbed36c76a864bfb37ec4fde4f8a6e119",
+   "selection_primary": 0.6035228392532407,
+   "status": "COMPLETE",
+   "times_selected_as_parent": 0
+  },
+  {
+   "children": [],
+   "decision": "ROLLBACK",
+   "execution_mode": "custom_patch",
+   "mechanism": "tab-6 oversampled mixture-of-experts FM",
+   "node_id": "n006",
+   "operator_stack": null,
+   "parent_node_id": "w001",
+   "pipeline_sha256": "b2e661b420bc3bab2b4de3b30a5db6b9158725c9e26f07852a95e7fe3e480620",
+   "selection_primary": 0.6048792975351228,
+   "status": "COMPLETE",
+   "times_selected_as_parent": 0
+  },
+  {
+   "children": [],
+   "decision": "REJECT",
+   "execution_mode": "custom_patch",
+   "mechanism": "strictly-prior-date user-by-tab affinity features",
+   "node_id": "n007",
+   "operator_stack": null,
+   "parent_node_id": "w003",
+   "pipeline_sha256": "6260754fa0c842653874927c5acce4273e34eda8adb1d83b08ace7dd88f03750",
+   "selection_primary": null,
+   "status": "FAILED",
+   "times_selected_as_parent": 0
+  },
+  {
+   "children": [],
+   "decision": "REJECT",
+   "execution_mode": "custom_patch",
+   "mechanism": "valid-watch-ratio soft-label shaping",
+   "node_id": "n008",
+   "operator_stack": null,
+   "parent_node_id": "w002",
+   "pipeline_sha256": "76d37ca071085c81e126379e10f25bd48561ad36460bdc954ead2a0a7a0cb8bf",
+   "selection_primary": null,
+   "status": "FAILED",
+   "times_selected_as_parent": 0
+  },
+  {
+   "children": [],
+   "decision": "ROLLBACK",
+   "execution_mode": "custom_patch",
+   "mechanism": "tab-6 importance-weighted BPR training",
+   "node_id": "n009",
+   "operator_stack": null,
+   "parent_node_id": "w001",
+   "pipeline_sha256": "37c56577fe2c83ca3766c3f7b228878aa54f64be0ab93866dc1ddbd555a3ca13",
+   "selection_primary": 0.6046269947114137,
+   "status": "COMPLETE",
+   "times_selected_as_parent": 0
+  },
+  {
+   "children": [],
+   "decision": "UNCERTAIN",
+   "execution_mode": "custom_patch",
+   "mechanism": "strictly_prior_exposure_affinity_features",
+   "node_id": "n010",
+   "operator_stack": null,
+   "parent_node_id": "w003",
+   "pipeline_sha256": "1dfa3e9467108f2a6fcb4e20c3c4f086c328436e353b847b1452910e52d286bc",
+   "selection_primary": 0.6013137305403489,
+   "status": "COMPLETE",
+   "times_selected_as_parent": 0
+  },
+  {
+   "children": [],
+   "decision": "REJECT",
+   "execution_mode": "custom_patch",
+   "mechanism": "replace weak hate auxiliary head with profile-enter supervision",
+   "node_id": "n011",
+   "operator_stack": null,
+   "parent_node_id": "w002",
+   "pipeline_sha256": "8190030849857d4dea3009845ec3ca1555db0ecc05ef05212a41b3987384feab",
+   "selection_primary": null,
+   "status": "FAILED",
+   "times_selected_as_parent": 0
+  },
+  {
+   "children": [],
+   "decision": "ORCHESTRATOR_ERROR",
+   "execution_mode": "custom_patch",
+   "mechanism": "user-uniform pairwise FM training",
+   "node_id": "n012",
+   "operator_stack": null,
+   "parent_node_id": "w001",
+   "pipeline_sha256": "ae8ee8fe535057c5e6a68d5ba2f92059cde092fa3727eb4e49d9263bf53b1abe",
+   "selection_primary": null,
+   "status": "ORCHESTRATOR_ERROR",
+   "times_selected_as_parent": 0
+  },
+  {
+   "children": [],
+   "decision": "UNCERTAIN",
+   "execution_mode": "custom_patch",
+   "mechanism": "label-free repeat-exposure affinity features",
+   "node_id": "n013",
+   "operator_stack": null,
+   "parent_node_id": "w003",
+   "pipeline_sha256": "e92ece619950f1055f4aad8d5033fda1851983d7f69980b739d79bcb5ed76206",
+   "selection_primary": 0.6016871257980373,
+   "status": "COMPLETE",
+   "times_selected_as_parent": 0
+  },
+  {
+   "children": [],
+   "decision": "REJECT",
+   "execution_mode": "custom_patch",
+   "mechanism": "watch-aligned multi-task auxiliary targets",
+   "node_id": "n014",
+   "operator_stack": null,
+   "parent_node_id": "w002",
+   "pipeline_sha256": "600e775b1f946cd10e62f5bebbf4163d51349a6f21b6dcb0d5a6f153aa9ab836",
+   "selection_primary": null,
+   "status": "FAILED",
+   "times_selected_as_parent": 0
+  },
+  {
+   "children": [],
+   "decision": "ROLLBACK",
+   "execution_mode": "custom_patch",
+   "mechanism": "macro-user-balanced pairwise FM training",
+   "node_id": "n015",
+   "operator_stack": null,
+   "parent_node_id": "w001",
+   "pipeline_sha256": "29ac68083784b51afa64e82e15788620fff8cedfcd6471d9201c5932353fd858",
+   "selection_primary": 0.5958773271682127,
+   "status": "COMPLETE",
+   "times_selected_as_parent": 0
+  },
+  {
+   "children": [
+    "n003",
+    "n006",
+    "n009",
+    "n012",
+    "n015"
+   ],
+   "decision": "ACCEPT",
+   "execution_mode": "empirical_prior_portfolio",
+   "mechanism": "Validated legal ranking stack",
+   "node_id": "w001",
+   "operator_stack": [
+    "legal_rank_stack_v1"
+   ],
+   "parent_node_id": "n000",
+   "pipeline_sha256": "960c2c3af18107d8def79c6e969d2be9870d70f29465e1ed68f033f23aad4f8d",
+   "selection_primary": 0.6049133715527031,
+   "status": "COMPLETE",
+   "times_selected_as_parent": 5
+  },
+  {
+   "children": [
+    "n002",
+    "n005",
+    "n008",
+    "n011",
+    "n014"
+   ],
+   "decision": "ACCEPT",
+   "execution_mode": "empirical_prior_portfolio",
+   "mechanism": "CPU DeepFM + four engagement heads",
+   "node_id": "w002",
+   "operator_stack": [
+    "deepfm_engagement_mtl_v1"
+   ],
+   "parent_node_id": "n000",
+   "pipeline_sha256": "2b3ae1494c2fe98e6dc6de77f09d3488d094f2f40c27837031b5a7e5ecedc447",
+   "selection_primary": 0.6047517554743435,
+   "status": "COMPLETE",
+   "times_selected_as_parent": 5
+  },
+  {
+   "children": [
+    "n004",
+    "n007",
+    "n010",
+    "n013"
+   ],
+   "decision": "ROLLBACK",
+   "execution_mode": "empirical_prior_portfolio",
+   "mechanism": "Item/context LambdaRank",
+   "node_id": "w003",
+   "operator_stack": [
+    "item_lambdarank"
+   ],
+   "parent_node_id": "n000",
+   "pipeline_sha256": "5a61d820798d697c7c097c674315d9ac31aeb101a97c152ec46cfa9ff58e54c0",
+   "selection_primary": 0.6010575837714116,
+   "status": "COMPLETE",
+   "times_selected_as_parent": 4
+  }
+ ],
+ "provenance": {
+  "note": "Distilled from the full run workspace: decisions, metrics and gate outcomes only. Seed prediction arrays and pipeline sources stay local.",
+  "source_run_dir": "../runs/pilot-15round-gpt56sol-20260831-001"
+ },
+ "role": "pilot",
+ "run_id": "pilot-15round-gpt56sol-20260831-001",
+ "seeds": [
+  0,
+  1,
+  2
+ ],
+ "stop_reason": "iteration_cap",
+ "summary": {
+  "accepted": 2,
+  "convergence": {
+   "best_history": [
+    0.6018779688793552,
+    0.6061277485758569,
+    0.6061277485758569,
+    0.6061277485758569,
+    0.6061277485758569,
+    0.6061277485758569,
+    0.6061277485758569,
+    0.6061277485758569,
+    0.6061277485758569,
+    0.6061277485758569,
+    0.6061277485758569,
+    0.6061277485758569,
+    0.6061277485758569,
+    0.6061277485758569,
+    0.6061277485758569,
+    0.6061277485758569
+   ],
+   "consecutive_small_gain": 14,
+   "epsilon": 0.002,
+   "pilot_override": true,
+   "required_consecutive": 3,
+   "stopping_enabled": false
+  },
+  "failed": 5,
+  "iterations_executed": 15,
+  "manual_interventions": 0,
+  "planning_errors": 0,
+  "post_run_integrity_gate": "PASS",
+  "rolled_back": 7,
+  "test_labels_used_for_selection": false,
+  "uncertain": 3,
+  "validation_labels_exposed_to_candidate": false
+ },
+ "terminated_early": false,
+ "usage": {
+  "calls": 115,
+  "completion_tokens": 194273,
+  "prompt_tokens": 689222,
+  "total_tokens": 883495,
+  "wall_s": 6723.808
+ }
+}

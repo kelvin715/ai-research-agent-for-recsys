@@ -3,6 +3,9 @@
 The dashboard shows the real graph saved by the agent. It is not a manually drawn reconstruction.
 It can follow a running experiment or replay the submitted experiment records.
 
+For reviewers who do not start the local viewer, [RUN_LOGS.md](RUN_LOGS.md) contains a static
+Mermaid snapshot of the submitted graph plus the exact success, uncertainty, and rollback analysis.
+
 ## Start the viewer
 
 For a running experiment:
@@ -36,6 +39,13 @@ standard library, and all page assets are included in `visualization/experiment-
 - **Rose nodes** were rolled back after measurement.
 - **Gray nodes** stopped during planning or implementation.
 - **Blue nodes** are currently being planned, checked, trained, or scored.
+
+Node color describes the node's own continuation evidence; it does not by itself decide portfolio
+membership. In the submitted graph, `w003` is rose because it was rolled back as a standalone
+successor, yet it still connects to the best portfolio because its different errors improve the
+combination. Conversely, `n002` is amber and has the highest new standalone score, but it was not
+deployed because its challenger portfolio was worse. This deliberate separation is part of the
+method, not a visualization exception.
 
 Selecting a node opens a compact evidence panel containing:
 

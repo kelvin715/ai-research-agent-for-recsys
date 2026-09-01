@@ -25,7 +25,12 @@ The warm start is not a hand-written answer added only for the demonstration. Du
 
 The final recorded run received all verified prior evidence so the best earlier discovery would be available. It still had to retrain each warm-start model, check the code and prediction hashes, and reconstruct the expected combined score before starting new search. In this way, prior evidence is executable state carried between agent runs rather than a list of suggestions or an old leaderboard number.
 
-The official stopping rule ends a run after three consecutive gains no larger than `0.002`, with a maximum of 50 iterations. Because the reproduced score was already high, the recorded run stopped after three new experiments. A separate 50-round pilot with this early stop disabled is planned to measure longer-horizon search and will be reported as supplementary evidence.
+The official stopping rule ends a run after three consecutive best-result gains no larger than
+`0.002`, with a maximum of 50 iterations. The threshold is a convergence trigger, not a minimum
+useful effect: the agent is explicitly instructed to prefer a credible smaller gain over a
+speculative threshold-crossing claim. Because the reproduced portfolio was already strong, three
+new candidates produced only small standalone changes and no deployed gain, so the recorded run
+stopped.
 
 ## AIDE: from code-tree search to combination-aware branch search
 

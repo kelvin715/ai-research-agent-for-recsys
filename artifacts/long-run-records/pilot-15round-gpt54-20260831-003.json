@@ -1,0 +1,788 @@
+{
+ "baseline_selection_primary": 0.6018779688793552,
+ "best_new_single_model_primary": 0.6052800193085559,
+ "convergence_stop_enabled": false,
+ "deployed_portfolio_primary": 0.6061277485758569,
+ "iteration_decision_counts": {
+  "ORCHESTRATOR_ERROR": 2,
+  "REJECT": 1,
+  "ROLLBACK": 6,
+  "TERMINATED": 1,
+  "UNCERTAIN": 3,
+  "WARMSTART_VERIFIED": 1
+ },
+ "iterations": [
+  {
+   "basis_type": null,
+   "decision": "WARMSTART_VERIFIED",
+   "execution_mode": "empirical_prior_portfolio",
+   "implementation_attempts": 0,
+   "iteration": 1,
+   "mechanism": "Reproduce the locked validation-only portfolio before LLM search.",
+   "next_lesson": "Start novel LLM search at logical iteration 2.",
+   "node_id": null,
+   "parent_node_id": null,
+   "planning_attempts": 0,
+   "primary_block": null,
+   "reflection_result": "supported",
+   "status": "COMPLETE",
+   "usage": {
+    "calls": 0,
+    "completion_tokens": 0,
+    "llm_latency_s": 0,
+    "prompt_tokens": 0,
+    "total_tokens": 0
+   },
+   "wall_s": 157.891
+  },
+  {
+   "GAUC_mean": 0.6719898024552714,
+   "basis_type": "task_spec",
+   "candidate_entered_challenger": true,
+   "challenger_delta_vs_incumbent": -0.0002527445864699551,
+   "challenger_paired_ci95": [
+    -0.0011832933222168441,
+    0.0007566694622673477
+   ],
+   "challenger_primary": 0.605875003989387,
+   "decision": "UNCERTAIN",
+   "deployed_primary_after": 0.6061277485758569,
+   "execution_mode": "operator",
+   "implementation_attempts": 1,
+   "iteration": 2,
+   "matched_seed_deltas": [
+    -0.0001499772178518155,
+    7.719835313002577e-06,
+    -0.00044749801613985785
+   ],
+   "mean_matched_seed_delta": -0.00019658513289289026,
+   "mechanism": "temporal-context feature augmentation",
+   "nDCG@5_mean": 0.5377429765691056,
+   "next_lesson": "Legal temporal context is active but weak and slice-dependent here, so treat it as a non-robust variant unless a future single-change follow-up can target the favorable slices without hurting the rest.",
+   "node_id": "n002",
+   "paired_ci95_vs_parent": [
+    -0.0008303693600360373,
+    0.00193394072380294
+   ],
+   "paired_delta_vs_parent": 0.0005282638342124502,
+   "paired_excludes_zero": false,
+   "parent_node_id": "w002",
+   "planning_attempts": 1,
+   "primary_block": "features",
+   "promoted": false,
+   "promotion_gate": "positive paired CI95 lower bound OR >=2/3 matched seeds positive, mean gain >= 0.0001, worst seed >= -5e-05",
+   "reflection_result": "inconclusive",
+   "standalone_primary": 0.6052800193085559,
+   "status": "COMPLETE",
+   "usage": {
+    "calls": 5,
+    "completion_tokens": 6174,
+    "llm_latency_s": 92.275,
+    "prompt_tokens": 33527,
+    "total_tokens": 39701
+   },
+   "wall_s": 253.253
+  },
+  {
+   "GAUC_mean": 0.6708934651567291,
+   "basis_type": "diagnostic",
+   "candidate_entered_challenger": false,
+   "challenger_delta_vs_incumbent": null,
+   "challenger_paired_ci95": null,
+   "challenger_primary": null,
+   "decision": "ROLLBACK",
+   "deployed_primary_after": 0.6061277485758569,
+   "execution_mode": "custom_patch",
+   "implementation_attempts": 1,
+   "iteration": 3,
+   "matched_seed_deltas": null,
+   "mean_matched_seed_delta": null,
+   "mechanism": "tab-aware score calibration at prediction",
+   "nDCG@5_mean": 0.5377302286565953,
+   "next_lesson": "Do not hand-code tab-specific predict-time score remaps from prior slice feedback; prefer learned train-time interactions or richer context features.",
+   "node_id": "n003",
+   "paired_ci95_vs_parent": [
+    -0.00036965772729180834,
+    5.9843739064341325e-05
+   ],
+   "paired_delta_vs_parent": -0.0001529057691886937,
+   "paired_excludes_zero": false,
+   "parent_node_id": "w001",
+   "planning_attempts": 1,
+   "primary_block": "predict",
+   "promoted": false,
+   "promotion_gate": "positive paired CI95 lower bound OR >=2/3 matched seeds positive, mean gain >= 0.0001, worst seed >= -5e-05",
+   "reflection_result": "not_supported",
+   "standalone_primary": 0.6047604657835144,
+   "status": "COMPLETE",
+   "usage": {
+    "calls": 6,
+    "completion_tokens": 5376,
+    "llm_latency_s": 85.631,
+    "prompt_tokens": 33899,
+    "total_tokens": 39275
+   },
+   "wall_s": 215.652
+  },
+  {
+   "basis_type": null,
+   "decision": "ORCHESTRATOR_ERROR",
+   "execution_mode": null,
+   "failure_reason": "draft_candidates schema failed: candidates[1]: mechanism_fusion \u5fc5\u987b\u5f15\u7528\u81f3\u5c11\u4e24\u4e2a parent_references",
+   "implementation_attempts": 0,
+   "iteration": 4,
+   "mechanism": null,
+   "next_lesson": null,
+   "node_id": null,
+   "parent_node_id": null,
+   "planning_attempts": 1,
+   "primary_block": null,
+   "reflection_result": null,
+   "status": "ORCHESTRATOR_ERROR",
+   "usage": {
+    "calls": 4,
+    "completion_tokens": 8481,
+    "llm_latency_s": 146.318,
+    "prompt_tokens": 38095,
+    "total_tokens": 46576
+   },
+   "wall_s": 228.115
+  },
+  {
+   "GAUC_mean": 0.6709926144381885,
+   "basis_type": "diagnostic",
+   "candidate_entered_challenger": false,
+   "challenger_delta_vs_incumbent": null,
+   "challenger_paired_ci95": null,
+   "challenger_primary": null,
+   "decision": "ROLLBACK",
+   "deployed_primary_after": 0.6061277485758569,
+   "execution_mode": "custom_patch",
+   "implementation_attempts": 2,
+   "iteration": 5,
+   "matched_seed_deltas": null,
+   "mean_matched_seed_delta": null,
+   "mechanism": "tab-specific prediction mixture between parent model and item-popularity prior",
+   "nDCG@5_mean": 0.5370467733888916,
+   "next_lesson": "A tab-specific correction must change within-user ordering on the weak slice more effectively than a coarse item-popularity prior; otherwise it adds little or no useful diversity.",
+   "node_id": "n005",
+   "paired_ci95_vs_parent": [
+    -0.0004971115428910489,
+    3.2847883175468575e-05
+   ],
+   "paired_delta_vs_parent": -0.0002466744088756023,
+   "paired_excludes_zero": false,
+   "parent_node_id": "w002",
+   "planning_attempts": 1,
+   "primary_block": "predict",
+   "promoted": false,
+   "promotion_gate": "positive paired CI95 lower bound OR >=2/3 matched seeds positive, mean gain >= 0.0001, worst seed >= -5e-05",
+   "reflection_result": "not_supported",
+   "standalone_primary": 0.6045050810654679,
+   "status": "COMPLETE",
+   "usage": {
+    "calls": 9,
+    "completion_tokens": 8128,
+    "llm_latency_s": 159.763,
+    "prompt_tokens": 55538,
+    "total_tokens": 63666
+   },
+   "wall_s": 311.323
+  },
+  {
+   "GAUC_mean": 0.6709014449173276,
+   "basis_type": "curated_research",
+   "candidate_entered_challenger": false,
+   "challenger_delta_vs_incumbent": null,
+   "challenger_paired_ci95": null,
+   "challenger_primary": null,
+   "decision": "ROLLBACK",
+   "deployed_primary_after": 0.6061277485758569,
+   "execution_mode": "operator",
+   "implementation_attempts": 1,
+   "iteration": 6,
+   "matched_seed_deltas": null,
+   "mean_matched_seed_delta": null,
+   "mechanism": "add selected static user profile fields to FM crosses",
+   "nDCG@5_mean": 0.5373669003864158,
+   "next_lesson": "Do not add static user-profile fields to the minimal hour+user_gap FM parent without a stronger supporting mechanism, because this refinement degrades validation in the current setting.",
+   "node_id": "n006",
+   "paired_ci95_vs_parent": [
+    -0.0014161918261403532,
+    -3.7182088574294706e-05
+   ],
+   "paired_delta_vs_parent": -0.0007378004158260509,
+   "paired_excludes_zero": true,
+   "parent_node_id": "w001",
+   "planning_attempts": 1,
+   "primary_block": "features",
+   "promoted": false,
+   "promotion_gate": "positive paired CI95 lower bound OR >=2/3 matched seeds positive, mean gain >= 0.0001, worst seed >= -5e-05",
+   "reflection_result": "not_supported",
+   "standalone_primary": 0.604175571136877,
+   "status": "COMPLETE",
+   "usage": {
+    "calls": 4,
+    "completion_tokens": 3284,
+    "llm_latency_s": 107.128,
+    "prompt_tokens": 24259,
+    "total_tokens": 27543
+   },
+   "wall_s": 395.056
+  },
+  {
+   "GAUC_mean": 0.6661740677734113,
+   "basis_type": "diagnostic",
+   "candidate_entered_challenger": true,
+   "challenger_delta_vs_incumbent": 0.00021662621472340327,
+   "challenger_paired_ci95": [
+    -0.0008239964126965677,
+    0.001316298491053727
+   ],
+   "challenger_primary": 0.6063443747905803,
+   "decision": "UNCERTAIN",
+   "deployed_primary_after": 0.6061277485758569,
+   "execution_mode": "custom_patch",
+   "implementation_attempts": 2,
+   "iteration": 7,
+   "matched_seed_deltas": [
+    -0.00015751898927496288,
+    0.00019971390701067904,
+    -0.00013214208116074655
+   ],
+   "mean_matched_seed_delta": -2.9982387808343464e-05,
+   "mechanism": "tab-specialized residual blend over base lambdarank",
+   "nDCG@5_mean": 0.5355999204279299,
+   "next_lesson": "Tab-specialized residual fusion can create genuine diversification, but the next test should isolate and constrain the harmful tab segments instead of using one global residual blend.",
+   "node_id": "n007",
+   "paired_ci95_vs_parent": [
+    -0.0007888344716550366,
+    0.0011032652758651532
+   ],
+   "paired_delta_vs_parent": 0.00013414459046257043,
+   "paired_excludes_zero": false,
+   "parent_node_id": "w003",
+   "planning_attempts": 1,
+   "primary_block": "train",
+   "promoted": false,
+   "promotion_gate": "positive paired CI95 lower bound OR >=2/3 matched seeds positive, mean gain >= 0.0001, worst seed >= -5e-05",
+   "reflection_result": "inconclusive",
+   "standalone_primary": 0.6011917283618742,
+   "status": "COMPLETE",
+   "usage": {
+    "calls": 9,
+    "completion_tokens": 9422,
+    "llm_latency_s": 214.986,
+    "prompt_tokens": 58111,
+    "total_tokens": 67533
+   },
+   "wall_s": 382.24
+  },
+  {
+   "basis_type": "curated_research",
+   "candidate_entered_challenger": false,
+   "challenger_delta_vs_incumbent": null,
+   "challenger_paired_ci95": null,
+   "challenger_primary": null,
+   "decision": "REJECT",
+   "deployed_primary_after": 0.6061277485758569,
+   "execution_mode": "custom_patch",
+   "failure_reason": {
+    "audit": {
+     "analysis": "The candidate does implement the claimed watch-target construction, custom model head, and mixed censored watch loss with real gradient consumers, and it does not use watch-time as an inference feature. However, fail-closed applies because predictions are still produced by opaque delegated SO.predict on a custom model class outside the trusted backend contract, so executable prediction change is not evidenced. Additionally, the custom replacement introduces its own best-train-loss checkpoint rule without contract support, creating an undeclared runtime behavior change.",
+     "changed_runtime_path": true,
+     "component_evidence": [
+      {
+       "code_evidence": "In build_target(), base = SO.build_target(...); then ratio, valid = DV.watch_ratio(), duration_ms = np.asarray(train.duration_ms,...), watch_ms = safe_ratio * safe_duration, watch_t = log1p(watch_ms)/12, dur_t = log1p(safe_duration)/12, and outputs include watch_time_target/watch_time_valid/watch_time_complete/watch_time_incomplete/watch_time_duration_target.",
+       "component": "target construction from DV.watch_ratio() and duration_ms in target block"
+      },
+      {
+       "code_evidence": "In model block, class DeepFMMTLWatch(nn.Module) defines self.watch_head = nn.Linear(in_dim, 1) and forward() returns {'main': main, 'aux': aux, 'watch': watch}.",
+       "component": "model extension with one scalar watch-time head in model block"
+      },
+      {
+       "code_evidence": "In train(), main_loss = BCEWithLogits(out['main'], y_main), aux_loss = BCEWithLogits(out['aux'], y_aux); watch loss uses smooth_l1 on incomplete rows and squared hinge relu(dur_b - watch_pred)^2 on complete rows, then loss = main_loss + aux_weight * aux_loss + watch_weight * watch_loss.",
+       "component": "train loss combining main long_view objective with censored watch-time loss in train block"
+      }
+     ],
+     "forbidden_shortcuts_found": [
+      "changed code cannot alter predictions at inference because predict() still delegates to SO.predict(model, Xs, split), while the trusted backend contract only guarantees SO.predict for models returned by SO.train on the delegated torch_deepfm_mtl path; no visible delegated code shows it can consume the custom DeepFMMTLWatch model, so prediction dataflow from the added head/custom trainer to output is unproven",
+      "custom training path replaces delegated backend but does not preserve the contract's fixed train-only checkpoint policy evidence. The accepted contract requires a fixed train-only checkpoint policy inside candidate code; candidate uses best total training loss over epochs, but this grouping/checkpoint rule is a new undeclared replacement of the parent training behavior rather than a contract-backed visible equivalent"
+     ],
+     "missing_components": [],
+     "status": "REVISE"
+    },
+    "kind": "experiment_contract"
+   },
+   "implementation_attempts": 3,
+   "iteration": 8,
+   "matched_seed_deltas": null,
+   "mean_matched_seed_delta": null,
+   "mechanism": "censored watch-time auxiliary head for long_view",
+   "next_lesson": "When replacing a parent training stack, make prediction and checkpoint behavior explicitly contract-safe in-code before interpreting any validation gain.",
+   "node_id": "n008",
+   "parent_node_id": "w002",
+   "planning_attempts": 1,
+   "primary_block": "train",
+   "promoted": false,
+   "promotion_gate": "positive paired CI95 lower bound OR >=2/3 matched seeds positive, mean gain >= 0.0001, worst seed >= -5e-05",
+   "reflection_result": "not_supported",
+   "status": "FAILED",
+   "usage": {
+    "calls": 11,
+    "completion_tokens": 14014,
+    "llm_latency_s": 255.621,
+    "prompt_tokens": 73999,
+    "total_tokens": 88013
+   },
+   "wall_s": 503.282
+  },
+  {
+   "GAUC_mean": 0.4941000651474606,
+   "basis_type": "curated_research",
+   "candidate_entered_challenger": false,
+   "challenger_delta_vs_incumbent": null,
+   "challenger_paired_ci95": null,
+   "challenger_primary": null,
+   "decision": "ROLLBACK",
+   "deployed_primary_after": 0.6061277485758569,
+   "execution_mode": "custom_patch",
+   "implementation_attempts": 3,
+   "iteration": 9,
+   "matched_seed_deltas": null,
+   "mean_matched_seed_delta": null,
+   "mechanism": "multi-target soft-label long_view training",
+   "nDCG@5_mean": 0.4631561053630889,
+   "next_lesson": "Do not replace the proven pairwise censored-watch objective with a blended soft pointwise target; if reward shaping is revisited, keep long_view-centered pairwise ranking and test only a minimal auxiliary formulation.",
+   "node_id": "n009",
+   "paired_ci95_vs_parent": [
+    -0.13204225301270067,
+    -0.12267597538479677
+   ],
+   "paired_delta_vs_parent": -0.12730439758399714,
+   "paired_excludes_zero": true,
+   "parent_node_id": "w001",
+   "planning_attempts": 1,
+   "primary_block": "target",
+   "promoted": false,
+   "promotion_gate": "positive paired CI95 lower bound OR >=2/3 matched seeds positive, mean gain >= 0.0001, worst seed >= -5e-05",
+   "reflection_result": "failed",
+   "standalone_primary": 0.47760897396870594,
+   "status": "COMPLETE",
+   "usage": {
+    "calls": 10,
+    "completion_tokens": 9729,
+    "llm_latency_s": 189.613,
+    "prompt_tokens": 63019,
+    "total_tokens": 72748
+   },
+   "wall_s": 323.89
+  },
+  {
+   "GAUC_mean": 0.6657545149648273,
+   "basis_type": "current_code",
+   "candidate_entered_challenger": false,
+   "challenger_delta_vs_incumbent": null,
+   "challenger_paired_ci95": null,
+   "challenger_primary": null,
+   "decision": "ROLLBACK",
+   "deployed_primary_after": 0.6061277485758569,
+   "execution_mode": "custom_patch",
+   "implementation_attempts": 1,
+   "iteration": 10,
+   "matched_seed_deltas": null,
+   "mean_matched_seed_delta": null,
+   "mechanism": "train-only user-author affinity count features",
+   "nDCG@5_mean": 0.5353885012006826,
+   "next_lesson": "Naive train-only pair-count affinity features are too sparse or redundant here; next personalization attempt should use a stronger backoff design rather than raw user-item/video memorization counts.",
+   "node_id": "n010",
+   "paired_ci95_vs_parent": [
+    -0.0011861589289728525,
+    0.0009444088297450523
+   ],
+   "paired_delta_vs_parent": -0.00014599092509692824,
+   "paired_excludes_zero": false,
+   "parent_node_id": "w003",
+   "planning_attempts": 1,
+   "primary_block": "features",
+   "promoted": false,
+   "promotion_gate": "positive paired CI95 lower bound OR >=2/3 matched seeds positive, mean gain >= 0.0001, worst seed >= -5e-05",
+   "reflection_result": "not_supported",
+   "standalone_primary": 0.6009115928463147,
+   "status": "COMPLETE",
+   "usage": {
+    "calls": 9,
+    "completion_tokens": 15429,
+    "llm_latency_s": 310.38,
+    "prompt_tokens": 61460,
+    "total_tokens": 76889
+   },
+   "wall_s": 467.201
+  },
+  {
+   "basis_type": null,
+   "decision": "ORCHESTRATOR_ERROR",
+   "execution_mode": null,
+   "failure_reason": "draft_candidates schema failed: candidates[1]: diagnostic evidence \u5fc5\u987b\u5f15\u7528\u5177\u4f53\u6570\u503c; evidence[2].ref='Within-user metrics require personalization via (user,candidate-item) interactions; temporal context changes candidate context rather than per-user constants'",
+   "implementation_attempts": 0,
+   "iteration": 11,
+   "mechanism": null,
+   "next_lesson": null,
+   "node_id": null,
+   "parent_node_id": null,
+   "planning_attempts": 1,
+   "primary_block": null,
+   "reflection_result": null,
+   "status": "ORCHESTRATOR_ERROR",
+   "usage": {
+    "calls": 4,
+    "completion_tokens": 8575,
+    "llm_latency_s": 129.307,
+    "prompt_tokens": 39794,
+    "total_tokens": 48369
+   },
+   "wall_s": 319.586
+  },
+  {
+   "GAUC_mean": 0.6644770063566949,
+   "basis_type": "diagnostic",
+   "candidate_entered_challenger": false,
+   "challenger_delta_vs_incumbent": null,
+   "challenger_paired_ci95": null,
+   "challenger_primary": null,
+   "decision": "ROLLBACK",
+   "deployed_primary_after": 0.6061277485758569,
+   "execution_mode": "custom_patch",
+   "implementation_attempts": 1,
+   "iteration": 12,
+   "matched_seed_deltas": null,
+   "mean_matched_seed_delta": null,
+   "mechanism": "pointwise long_view target for probability-style error diversification",
+   "nDCG@5_mean": 0.5344251354489836,
+   "next_lesson": "Keep the official long_view target if needed, but preserve the pairwise censored-watch objective; objective-family switching alone was a net negative here.",
+   "node_id": "n012",
+   "paired_ci95_vs_parent": [
+    -0.006985271057388248,
+    -0.0033271836431576583
+   ],
+   "paired_delta_vs_parent": -0.005117702403826252,
+   "paired_excludes_zero": true,
+   "parent_node_id": "w001",
+   "planning_attempts": 1,
+   "primary_block": "train",
+   "promoted": false,
+   "promotion_gate": "positive paired CI95 lower bound OR >=2/3 matched seeds positive, mean gain >= 0.0001, worst seed >= -5e-05",
+   "reflection_result": "not_supported",
+   "standalone_primary": 0.5997956691488768,
+   "status": "COMPLETE",
+   "usage": {
+    "calls": 8,
+    "completion_tokens": 8655,
+    "llm_latency_s": 174.346,
+    "prompt_tokens": 54340,
+    "total_tokens": 62995
+   },
+   "wall_s": 313.339
+  },
+  {
+   "GAUC_mean": 0.6657972932786728,
+   "basis_type": "diagnostic",
+   "candidate_entered_challenger": false,
+   "challenger_delta_vs_incumbent": null,
+   "challenger_paired_ci95": null,
+   "challenger_primary": null,
+   "decision": "UNCERTAIN",
+   "deployed_primary_after": 0.6061277485758569,
+   "execution_mode": "custom_patch",
+   "implementation_attempts": 1,
+   "iteration": 13,
+   "matched_seed_deltas": null,
+   "mean_matched_seed_delta": null,
+   "mechanism": "tab-specific monotone score calibration on LambdaRank outputs",
+   "nDCG@5_mean": 0.5354351508419706,
+   "next_lesson": "Fixed hand-chosen tab-wise score transforms are too weak or mis-targeted here; if tab context matters, test a single train-time tab interaction model rather than predict-time calibration.",
+   "node_id": "n013",
+   "paired_ci95_vs_parent": [
+    -7.93303322817962e-05,
+    0.0004521349047575035
+   ],
+   "paired_delta_vs_parent": 0.00018501054231023772,
+   "paired_excludes_zero": false,
+   "parent_node_id": "w003",
+   "planning_attempts": 1,
+   "primary_block": "predict",
+   "promoted": false,
+   "promotion_gate": "positive paired CI95 lower bound OR >=2/3 matched seeds positive, mean gain >= 0.0001, worst seed >= -5e-05",
+   "reflection_result": "inconclusive",
+   "standalone_primary": 0.6012425943137218,
+   "status": "COMPLETE",
+   "usage": {
+    "calls": 7,
+    "completion_tokens": 9451,
+    "llm_latency_s": 138.853,
+    "prompt_tokens": 45925,
+    "total_tokens": 55376
+   },
+   "wall_s": 477.856
+  },
+  {
+   "basis_type": null,
+   "decision": "TERMINATED",
+   "execution_mode": null,
+   "implementation_attempts": 0,
+   "iteration": 14,
+   "mechanism": null,
+   "next_lesson": null,
+   "node_id": null,
+   "parent_node_id": null,
+   "planning_attempts": 1,
+   "primary_block": null,
+   "reflection_result": null,
+   "status": "TERMINATED",
+   "usage": null,
+   "wall_s": null
+  }
+ ],
+ "iterations_cap": 15,
+ "journal_iterations": 13,
+ "label_boundary": {
+  "note": "Validation-only pilot: no submission was produced and no hidden-test label entered any selection decision.",
+  "submission_written": false,
+  "test_labels_used_anywhere": false
+ },
+ "model": "gpt-5.4",
+ "nodes": [
+  {
+   "children": [
+    "w001",
+    "w002",
+    "w003"
+   ],
+   "decision": "BASELINE",
+   "execution_mode": "baseline",
+   "mechanism": "official FM baseline",
+   "node_id": "n000",
+   "operator_stack": [],
+   "parent_node_id": null,
+   "pipeline_sha256": "41f6fb3e5cdbdea6ba76a2b8925f2e1b29d3bcd1b88de29fa326f65f3b6efe2a",
+   "selection_primary": 0.6018779688793552,
+   "status": "COMPLETE",
+   "times_selected_as_parent": 0
+  },
+  {
+   "children": [],
+   "decision": "UNCERTAIN",
+   "execution_mode": "operator",
+   "mechanism": "temporal-context feature augmentation",
+   "node_id": "n002",
+   "operator_stack": [
+    "deepfm_engagement_mtl_v1",
+    "legal_temporal_context"
+   ],
+   "parent_node_id": "w002",
+   "pipeline_sha256": "79abf9cca5e5397b1c6654f826bc2accf69710e1a74728f6f21314b7cbabbb5c",
+   "selection_primary": 0.6052800193085559,
+   "status": "COMPLETE",
+   "times_selected_as_parent": 0
+  },
+  {
+   "children": [],
+   "decision": "ROLLBACK",
+   "execution_mode": "custom_patch",
+   "mechanism": "tab-aware score calibration at prediction",
+   "node_id": "n003",
+   "operator_stack": null,
+   "parent_node_id": "w001",
+   "pipeline_sha256": "faf1a5f12ffd4abb937cc5069b4cfcb44076925f4eec981ecac0782828d17baf",
+   "selection_primary": 0.6047604657835144,
+   "status": "COMPLETE",
+   "times_selected_as_parent": 0
+  },
+  {
+   "children": [],
+   "decision": "ROLLBACK",
+   "execution_mode": "custom_patch",
+   "mechanism": "tab-specific prediction mixture between parent model and item-popularity prior",
+   "node_id": "n005",
+   "operator_stack": null,
+   "parent_node_id": "w002",
+   "pipeline_sha256": "23c5a64516fa509fc2a0eb0c84af9680d1ef8fe39ab4f02f3d490fad5d4e8b40",
+   "selection_primary": 0.6045050810654679,
+   "status": "COMPLETE",
+   "times_selected_as_parent": 0
+  },
+  {
+   "children": [],
+   "decision": "ROLLBACK",
+   "execution_mode": "operator",
+   "mechanism": "add selected static user profile fields to FM crosses",
+   "node_id": "n006",
+   "operator_stack": [
+    "legal_rank_stack_v1",
+    "selected_user_profile"
+   ],
+   "parent_node_id": "w001",
+   "pipeline_sha256": "96119ca56f3d25beaf25f93a5516833d7aff0a4d08f9de35d685ab1e25ad540e",
+   "selection_primary": 0.604175571136877,
+   "status": "COMPLETE",
+   "times_selected_as_parent": 0
+  },
+  {
+   "children": [],
+   "decision": "UNCERTAIN",
+   "execution_mode": "custom_patch",
+   "mechanism": "tab-specialized residual blend over base lambdarank",
+   "node_id": "n007",
+   "operator_stack": null,
+   "parent_node_id": "w003",
+   "pipeline_sha256": "098ca3e3cbeceff2f6fe2e78e1482d4e73beb383d2cdabadc18dfdc4cbd25dc6",
+   "selection_primary": 0.6011917283618742,
+   "status": "COMPLETE",
+   "times_selected_as_parent": 0
+  },
+  {
+   "children": [],
+   "decision": "REJECT",
+   "execution_mode": "custom_patch",
+   "mechanism": "censored watch-time auxiliary head for long_view",
+   "node_id": "n008",
+   "operator_stack": null,
+   "parent_node_id": "w002",
+   "pipeline_sha256": "22d9f33c0ee42dbf2cbf61eded134e4b0853703a0ced65d0df9d409a5ce19066",
+   "selection_primary": null,
+   "status": "FAILED",
+   "times_selected_as_parent": 0
+  },
+  {
+   "children": [],
+   "decision": "ROLLBACK",
+   "execution_mode": "custom_patch",
+   "mechanism": "multi-target soft-label long_view training",
+   "node_id": "n009",
+   "operator_stack": null,
+   "parent_node_id": "w001",
+   "pipeline_sha256": "038608db13b228394a335ce115283c9176ef7247ef7b25b5b92a066e0cb3e12f",
+   "selection_primary": 0.47760897396870594,
+   "status": "COMPLETE",
+   "times_selected_as_parent": 0
+  },
+  {
+   "children": [],
+   "decision": "ROLLBACK",
+   "execution_mode": "custom_patch",
+   "mechanism": "train-only user-author affinity count features",
+   "node_id": "n010",
+   "operator_stack": null,
+   "parent_node_id": "w003",
+   "pipeline_sha256": "c89b60dc4d19464c6d95166dbfe0cbe47172755d0c26cf7ff654c95435dbb34b",
+   "selection_primary": 0.6009115928463147,
+   "status": "COMPLETE",
+   "times_selected_as_parent": 0
+  },
+  {
+   "children": [],
+   "decision": "ROLLBACK",
+   "execution_mode": "custom_patch",
+   "mechanism": "pointwise long_view target for probability-style error diversification",
+   "node_id": "n012",
+   "operator_stack": null,
+   "parent_node_id": "w001",
+   "pipeline_sha256": "b6eb4d4a6b56c611857fbfee023c39679f8fbcfe9120df07063bfb4dd14329fc",
+   "selection_primary": 0.5997956691488768,
+   "status": "COMPLETE",
+   "times_selected_as_parent": 0
+  },
+  {
+   "children": [],
+   "decision": "UNCERTAIN",
+   "execution_mode": "custom_patch",
+   "mechanism": "tab-specific monotone score calibration on LambdaRank outputs",
+   "node_id": "n013",
+   "operator_stack": null,
+   "parent_node_id": "w003",
+   "pipeline_sha256": "ce6762fe2eb26cd9c741791cc9c2bb1d95ff2f92d9dbe77d6cce4d55cf7794b1",
+   "selection_primary": 0.6012425943137218,
+   "status": "COMPLETE",
+   "times_selected_as_parent": 0
+  },
+  {
+   "children": [
+    "n003",
+    "n006",
+    "n009",
+    "n012"
+   ],
+   "decision": "ACCEPT",
+   "execution_mode": "empirical_prior_portfolio",
+   "mechanism": "Validated legal ranking stack",
+   "node_id": "w001",
+   "operator_stack": [
+    "legal_rank_stack_v1"
+   ],
+   "parent_node_id": "n000",
+   "pipeline_sha256": "960c2c3af18107d8def79c6e969d2be9870d70f29465e1ed68f033f23aad4f8d",
+   "selection_primary": 0.6049133715527031,
+   "status": "COMPLETE",
+   "times_selected_as_parent": 4
+  },
+  {
+   "children": [
+    "n002",
+    "n005",
+    "n008"
+   ],
+   "decision": "ACCEPT",
+   "execution_mode": "empirical_prior_portfolio",
+   "mechanism": "CPU DeepFM + four engagement heads",
+   "node_id": "w002",
+   "operator_stack": [
+    "deepfm_engagement_mtl_v1"
+   ],
+   "parent_node_id": "n000",
+   "pipeline_sha256": "2b3ae1494c2fe98e6dc6de77f09d3488d094f2f40c27837031b5a7e5ecedc447",
+   "selection_primary": 0.6047517554743435,
+   "status": "COMPLETE",
+   "times_selected_as_parent": 5
+  },
+  {
+   "children": [
+    "n007",
+    "n010",
+    "n013"
+   ],
+   "decision": "ROLLBACK",
+   "execution_mode": "empirical_prior_portfolio",
+   "mechanism": "Item/context LambdaRank",
+   "node_id": "w003",
+   "operator_stack": [
+    "item_lambdarank"
+   ],
+   "parent_node_id": "n000",
+   "pipeline_sha256": "5a61d820798d697c7c097c674315d9ac31aeb101a97c152ec46cfa9ff58e54c0",
+   "selection_primary": 0.6010575837714116,
+   "status": "COMPLETE",
+   "times_selected_as_parent": 4
+  }
+ ],
+ "provenance": {
+  "note": "Distilled from the full run workspace: decisions, metrics and gate outcomes only. Seed prediction arrays and pipeline sources stay local.",
+  "source_run_dir": "../runs/pilot-15round-gpt54-20260831-003"
+ },
+ "role": "pilot",
+ "run_id": "pilot-15round-gpt54-20260831-003",
+ "seeds": [
+  0,
+  1,
+  2
+ ],
+ "stop_reason": "process terminated before summary",
+ "summary": {},
+ "terminated_early": true,
+ "usage": {
+  "calls": 86,
+  "completion_tokens": 106718,
+  "prompt_tokens": 581966,
+  "total_tokens": 688684,
+  "wall_s": 4348.683999999999
+ }
+}

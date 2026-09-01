@@ -47,6 +47,25 @@ Label separation, isolated training, hashes, repeated seeds, and complete logs p
 
 **Worse changes are rejected.** The final proposed combination scored `0.6060940663`, just below the saved best result of `0.6061277486`. The agent kept the better result.
 
+## What the experiment graph taught the agent
+
+The submitted graph contains one baseline, three reproduced portfolio branches, and three new
+post-warm-start branches. It records more than a final score:
+
+| Branch | What happened | What the agent learned |
+|---|---|---|
+| Pairwise ranker (`w001`) | `0.604913`; accepted | Strongest verified standalone base. |
+| DeepFM MTL (`w002`) | `0.604752`; accepted | A different neural interaction path adds portfolio value. |
+| Item LambdaRank (`w003`) | only `0.601058` alone; standalone rollback | Do not discard it from the portfolio: removing it causes the largest loss, `0.000752`. |
+| DeepFM + temporal context (`n002`) | best new standalone score, `0.605280`; portfolio `−0.000253` | A locally better member can still duplicate the ensemble's information. |
+| Pairwise `tab` calibration (`n003`) | `+0.000101` alone; portfolio `−0.000034` | A connected implementation is not enough; the intended weak slices must actually improve. |
+| LambdaRank `tab` residual (`n004`) | `+0.000015` alone; did not enter the best challenger | Portfolio-relative slice weakness does not directly provide a reliable correction constant. |
+
+This is the advantage of a graph over an overwrite-and-retry loop. A rollback preserves the exact
+code, measurements, and lesson. A weak standalone branch can keep a portfolio role, while a stronger
+standalone child can be withheld from deployment. “Success” means improving the complete recommender
+with repeatable evidence, not merely producing the newest high point estimate.
+
 ## How the warm start was created
 
 Development and demonstration were intentionally separated.
@@ -55,7 +74,13 @@ During the discovery stage, the agent continued searching across repeated sessio
 
 For the final reproducible run, GPT-5.4 received all verified prior evidence. It first retrained all three warm-start models with three seeds, checked their hashes and scores, and reconstructed the expected `0.6061277486` result. Only then could it propose new changes. This shows that the prior is executable knowledge, not a copied leaderboard number.
 
-The challenge permits at most 50 iterations and requires convergence after three consecutive improvements of no more than `0.002`. Because the score was already near saturation, the final run reached this condition after three post-warm-start experiments. The short run reflects the required stopping rule, not a three-iteration limit in the agent. We plan a separate 50-round pilot with the early stop disabled to study longer-term search; its result will be reported as supplementary evidence.
+The challenge permits at most 50 iterations and requires convergence after three consecutive best-result gains of no more than `0.002` (`N=3`, `ε=0.002`). This is a stopping trigger, not a minimum useful effect. Since primary is the mean of GAUC and nDCG@5, resetting the counter requires their combined change to exceed `0.004`. The `0.002` threshold is also about 47% of the final system's complete `0.004250` gain over our reproduced baseline.
+
+At the strong warm-start operating point, the realistic marginal changes were much smaller. Some
+creative ideas improved a member by `1e-5` to `5e-4`, but none improved the verified portfolio. The
+deployed best history therefore stayed at `0.606128` for three rounds and the run stopped. We call
+this local convergence under the required rule—not proof that the metric has no remaining
+mathematical headroom, and not a three-iteration limitation of the agent.
 
 ## Earlier work and our extension
 
@@ -95,17 +120,36 @@ The hardest part was correcting the search objective. If the agent expanded only
 
 A second challenge was preventing small validation changes from being overstated. The `tab` weights improved all three seed comparisons, but the measured gain was small. We report both the gain and its uncertainty.
 
+A third challenge was the scale mismatch created by `N=3`, `ε=0.002`. Once a heterogeneous warm
+start had captured most easy gains, plausible refinements were an order of magnitude smaller than
+the reset threshold. The agent still tested the most credible sub-threshold ideas, but promotion
+depended on repeated standalone and portfolio evidence. This prevented a creative but unstable
+change from surviving merely because its single fitted score looked higher.
+
+The strongest example is the final challenger router. Its raw point estimate reached `0.606411`,
+but the three matched-seed changes were `+0.000072`, `+0.000068`, and `−0.000017`; the confidence
+interval crossed zero. The router failed its predeclared gate. The verified challenger without it
+scored `0.606094`, so the system retained `0.606128`.
+
 ## What we learned
 
 - The best branch to explore is not always the current highest-scoring model.
 - Model-combination value should guide research, not appear only after research is finished.
 - Prior knowledge is most useful when it can be reproduced and traced to executable code.
 - Repeated experiments are necessary because one training result can be lucky or unlucky.
+- A standalone gain and a portfolio gain answer different questions; both must be recorded.
+- Failed evidence should narrow the next hypothesis, not erase the branch that produced it.
 - Rejecting a nearly equal but worse result is as important as finding a better one.
 
-## What is next
+## Team and contributions
 
-The next steps are to run the supplementary 50-round search, repeat weight selection on another time period, choose one set of weights across both periods, and train a smaller single model to reproduce the three-model output at lower serving cost.
+| Member | Contact | Contribution |
+|---|---|---|
+| **Zhihan Yang** | zhihan.yang@u.nus.edu | Idea, system design, core implementation, agent runtime, model portfolio, experiments, and final integration. |
+| **Li Haixin** | e1113229@u.nus.edu | Evaluation contracts, quality assurance, tests, preflight checks, robustness review, and result reproduction. |
+| **Dong Yicheng** | DONG0195@e.ntu.edu.sg | Experiment analysis, graph and dashboard review, decision-trace verification, and result visualization. |
+| **Minxi Chen** | chen1997@e.ntu.edu.sg | README and Devpost review, judge-facing explanation, experiment narrative, and submission checklist. |
+| **Qian Nuowen** | qian_nuowen@u.nus.edu | Prior-art and public-solution research, baseline comparison, method-lineage review, and diagnostic-design feedback. |
 
 ## Built with
 
