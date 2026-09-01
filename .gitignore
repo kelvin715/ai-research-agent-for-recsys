@@ -27,3 +27,7 @@ runs/
 # Local coding-assistant notes, not part of the submission
 CLAUDE.md
 
+# Submission-process working documents, kept locally
+docs/FINAL_SUBMISSION_CHECKLIST.md
+docs/DEVPOST_STORY.md
+
