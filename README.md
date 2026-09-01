@@ -419,6 +419,12 @@ The script uses GPT-5.4 and the saved warm-start settings. It creates a new expe
 
 ### 👀 Watch the experiment graph while the agent works
 
+**Try it without installing anything: [kelvin715.github.io/ai-research-agent-for-recsys](https://kelvin715.github.io/ai-research-agent-for-recsys/)**
+— the same dashboard, replaying the submitted run and both extended searches from frozen
+snapshots. Select any node to read its hypothesis, parent, three-seed scores, paired interval,
+effect on the deployed combination, and the exact evidence files. Rebuild the snapshots with
+`python3 scripts/build_demo_site.py`.
+
 After the run directory appears, start the read-only viewer in another terminal:
 
 ```bash
